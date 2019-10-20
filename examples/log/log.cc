@@ -3,6 +3,6 @@
 int main(int argc, char const *argv[])
 {
     fswWarn("warn");
-    fswError("error");
+    fswError("error");//
     return 0;
 }
