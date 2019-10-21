@@ -10,3 +10,4 @@ Makefile
 install_header.sh
 include/config.h
 clean_cmake.sh
+*.out
