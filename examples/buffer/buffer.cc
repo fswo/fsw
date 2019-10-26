@@ -32,5 +32,23 @@ int main(int argc, char const *argv[])
     assert(buffer4->length() == 19);
     assert(strcmp(buffer4->c_buffer(),s1.c_str()) == 0);
 
+    // clear function
+    Buffer *buffer5 = new Buffer(1024);
+    char test_buffer[] = "The really interesting part of the show is yet to come";
+
+    struct timeval start,end;
+    gettimeofday(&start,NULL);
+
+    // 执行100万次
+    for(int i=0;i<1000000;i++) {
+        buffer5->append(test_buffer,strlen(test_buffer));
+        buffer5->clear();
+    }
+
+    gettimeofday(&end,NULL);
+    printf("used time: %lu us\n", (end.tv_sec - start.tv_sec)*1000000+ (end.tv_usec - start.tv_usec));
+    // Buffer::clear()方法优化前，used time: 135819 us
+    // Buffer::clear()方法优化后，used time: 16661 us ， 时间上优化了8倍
+
     return 0;
 }

@@ -71,9 +71,9 @@ void Buffer::append(Buffer *buffer)
 
 void Buffer::clear()
 {
-    for (size_t i = 0; i < _length; i++)
-    {
-        _buffer[_length] = 0;
-    }
+    // for (size_t i = 0; i < _length; i++)
+    // {
+    //     _buffer[_length] = 0;
+    // }
     _length = 0;
 }
