@@ -178,7 +178,6 @@ Ctx::~Ctx()
 {
     conn->shutdown(SHUT_WR);
     conn->check_client_close();
-    conn->close();
     delete conn;
 }
 

@@ -66,8 +66,6 @@ int main(int argc, char const *argv[])
                     fswError("Error has occurred: (errno %d) %s", errno, strerror(errno));
                 }
                 fswTrace("connfd[%d] send success.", conn->get_fd());
-                conn->close();
-                fswTrace("connfd[%d] close success.", conn->get_fd());
                 delete conn;
             }, (void *)conn);
         }

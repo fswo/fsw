@@ -58,7 +58,6 @@ int main(int argc, char const *argv[])
                     fswWarn("Error has occurred: (errno %d) %s", errno, strerror(errno));
                 }
                 fswDebug("connfd[%d] send success.", conn.get_fd());
-                conn->close();
                 delete conn;
             }, (void *)conn);
         }
