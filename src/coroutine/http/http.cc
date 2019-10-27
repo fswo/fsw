@@ -190,7 +190,6 @@ size_t Ctx::parse(ssize_t recved)
     size_t nparsed;
     Socket *conn = this->conn;
 
-    conn->get_read_buf()->clear();
     nparsed = http_parser_execute(&parser, &parser_settings, conn->get_read_buf()->c_buffer(), recved);
     return nparsed;
 }
