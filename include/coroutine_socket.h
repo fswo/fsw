@@ -30,12 +30,17 @@ public:
     int shutdown(int how);
     Buffer* get_read_buf();
     Buffer* get_write_buf();
-
     bool wait_event(int event);
 
     inline int get_fd()
     {
         return sockfd;
+    }
+
+    inline void check_client_close()
+    {
+        char buffer[1];
+        while (recv(buffer, 1) > 0){}
     }
 };
 }

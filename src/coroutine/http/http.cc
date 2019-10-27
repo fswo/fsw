@@ -177,10 +177,7 @@ Ctx::Ctx(Socket *_conn)
 Ctx::~Ctx()
 {
     conn->shutdown(SHUT_WR);
-    Buffer *buffer = conn->get_read_buf();
-    char *buf = buffer->c_buffer();
-    while (conn->recv(buf, READ_BUF_MAX_SIZE) > 0){}
-    
+    conn->check_client_close();
     conn->close();
     delete conn;
 }
