@@ -39,8 +39,7 @@ public:
 
     inline void check_client_close()
     {
-        char buffer[1];
-        while (recv(buffer, 1) > 0){}
+        while (recv(read_buf->c_buffer(), READ_BUF_MAX_SIZE) > 0){}
     }
 };
 }
