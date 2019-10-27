@@ -176,6 +176,11 @@ Ctx::Ctx(Socket *_conn)
 
 Ctx::~Ctx()
 {
+    /**
+     * TODO: Perhaps we can design a protocol for TCP payload 
+     * that tells the client server that it has sent data, 
+     * so the server doesn't need to send the FIN segment.
+     */
     conn->shutdown(SHUT_WR);
     /**
      * TODO: If the client never clsoe the connection, 
