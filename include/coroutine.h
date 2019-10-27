@@ -8,12 +8,6 @@
 
 #define DEFAULT_C_STACK_SIZE          (2 *1024 * 1024)
 
-struct defer_task
-{
-    coroutine_func_t fn;
-    void *args;
-};
-
 namespace fsw
 {
 class Coroutine
@@ -51,9 +45,6 @@ protected:
     Context ctx;
     long cid;
     static long last_cid;
-    std::stack<defer_task *> *defer_tasks = nullptr;
-
-    void execute_defer_tasks();
 
     Coroutine(coroutine_func_t fn, void *private_data) :
             ctx(stack_size, fn, private_data)

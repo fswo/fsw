@@ -24,7 +24,6 @@ void handler(void *args)
     {
         fswWarn("Error has occurred: (errno %d) %s", errno, strerror(errno));
     }
-    conn->close();
     delete conn;
 }
 

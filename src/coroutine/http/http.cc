@@ -176,7 +176,19 @@ Ctx::Ctx(Socket *_conn)
 
 Ctx::~Ctx()
 {
-    conn->close();
+    /**
+     * TODO: Perhaps we can design a protocol for TCP payload 
+     * that tells the client server that it has sent data, 
+     * so the server doesn't need to send the FIN segment.
+     */
+    conn->shutdown(SHUT_WR);
+    /**
+     * TODO: If the client never clsoe the connection, 
+     * the coroutine will always be suspended, causing a memory leak. 
+     * Therefore, we need to add a timeout judgment logic to determine the timeout 
+     * in the time drive and then forcibly disconnect the connection.
+     */
+    conn->check_client_close();
     delete conn;
 }
 
@@ -185,7 +197,6 @@ size_t Ctx::parse(ssize_t recved)
     size_t nparsed;
     Socket *conn = this->conn;
 
-    conn->get_read_buf()->clear();
     nparsed = http_parser_execute(&parser, &parser_settings, conn->get_read_buf()->c_buffer(), recved);
     return nparsed;
 }

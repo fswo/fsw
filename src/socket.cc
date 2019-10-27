@@ -73,6 +73,19 @@ int fswSocket_close(int fd)
     return ret;
 }
 
+int fswSocket_shutdown(int sock, int how)
+{
+    int ret;
+
+    ret = shutdown(sock, how);
+
+    if (ret < 0)
+    {
+        fswWarn("Error has occurred: (errno %d) %s", errno, strerror(errno));
+    }
+    return ret;
+}
+
 int fswSocket_listen(int sock, int backlog)
 {
     int ret;

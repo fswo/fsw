@@ -28,13 +28,18 @@ static void http_connection_on_accept(void *arg)
     Server *server = ((http_accept_handler_args *)arg)->server;
     Socket *conn = ((http_accept_handler_args *)arg)->conn;
     Ctx *ctx = new Ctx(conn);
+    Coroutine *co = Coroutine::get_current();
+    co->defer([](void *arg)
+    {
+        Ctx *ctx = (Ctx *)arg;
+        delete ctx;
+    }, (void *)ctx);
 
     http_parser_init(&ctx->parser, HTTP_REQUEST);
 
     recved = conn->recv(conn->get_read_buf()->c_buffer(), READ_BUF_MAX_SIZE);
     if (recved == 0)
     {
-        delete ctx;
         return;
     }
 
@@ -47,7 +52,6 @@ static void http_connection_on_accept(void *arg)
     if (handler != nullptr)
     {
         handler(&(ctx->request), &(ctx->response));
-        delete ctx;
     }
 }
 

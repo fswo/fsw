@@ -47,6 +47,37 @@ void Context::context_func(void *arg)
 {
     Context *_this = (Context *) arg;
     _this->fn_(_this->private_data_);
+    _this->execute_defer_tasks();
     _this->end_ = true;
     _this->swap_out();
+}
+
+void Context::defer(coroutine_func_t _fn, void* _args)
+{
+    if (defer_tasks == nullptr)
+    {
+        defer_tasks = new std::stack<defer_task *>;
+    }
+    defer_task *task = new defer_task();
+    task->fn = _fn;
+    task->args = _args;
+    defer_tasks->push(task);
+}
+
+void Context::execute_defer_tasks()
+{
+    if (defer_tasks) {
+        defer_task *defer_task;
+        while(!defer_tasks->empty())
+        {
+            defer_task = defer_tasks->top();
+            defer_tasks->pop();
+            fswDebug("here 1");
+            defer_task->fn(defer_task->args);
+            fswDebug("here 2");
+            delete defer_task;
+        }
+        delete defer_tasks;
+        defer_tasks = nullptr;
+    }
 }

@@ -27,14 +27,19 @@ public:
     ssize_t recv(void *buf, size_t len);
     ssize_t send(const void *buf, size_t len);
     int close();
+    int shutdown(int how);
     Buffer* get_read_buf();
     Buffer* get_write_buf();
-
     bool wait_event(int event);
 
     inline int get_fd()
     {
         return sockfd;
+    }
+
+    inline void check_client_close()
+    {
+        while (recv(read_buf->c_buffer(), READ_BUF_MAX_SIZE) > 0){}
     }
 };
 }
