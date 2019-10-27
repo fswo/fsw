@@ -177,6 +177,12 @@ Ctx::Ctx(Socket *_conn)
 Ctx::~Ctx()
 {
     conn->shutdown(SHUT_WR);
+    /**
+     * TODO: If the client never clsoe the connection, 
+     * the coroutine will always be suspended, causing a memory leak. 
+     * Therefore, we need to add a timeout judgment logic to determine the timeout 
+     * in the time drive and then forcibly disconnect the connection.
+     */
     conn->check_client_close();
     delete conn;
 }
