@@ -15,6 +15,26 @@ static int http_request_on_headers_complete(http_parser *parser);
 static int http_request_on_body(http_parser *parser, const char *at, size_t length);
 static int http_request_on_message_complete(http_parser *parser);
 
+inline void set_http_version(Ctx *ctx, http_parser *parser)
+{
+    ctx->request.version = parser->http_major * 100 + parser->http_minor;
+}
+
+inline void set_http_method(Ctx *ctx, http_parser *parser)
+{
+    switch (parser->method)
+    {
+    case HTTP_GET:
+        ctx->request.method = "GET";
+        break;
+    case HTTP_POST:
+        ctx->request.method = "POST";
+        break;
+    default:
+        break;
+    }
+}
+
 static int http_request_on_message_begin(http_parser *parser)
 {
     fswTrace("http request on message begin");
@@ -70,19 +90,8 @@ static int http_request_on_header_value(http_parser *parser, const char *at, siz
 static int http_request_on_headers_complete(http_parser *parser)
 {
     Ctx *ctx = (Ctx *)parser->data;
-    ctx->request.version = parser->http_major * 100 + parser->http_minor;
-
-    switch (parser->method)
-    {
-    case HTTP_GET:
-        ctx->request.method = "GET";
-        break;
-    case HTTP_POST:
-        ctx->request.method = "POST";
-        break;
-    default:
-        break;
-    }
+    set_http_version(ctx, parser);
+    set_http_method(ctx, parser);
     return 0;
 }
 
