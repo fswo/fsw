@@ -15,6 +15,26 @@ static int http_request_on_headers_complete(http_parser *parser);
 static int http_request_on_body(http_parser *parser, const char *at, size_t length);
 static int http_request_on_message_complete(http_parser *parser);
 
+inline void set_http_version(Ctx *ctx, http_parser *parser)
+{
+    ctx->request.version = parser->http_major * 100 + parser->http_minor;
+}
+
+inline void set_http_method(Ctx *ctx, http_parser *parser)
+{
+    switch (parser->method)
+    {
+    case HTTP_GET:
+        ctx->request.method = "GET";
+        break;
+    case HTTP_POST:
+        ctx->request.method = "POST";
+        break;
+    default:
+        break;
+    }
+}
+
 static int http_request_on_message_begin(http_parser *parser)
 {
     fswTrace("http request on message begin");
@@ -70,19 +90,9 @@ static int http_request_on_header_value(http_parser *parser, const char *at, siz
 static int http_request_on_headers_complete(http_parser *parser)
 {
     Ctx *ctx = (Ctx *)parser->data;
-    ctx->request.version = parser->http_major * 100 + parser->http_minor;
-
-    switch (parser->method)
-    {
-    case HTTP_GET:
-        ctx->request.method = "GET";
-        break;
-    case HTTP_POST:
-        ctx->request.method = "POST";
-        break;
-    default:
-        break;
-    }
+    set_http_version(ctx, parser);
+    set_http_method(ctx, parser);
+    ctx->keep_alive = http_should_keep_alive(parser);
     return 0;
 }
 
@@ -120,21 +130,33 @@ Request::Request()
 
 Request::~Request()
 {
-    if (path)
-    {
-        delete[] path;
-        path = nullptr;
-    }
+    clear_path();
+    clear_header();
+    clear_body();
+}
 
-    /**
-     * delete header name and header value
-     */
+void Request::clear_path()
+{
+    delete[] path;
+    path = nullptr;
+    path_len = 0;
+}
+
+void Request::clear_body()
+{
+    delete[] body;
+    body = nullptr;
+    body_length = 0;
+}
+
+void Request::clear_header()
+{
     for (auto i = header.begin(); i != header.end(); i++)
     {
         delete[] i->first;
         delete[] i->second;
     }
-    delete[] body;
+    header.clear();
 }
 
 Response::Response()
@@ -144,15 +166,18 @@ Response::Response()
 
 Response::~Response()
 {
-    
+    clear_header();
 }
 
-void Response::end(Buffer *body)
+void Response::set_header(Buffer *_name, Buffer *_value)
 {
-    Socket *conn = this->ctx->conn;
+    Buffer *name = _name->dup();
+    Buffer *value = _value->dup();
+    header[name] = value;
+}
 
-    Buffer* buf = conn->get_write_buf();
-    buf->clear();
+void Response::build_http_header(Buffer* buf)
+{
     buf->append("HTTP/1.1 200 OK\r\n");
     for(auto h : this->header)
     {
@@ -161,10 +186,38 @@ void Response::end(Buffer *body)
         buf->append(h.second);
         buf->append("\r\n");
     }
+    if (ctx->keep_alive)
+    {
+        buf->append("Connection: Keep-Alive\r\n");
+    }
     buf->append("\r\n");
+}
+
+void Response::build_http_body(Buffer* buf, Buffer *body)
+{
     buf->append(body);
     buf->append("\r\n");
+}
+
+void Response::end(Buffer *body)
+{
+    Socket *conn = this->ctx->conn;
+
+    Buffer* buf = conn->get_write_buf();
+    buf->clear();
+    build_http_header(buf);
+    build_http_body(buf, body);
     conn->send(buf->c_buffer(), buf->length());
+}
+
+void Response::clear_header()
+{
+    for (auto i = header.begin(); i != header.end(); i++)
+    {
+        delete i->first;
+        delete i->second;
+    }
+    header.clear();
 }
 
 Ctx::Ctx(Socket *_conn)
@@ -199,4 +252,12 @@ size_t Ctx::parse(ssize_t recved)
 
     nparsed = http_parser_execute(&parser, &parser_settings, conn->get_read_buf()->c_buffer(), recved);
     return nparsed;
+}
+
+void Ctx::clear()
+{
+    request.clear_path();
+    request.clear_header();
+    request.clear_body();
+    response.clear_header();
 }

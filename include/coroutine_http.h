@@ -26,6 +26,9 @@ public:
 
     Request();
     ~Request();
+    void clear_path();
+    void clear_body();
+    void clear_header();
 };
 
 
@@ -41,7 +44,11 @@ public:
 
     Response();
     ~Response();
+    void set_header(Buffer *_name, Buffer *_value);
+    void build_http_header(Buffer* buf);
+    void build_http_body(Buffer* buf, Buffer *body);
     void end(Buffer *body);
+    void clear_header();
 };
 
 class Ctx
@@ -53,10 +60,12 @@ public:
     Response response;
     char *current_header_name;
     size_t current_header_name_len;
+    bool keep_alive;
 
     Ctx(Socket *_conn);
     ~Ctx();
     size_t parse(ssize_t recved);
+    void clear();
 };
 }
 }

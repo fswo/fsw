@@ -20,6 +20,7 @@ public:
     void append(std::string str);
     void append(Buffer *buffer);
     void clear();
+    Buffer* dup();
 
 private:
     size_t _size;
