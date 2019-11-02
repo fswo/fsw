@@ -41,6 +41,7 @@ public:
 
     Response();
     ~Response();
+    void set_header(Buffer *_name, Buffer *_value);
     void build_http_header(Buffer* buf);
     void build_http_body(Buffer* buf, Buffer *body);
     void end(Buffer *body);

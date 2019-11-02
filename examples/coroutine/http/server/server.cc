@@ -37,9 +37,9 @@ void handler(Request *request, Response *response)
     Buffer *buffer = new Buffer(1024);
     buffer->append(response_body, sizeof(response_body) - 1);
 
-    response->header[&buffer1] = &buffer2;
-    response->header[&buffer3] = &buffer4;
-    response->header[&buffer5] = &buffer6;
+    response->set_header(&buffer1, &buffer2);
+    response->set_header(&buffer3, &buffer4);
+    response->set_header(&buffer5, &buffer6);
     response->end(buffer);
 
     delete buffer;

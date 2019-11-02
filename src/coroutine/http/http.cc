@@ -153,7 +153,19 @@ Response::Response()
 
 Response::~Response()
 {
-    
+    for (auto i = header.begin(); i != header.end(); i++)
+    {
+        delete i->first;
+        delete i->second;
+    }
+    header.clear();
+}
+
+void Response::set_header(Buffer *_name, Buffer *_value)
+{
+    Buffer *name = _name->dup();
+    Buffer *value = _value->dup();
+    header[name] = value;
 }
 
 void Response::build_http_header(Buffer* buf)

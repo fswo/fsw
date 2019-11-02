@@ -74,3 +74,10 @@ void Buffer::clear()
     _length = 0;
     _buffer[0] = 0;
 }
+
+Buffer* Buffer::dup()
+{
+    Buffer *ret_buffer = new Buffer(_length);
+    ret_buffer->append(this);
+    return ret_buffer;
+}
