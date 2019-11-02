@@ -186,6 +186,10 @@ void Response::build_http_header(Buffer* buf)
         buf->append(h.second);
         buf->append("\r\n");
     }
+    if (ctx->keep_alive)
+    {
+        buf->append("Connection: Keep-Alive\r\n");
+    }
     buf->append("\r\n");
 }
 
