@@ -41,6 +41,8 @@ public:
 
     Response();
     ~Response();
+    void build_http_header(Buffer* buf);
+    void build_http_body(Buffer* buf, Buffer *body);
     void end(Buffer *body);
 };
 
