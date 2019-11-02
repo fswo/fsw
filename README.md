@@ -1,13 +1,23 @@
-# Fsw
+# Introduction
 
-fsw means from swoole but not all swoole. This project is the foundation of [study php extension](https://github.com/php-extension-research/study).
+fsw is a coroutine component that we can use to quickly develop a high performance server, etc.
 
-## Build
+## Get started quickly
+
+### Build
+
+#### Build fsw
 
 ```shell
 ~/codeDir/cppCode/fsw # cmake .
 ~/codeDir/cppCode/fsw # make
 ~/codeDir/cppCode/fsw # make install
+```
+
+#### Build example
+
+```shell
+~/codeDir/cppCode/fsw/example # g++ example.cc -lfsw
 ```
 
 ## Example
