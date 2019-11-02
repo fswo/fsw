@@ -92,6 +92,7 @@ static int http_request_on_headers_complete(http_parser *parser)
     Ctx *ctx = (Ctx *)parser->data;
     set_http_version(ctx, parser);
     set_http_method(ctx, parser);
+    ctx->keep_alive = http_should_keep_alive(parser);
     return 0;
 }
 

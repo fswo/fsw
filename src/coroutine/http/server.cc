@@ -55,7 +55,7 @@ static void http_connection_on_accept(void *arg)
         {
             handler(&(ctx->request), &(ctx->response));
         }
-        if (!http_should_keep_alive(&ctx->parser))
+        if (!ctx->keep_alive)
         {
             break;
         }

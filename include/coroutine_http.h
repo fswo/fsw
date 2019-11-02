@@ -60,6 +60,7 @@ public:
     Response response;
     char *current_header_name;
     size_t current_header_name_len;
+    bool keep_alive;
 
     Ctx(Socket *_conn);
     ~Ctx();
