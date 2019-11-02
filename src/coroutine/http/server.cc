@@ -37,21 +37,29 @@ static void http_connection_on_accept(void *arg)
 
     http_parser_init(&ctx->parser, HTTP_REQUEST);
 
-    recved = conn->recv(conn->get_read_buf()->c_buffer(), READ_BUF_MAX_SIZE);
-    if (recved == 0)
+    while (true)
     {
-        return;
-    }
+        recved = conn->recv(conn->get_read_buf()->c_buffer(), READ_BUF_MAX_SIZE);
+        if (recved == 0)
+        {
+            break;
+        }
 
-    /* Start up / continue the parser.
-    * Note we pass recved==0 to signal that EOF has been received.
-    */
-    ctx->parse(recved);
-    string path(ctx->request.path);
-    on_accept_handler handler = server->get_handler(path);
-    if (handler != nullptr)
-    {
-        handler(&(ctx->request), &(ctx->response));
+        /* Start up / continue the parser.
+        * Note we pass recved==0 to signal that EOF has been received.
+        */
+        ctx->parse(recved);
+        string path(ctx->request.path);
+        on_accept_handler handler = server->get_handler(path);
+        if (handler != nullptr)
+        {
+            handler(&(ctx->request), &(ctx->response));
+        }
+        if (!http_should_keep_alive(&ctx->parser))
+        {
+            break;
+        }
+        ctx->clear();
     }
 }
 

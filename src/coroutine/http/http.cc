@@ -129,21 +129,33 @@ Request::Request()
 
 Request::~Request()
 {
-    if (path)
-    {
-        delete[] path;
-        path = nullptr;
-    }
+    clear_path();
+    clear_header();
+    clear_body();
+}
 
-    /**
-     * delete header name and header value
-     */
+void Request::clear_path()
+{
+    delete[] path;
+    path = nullptr;
+    path_len = 0;
+}
+
+void Request::clear_body()
+{
+    delete[] body;
+    body = nullptr;
+    body_length = 0;
+}
+
+void Request::clear_header()
+{
     for (auto i = header.begin(); i != header.end(); i++)
     {
         delete[] i->first;
         delete[] i->second;
     }
-    delete[] body;
+    header.clear();
 }
 
 Response::Response()
@@ -153,12 +165,7 @@ Response::Response()
 
 Response::~Response()
 {
-    for (auto i = header.begin(); i != header.end(); i++)
-    {
-        delete i->first;
-        delete i->second;
-    }
-    header.clear();
+    clear_header();
 }
 
 void Response::set_header(Buffer *_name, Buffer *_value)
@@ -198,6 +205,16 @@ void Response::end(Buffer *body)
     conn->send(buf->c_buffer(), buf->length());
 }
 
+void Response::clear_header()
+{
+    for (auto i = header.begin(); i != header.end(); i++)
+    {
+        delete i->first;
+        delete i->second;
+    }
+    header.clear();
+}
+
 Ctx::Ctx(Socket *_conn)
 {
     conn = _conn;
@@ -230,4 +247,12 @@ size_t Ctx::parse(ssize_t recved)
 
     nparsed = http_parser_execute(&parser, &parser_settings, conn->get_read_buf()->c_buffer(), recved);
     return nparsed;
+}
+
+void Ctx::clear()
+{
+    request.clear_path();
+    request.clear_header();
+    request.clear_body();
+    response.clear_header();
 }
