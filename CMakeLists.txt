@@ -55,3 +55,8 @@ link_directories(${LIBRARY_OUTPUT_PATH})
 install(CODE "MESSAGE(\"Are you run command using root user?\")")
 install(TARGETS shared LIBRARY DESTINATION lib ARCHIVE DESTINATION lib)
 install(FILES ${HEAD_FILES} DESTINATION include/fsw)
+
+# build test
+file(GLOB_RECURSE TEST_LIST test/*.cc)
+add_executable(test ${TEST_LIST})
+target_link_libraries(test -lgtest -lfsw)
