@@ -1,6 +1,6 @@
 # Introduction
 
-[![Build Status](https://travis-ci.org/fswo/fsw.svg?branch=master)](https://travis-ci.org/fswo/fsw)
+[![Build Status](https://travis-ci.org/fswo/fsw.svg?branch=dev)](https://travis-ci.org/fswo/fsw)
 
 fsw is a coroutine component that we can use to quickly develop a high performance server, etc.
 

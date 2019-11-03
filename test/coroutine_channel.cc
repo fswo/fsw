@@ -1,12 +1,13 @@
 #include <iostream>
 #include "fsw/coroutine.h"
 #include "fsw/coroutine_channel.h"
+#include "gtest/gtest.h"
 
 using namespace fsw;
 using namespace std;
 using fsw::coroutine::Channel;
 
-int main(int argc, char const *argv[])
+TEST(coroutine_channel, pop_push)
 {
     Channel *chan = new Channel();
 
@@ -14,10 +15,8 @@ int main(int argc, char const *argv[])
     {
         void *data;
         Channel *chan = (Channel *)arg;
-
-        std::cout << "pop start" << std::endl;
         data = chan->pop();
-        std::cout << "pop ret:" << *(string *)data << std::endl;
+        ASSERT_EQ(*(string *)data, "hello world");
     }, (void *)chan);
 
     Coroutine::create([](void *arg)
@@ -25,14 +24,9 @@ int main(int argc, char const *argv[])
         bool ret;
         string data = "hello world";
         Channel *chan = (Channel *)arg;
-
-        std::cout << "push start" << std::endl;
         ret = chan->push(&data);
-        std::cout << "push ret:" << ret << std::endl;
+        ASSERT_TRUE(ret);
     }, (void *)chan);
 
-    std::cout << "main co" << endl;
     delete chan;
-
-    return 0;
 }
