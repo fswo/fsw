@@ -51,6 +51,21 @@ TEST(buffer, append)
     ASSERT_EQ(strcmp(buffer5->c_buffer(), "abc"), 0);
 }
 
+TEST(buffer, append_int)
+{
+    char str1[] = "1";
+    char str2[] = "12";
+    Buffer buffer(16);
+
+    buffer.append(1);
+    ASSERT_EQ(buffer.length(), 1);
+    ASSERT_EQ(strcmp(buffer.c_buffer(), str1), 0);
+
+    buffer.append(2);
+    ASSERT_EQ(buffer.length(), 2);
+    ASSERT_EQ(strcmp(buffer.c_buffer(), str2), 0);
+}
+
 TEST(buffer, dup)
 {
     char src_buffer[] = "aa";
