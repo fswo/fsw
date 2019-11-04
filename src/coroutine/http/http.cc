@@ -191,7 +191,7 @@ bool Response::update_header(Buffer *_name, Buffer *_value)
     return false;
 }
 
-void Response::build_http_header()
+void Response::build_http_header(int body_length)
 {
     Socket *conn = ctx->conn;
     Buffer* buf = conn->get_write_buf();
@@ -207,6 +207,20 @@ void Response::build_http_header()
     if (ctx->keep_alive)
     {
         buf->append("Connection: Keep-Alive\r\n");
+        /**
+         * note the addition of content-length, 
+         * otherwise the client might not disconnect, for example, curl
+         */
+        buf->append("Content-Length: ");
+        buf->append(body_length);
+        buf->append("\r\n");
+    }
+    else
+    {
+        buf->append("Connection: Close\r\n");
+        buf->append("Content-Length: ");
+        buf->append(body_length);
+        buf->append("\r\n");
     }
     buf->append("\r\n");
 }
@@ -226,7 +240,7 @@ void Response::end(Buffer *body)
     Buffer* buf = conn->get_write_buf();
 
     buf->clear();
-    build_http_header();
+    build_http_header(body->length());
     build_http_body(body);
     conn->send(buf->c_buffer(), buf->length());
 }

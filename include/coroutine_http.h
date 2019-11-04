@@ -60,7 +60,7 @@ public:
      * so need to iterate through all the headers.
      */
     bool update_header(Buffer *_name, Buffer *_value);
-    void build_http_header();
+    void build_http_header(int body_length);
     void build_http_body(Buffer *body);
     void end(Buffer *body);
     void clear_header();
