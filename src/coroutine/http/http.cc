@@ -176,8 +176,11 @@ void Response::set_header(Buffer *_name, Buffer *_value)
     header[name] = value;
 }
 
-void Response::build_http_header(Buffer* buf)
+void Response::build_http_header()
 {
+    Socket *conn = ctx->conn;
+    Buffer* buf = conn->get_write_buf();
+
     buf->append("HTTP/1.1 200 OK\r\n");
     for(auto h : this->header)
     {
@@ -193,8 +196,11 @@ void Response::build_http_header(Buffer* buf)
     buf->append("\r\n");
 }
 
-void Response::build_http_body(Buffer* buf, Buffer *body)
+void Response::build_http_body(Buffer *body)
 {
+    Socket *conn = ctx->conn;
+    Buffer* buf = conn->get_write_buf();
+    
     buf->append(body);
     buf->append("\r\n");
 }
@@ -202,11 +208,11 @@ void Response::build_http_body(Buffer* buf, Buffer *body)
 void Response::end(Buffer *body)
 {
     Socket *conn = this->ctx->conn;
-
     Buffer* buf = conn->get_write_buf();
+
     buf->clear();
-    build_http_header(buf);
-    build_http_body(buf, body);
+    build_http_header();
+    build_http_body(body);
     conn->send(buf->c_buffer(), buf->length());
 }
 
