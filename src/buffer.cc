@@ -81,3 +81,27 @@ Buffer* Buffer::dup()
     ret_buffer->append(this);
     return ret_buffer;
 }
+
+bool Buffer::equal(Buffer *target)
+{
+    if (_length != target->length() || memcmp(_buffer, target->c_buffer(), _length) != 0)
+    {
+        return false;
+    }
+    return true;
+}
+
+bool Buffer::deep_equal(Buffer *target)
+{
+    if (
+        this != target
+        || _size != target->size()
+        || _length != target->length()
+        || _buffer != target->c_buffer()
+        || memcmp(_buffer, target->c_buffer(), _length) != 0
+    )
+    {
+        return false;
+    }
+    return true;
+}

@@ -21,6 +21,8 @@ public:
     void append(Buffer *buffer);
     void clear();
     Buffer* dup();
+    bool equal(Buffer *target);
+    bool deep_equal(Buffer *target);
 
 private:
     size_t _size;
