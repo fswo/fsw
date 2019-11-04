@@ -57,6 +57,20 @@ void Buffer::append(std::string str)
     _buffer[_length] = 0;
 }
 
+void Buffer::append(int value)
+{
+    auto str = std::to_string(value);
+    size_t len = _length + str.length();
+
+    if (len > _size)
+    {
+        fswError("buffer capacity is not enough");
+    }
+    memcpy(_buffer + _length, str.c_str(), str.length());
+    _length = len;
+    _buffer[_length] = 0;
+}
+
 void Buffer::append(Buffer *buffer)
 {
     if (_length + buffer->length() > _size)

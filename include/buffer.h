@@ -18,6 +18,7 @@ public:
     char* c_buffer();
     void append(char *str, size_t length);
     void append(std::string str);
+    void append(int value);
     void append(Buffer *buffer);
     void clear();
     Buffer* dup();
