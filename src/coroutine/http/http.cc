@@ -176,6 +176,21 @@ void Response::set_header(Buffer *_name, Buffer *_value)
     header[name] = value;
 }
 
+bool Response::update_header(Buffer *_name, Buffer *_value)
+{
+    std::map<fsw::Buffer *, fsw::Buffer *>::iterator i;
+    for (i = header.begin(); i != header.end(); i++)
+    {
+        if (memcpy(i->first->c_buffer(), _name->c_buffer(), i->first->length()) == 0)
+        {
+            Buffer *value = _value->dup();
+            i->second = value;
+            return true;
+        }
+    }
+    return false;
+}
+
 void Response::build_http_header()
 {
     Socket *conn = ctx->conn;
@@ -200,7 +215,7 @@ void Response::build_http_body(Buffer *body)
 {
     Socket *conn = ctx->conn;
     Buffer* buf = conn->get_write_buf();
-    
+
     buf->append(body);
     buf->append("\r\n");
 }
