@@ -57,10 +57,40 @@ TEST(buffer, dup)
     Buffer *buffer1 = new Buffer(1024);
     Buffer *buffer2;
 
-    // function append test
     buffer1->append(src_buffer, strlen(src_buffer));
     buffer2 = buffer1->dup();
     ASSERT_EQ(buffer2->length(), 2);
     ASSERT_EQ(strcmp(buffer2->c_buffer(), buffer1->c_buffer()), 0);
     ASSERT_NE(buffer2->c_buffer(), buffer1->c_buffer());
+}
+
+TEST(buffer, equal)
+{
+    char src_buffer1[] = "aa";
+    char src_buffer2[] = "bb";
+    Buffer buffer1(16);
+    Buffer buffer2(16);
+    Buffer buffer3(16);
+
+    buffer1.append(src_buffer1, sizeof(src_buffer1) - 1);
+    buffer2.append(src_buffer1, sizeof(src_buffer1) - 1);
+    ASSERT_TRUE(buffer1.equal(&buffer2));
+    buffer3.append(src_buffer2, sizeof(src_buffer2) - 1);
+    ASSERT_FALSE(buffer1.equal(&buffer3));
+}
+
+TEST(buffer, deep_equal)
+{
+    char src_buffer1[] = "aa";
+    char src_buffer2[] = "bb";
+    Buffer buffer1(16);
+    Buffer buffer2(16);
+    Buffer buffer3(32);
+
+    buffer1.append(src_buffer1, sizeof(src_buffer1) - 1);
+    buffer2.append(src_buffer1, sizeof(src_buffer1) - 1);
+
+    ASSERT_TRUE(buffer1.deep_equal(&buffer1));
+    ASSERT_FALSE(buffer1.deep_equal(&buffer2));
+    ASSERT_FALSE(buffer1.deep_equal(&buffer3));
 }
