@@ -18,3 +18,18 @@ TEST(coroutine_http_request, clear_path)
     ASSERT_EQ(request->path, nullptr);
     ASSERT_EQ(request->path_len, 0);
 }
+
+TEST(coroutine_http_request, clear_body)
+{
+    char body[] = "hello world";
+    Request *request = new Request();
+    request->body = new char[12];
+    memcpy(request->body, body, 12);
+    request->body_length = 12;
+    ASSERT_NE(request->body, body);
+    ASSERT_EQ(memcmp(request->body, body, 12), 0);
+    ASSERT_EQ(request->body_length, 12);
+    request->clear_body();
+    ASSERT_EQ(request->body, nullptr);
+    ASSERT_EQ(request->body_length, 0);
+}
