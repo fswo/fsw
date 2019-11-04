@@ -44,6 +44,15 @@ public:
 
     Response();
     ~Response();
+
+    /**
+     * in order to prevent the user from modifying the header, 
+     * set_header needs to copy the passed parameters.
+     * 
+     * in order to improve performance, set_header does not check if header name is set,
+     * so you can't use it to update the header value.
+     * if you want to update the value of the header name, you should use update_header.
+     */
     void set_header(Buffer *_name, Buffer *_value);
     bool update_header(Buffer *_name, Buffer *_value);
     void build_http_header();
