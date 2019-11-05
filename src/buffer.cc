@@ -47,14 +47,7 @@ void Buffer::append(char *str, size_t length)
 
 void Buffer::append(std::string str)
 {
-    if (_length + str.length() > _size)
-    {
-        fswError("buffer capacity is not enough");
-    }
-
-    memcpy(_buffer + _length, str.c_str(), str.length());
-    _length += str.length();
-    _buffer[_length] = 0;
+    append((char *)str.c_str(), str.length());
 }
 
 void Buffer::append(int value)
@@ -65,14 +58,7 @@ void Buffer::append(int value)
 
 void Buffer::append(Buffer *buffer)
 {
-    if (_length + buffer->length() > _size)
-    {
-        fswError("buffer capacity is not enough");
-    }
-
-    memcpy(_buffer + _length, buffer->c_buffer(), buffer->length());
-    _length += buffer->length();
-    _buffer[_length] = 0;
+    append(buffer->c_buffer(), buffer->length());
 }
 
 void Buffer::clear()
