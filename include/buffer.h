@@ -36,7 +36,7 @@ public:
         return _buffer;
     }
 
-    void clear()
+    inline void clear()
     {
         _length = 0;
         _buffer[0] = 0;
