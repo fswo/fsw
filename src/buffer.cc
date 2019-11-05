@@ -15,24 +15,6 @@ Buffer::~Buffer()
     delete[] _buffer;
 }
 
-size_t Buffer::length()
-{
-    return _length;
-}
-
-/**
- * size represents a valid character that can be stored, excluding the last \0
- */
-size_t Buffer::size()
-{
-    return _size;
-}
-
-char* Buffer::c_buffer()
-{
-    return _buffer;
-}
-
 void Buffer::append(char *str, size_t length)
 {
     if (_length + length > _size)
@@ -59,12 +41,6 @@ void Buffer::append(int value)
 void Buffer::append(Buffer *buffer)
 {
     append(buffer->c_buffer(), buffer->length());
-}
-
-void Buffer::clear()
-{
-    _length = 0;
-    _buffer[0] = 0;
 }
 
 Buffer* Buffer::dup()
