@@ -90,8 +90,8 @@ TEST(buffer, append_buffer)
 
     buffer1.append(str);
     buffer2.append(&buffer1);
-    ASSERT_EQ(strcmp(buffer2.c_buffer(), "fswfsw"), 0);
-    ASSERT_EQ(buffer2.length(), 2 * str.length());
+    ASSERT_EQ(strcmp(buffer2.c_buffer(), "fsw"), 0);
+    ASSERT_EQ(buffer2.length(), str.length());
 }
 
 TEST(buffer, append)
