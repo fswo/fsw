@@ -36,7 +36,6 @@ class Response
 {
 public:
     Ctx *ctx;
-    std::string method;
     int version;
     int status;
     std::string reason;
