@@ -70,6 +70,8 @@ int main(int argc, char const *argv[])
 The machine configuration is one cpu core, 2G memory:
 
 ```shell
+ab -c 1000 -n 1000000 -k 127.0.0.1/index
+
 Concurrency Level:      100
 Time taken for tests:   0.321 seconds
 Complete requests:      10000
