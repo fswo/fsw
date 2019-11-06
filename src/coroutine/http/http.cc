@@ -17,7 +17,7 @@ static int http_request_on_message_complete(http_parser *parser);
 
 inline void set_http_version(Ctx *ctx, http_parser *parser)
 {
-    ctx->request.version = parser->http_major * 100 + parser->http_minor;
+    ctx->request->version = parser->http_major * 100 + parser->http_minor;
 }
 
 inline void set_http_method(Ctx *ctx, http_parser *parser)
@@ -25,10 +25,10 @@ inline void set_http_method(Ctx *ctx, http_parser *parser)
     switch (parser->method)
     {
     case HTTP_GET:
-        ctx->request.method = "GET";
+        ctx->request->method = "GET";
         break;
     case HTTP_POST:
-        ctx->request.method = "POST";
+        ctx->request->method = "POST";
         break;
     default:
         break;
@@ -47,9 +47,9 @@ static int http_request_on_url(http_parser *parser, const char *at, size_t lengt
     /**
      * because const char *at may be destroyed, so must copy to ctx->request.path
      */
-    ctx->request.path = new char[length + 1]();
-    memcpy(ctx->request.path, at, length);
-    ctx->request.path_len = length;
+    ctx->request->path = new char[length + 1]();
+    memcpy(ctx->request->path, at, length);
+    ctx->request->path_len = length;
     return 0;
 }
 
@@ -70,7 +70,7 @@ static int http_request_on_header_field(http_parser *parser, const char *at, siz
 static int http_request_on_header_value(http_parser *parser, const char *at, size_t length)
 {
     Ctx *ctx = (Ctx *)parser->data;
-    std::map<char *, char *> &headers = ctx->request.header;
+    std::map<char *, char *> &headers = ctx->request->header;
     size_t header_len = ctx->current_header_name_len;
     char *header_name = new char[header_len + 1]();
 
@@ -99,9 +99,9 @@ static int http_request_on_headers_complete(http_parser *parser)
 static int http_request_on_body(http_parser *parser, const char *at, size_t length)
 {
     Ctx *ctx = (Ctx *)parser->data;
-    ctx->request.body = new char[length + 1]();
-    memcpy(ctx->request.body, at, length);
-    ctx->request.body_length = length;
+    ctx->request->body = new char[length + 1]();
+    memcpy(ctx->request->body, at, length);
+    ctx->request->body_length = length;
     return 0;
 }
 
@@ -193,8 +193,7 @@ bool Response::update_header(Buffer *_name, Buffer *_value)
 
 void Response::build_http_header(int body_length)
 {
-    Socket *conn = ctx->conn;
-    Buffer* buf = conn->get_write_buf();
+    Buffer* buf = get_write_buf();
 
     buf->append("HTTP/1.1 200 OK\r\n");
     for(auto h : this->header)
@@ -227,8 +226,7 @@ void Response::build_http_header(int body_length)
 
 void Response::build_http_body(Buffer *body)
 {
-    Socket *conn = ctx->conn;
-    Buffer* buf = conn->get_write_buf();
+    Buffer* buf = get_write_buf();
 
     buf->append(body);
     buf->append("\r\n");
@@ -236,13 +234,10 @@ void Response::build_http_body(Buffer *body)
 
 void Response::end(Buffer *body)
 {
-    Socket *conn = this->ctx->conn;
-    Buffer* buf = conn->get_write_buf();
-
-    buf->clear();
+    clear_write_buf();
     build_http_header(body->length());
     build_http_body(body);
-    conn->send(buf->c_buffer(), buf->length());
+    send_response();
 }
 
 void Response::clear_header()
@@ -257,9 +252,11 @@ void Response::clear_header()
 
 Ctx::Ctx(Socket *_conn)
 {
+    request = new Request();
+    response = new Response();
     conn = _conn;
     parser.data = this;
-    this->response.ctx = this;
+    response->ctx = this;
 }
 
 Ctx::~Ctx()
@@ -278,6 +275,8 @@ Ctx::~Ctx()
      */
     conn->check_client_close();
     delete conn;
+    delete response;
+    delete request;
 }
 
 size_t Ctx::parse(ssize_t recved)
@@ -291,8 +290,8 @@ size_t Ctx::parse(ssize_t recved)
 
 void Ctx::clear()
 {
-    request.clear_path();
-    request.clear_header();
-    request.clear_body();
-    response.clear_header();
+    request->clear_path();
+    request->clear_header();
+    request->clear_body();
+    response->clear_header();
 }

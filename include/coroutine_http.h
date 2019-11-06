@@ -12,7 +12,25 @@ using fsw::Buffer;
 
 namespace fsw { namespace coroutine { namespace http {
 
-class Ctx;
+class Request;
+class Response;
+
+class Ctx
+{
+public:
+    Socket *conn;
+    http_parser parser;
+    Request *request;
+    Response *response;
+    char *current_header_name;
+    size_t current_header_name_len;
+    bool keep_alive;
+
+    Ctx(Socket *_conn);
+    ~Ctx();
+    size_t parse(ssize_t recved);
+    void clear();
+};
 
 class Request
 {
@@ -95,23 +113,23 @@ public:
             break;
         }
     }
-};
 
-class Ctx
-{
-public:
-    Socket *conn;
-    http_parser parser;
-    Request request;
-    Response response;
-    char *current_header_name;
-    size_t current_header_name_len;
-    bool keep_alive;
+    inline Buffer* get_write_buf()
+    {
+        return ctx->conn->get_write_buf();
+    }
 
-    Ctx(Socket *_conn);
-    ~Ctx();
-    size_t parse(ssize_t recved);
-    void clear();
+    inline void clear_write_buf()
+    {
+        Buffer* buf = get_write_buf();
+        buf->clear();
+    }
+
+    inline ssize_t send_response()
+    {
+        Buffer *buf = get_write_buf();
+        return ctx->conn->send(buf->c_buffer(), buf->length());
+    }
 };
 }
 }
