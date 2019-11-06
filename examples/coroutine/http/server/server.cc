@@ -7,7 +7,6 @@ using fsw::Coroutine;
 using fsw::coroutine::http::Request;
 using fsw::coroutine::http::Response;
 using fsw::coroutine::http::Server;
-using fsw::coroutine::Socket;
 using fsw::Buffer;
 
 void handler(Request *request, Response *response)
