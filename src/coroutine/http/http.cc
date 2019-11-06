@@ -200,7 +200,7 @@ bool Response::update_header(Buffer *_name, Buffer *_value)
     return false;
 }
 
-void Response::build_http_header(int body_length)
+Response* Response::build_http_header(int body_length)
 {
     Buffer* buf = get_write_buf();
 
@@ -224,21 +224,21 @@ void Response::build_http_header(int body_length)
         buf->append("Content-Length: ")->append(body_length)->append("\r\n");
     }
     buf->append("\r\n");
+    return this;
 }
 
-void Response::build_http_body(Buffer *body)
+Response* Response::build_http_body(Buffer *body)
 {
     Buffer* buf = get_write_buf();
 
     buf->append(body)->append("\r\n");
+    return this;
 }
 
 void Response::end(Buffer *body)
 {
     clear_write_buf();
-    build_http_header(body->length());
-    build_http_body(body);
-    send_response();
+    build_http_header(body->length())->build_http_body(body)->send_response();
 }
 
 void Response::clear_header()
