@@ -5,6 +5,7 @@
 #include "coroutine_socket.h"
 #include "http_parser.h"
 #include "buffer.h"
+#include "log.h"
 
 using fsw::coroutine::Socket;
 using fsw::Buffer;
@@ -36,9 +37,15 @@ class Response
 {
 public:
     Ctx *ctx;
-    int version;
-    int status;
-    std::string reason;
+
+    /**
+     * 100 => 1.0
+     * 101 => 1.1
+     * 200 => 2.0
+     */
+    int _version;
+    int _status;
+    std::string _reason;
     std::map<Buffer*, Buffer*> header;
 
     Response();
@@ -63,6 +70,31 @@ public:
     void build_http_body(Buffer *body);
     void end(Buffer *body);
     void clear_header();
+
+    inline void set_version(int version)
+    {
+        _version = version;
+    }
+
+    inline std::string get_real_version()
+    {
+        switch (_version)
+        {
+        case 100:
+            return "1.0";
+            break;
+        case 101:
+            return "1.1";
+            break;
+        case 200:
+            return "2.0";
+            break;
+        default:
+            snprintf(fsw_error, sizeof(fsw_error), "Unknown version: %d", _version);
+            return fsw_error;
+            break;
+        }
+    }
 };
 
 class Ctx
