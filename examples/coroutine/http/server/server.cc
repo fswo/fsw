@@ -12,21 +12,13 @@ using fsw::Buffer;
 
 void handler(Request *request, Response *response)
 {
-    char header1[] = "Content-Type";
-    Buffer buffer1(12);
-    buffer1.append(header1, 12);
-    char value1[] = "text/html";
-    Buffer buffer2(9);
-    buffer2.append(value1, 9);
-
     char response_body[] = "hello world";
-    Buffer *buffer = new Buffer(1024);
-    buffer->append(response_body, sizeof(response_body) - 1);
+    Buffer buffer(1024);
+    buffer.append(response_body, sizeof(response_body) - 1);
 
-    response->set_header(&buffer1, &buffer2);
-    response->end(buffer);
+    response->set_header("Content-Type", "text/html");
+    response->end(&buffer);
 
-    delete buffer;
     return;
 }
 
