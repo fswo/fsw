@@ -135,21 +135,23 @@ Request::~Request()
     clear_body();
 }
 
-void Request::clear_path()
+Request* Request::clear_path()
 {
     delete[] path;
     path = nullptr;
     path_len = 0;
+    return this;
 }
 
-void Request::clear_body()
+Request* Request::clear_body()
 {
     delete[] body;
     body = nullptr;
     body_length = 0;
+    return this;
 }
 
-void Request::clear_header()
+Request* Request::clear_header()
 {
     for (auto i = header.begin(); i != header.end(); i++)
     {
@@ -157,6 +159,7 @@ void Request::clear_header()
         delete[] i->second;
     }
     header.clear();
+    return this;
 }
 
 Response::Response()
@@ -291,8 +294,6 @@ size_t Ctx::parse(ssize_t recved)
 
 void Ctx::clear()
 {
-    request->clear_path();
-    request->clear_header();
-    request->clear_body();
+    request->clear_path()->clear_header()->clear_body();
     response->clear_header();
 }

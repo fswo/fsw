@@ -48,9 +48,9 @@ public:
 
     Request();
     ~Request();
-    void clear_path();
-    void clear_body();
-    void clear_header();
+    Request* clear_path();
+    Request* clear_body();
+    Request* clear_header();
 };
 
 
