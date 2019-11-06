@@ -72,17 +72,17 @@ The machine configuration is one cpu core, 2G memory:
 ```shell
 ab -c 1000 -n 1000000 -k 127.0.0.1/index
 
-Concurrency Level:      100
-Time taken for tests:   0.321 seconds
-Complete requests:      10000
+Concurrency Level:      1000
+Time taken for tests:   35.721 seconds
+Complete requests:      1000000
 Failed requests:        0
-Keep-Alive requests:    10000
-Total transferred:      1010000 bytes
-HTML transferred:       130000 bytes
-Requests per second:    31171.10 [#/sec] (mean)
-Time per request:       3.208 [ms] (mean)
-Time per request:       0.032 [ms] (mean, across all concurrent requests)
-Transfer rate:          3074.49 [Kbytes/sec] received
+Keep-Alive requests:    1000000
+Total transferred:      101000000 bytes
+HTML transferred:       13000000 bytes
+Requests per second:    27994.62 [#/sec] (mean)
+Time per request:       35.721 [ms] (mean)
+Time per request:       0.036 [ms] (mean, across all concurrent requests)
+Transfer rate:          2761.19 [Kbytes/sec] received
 ```
 
 ## docs
