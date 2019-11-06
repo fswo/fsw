@@ -6,7 +6,16 @@
 using fsw::Buffer;
 using fsw::coroutine::http::Response;
 
-TEST(coroutine_http_response, set_header)
+TEST(coroutine_http_response, set_header_string)
+{
+    Response *response = new Response();
+    response->set_header("Connection", "Close");
+    response->set_header("Content-Type", "text/html");
+    response->set_header("Content-Type", "text/html");
+    ASSERT_EQ(response->header.size(), 3);
+}
+
+TEST(coroutine_http_response, set_header_buffer)
 {
     Buffer header_name1(16);
     Buffer header_value1(16);
