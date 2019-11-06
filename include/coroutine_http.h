@@ -18,6 +18,9 @@ class Response;
 class Ctx
 {
 public:
+    /**
+     * conn must allocate memory on the heap and be freed by Ctx's destructor function.
+     */
     Socket *conn;
     http_parser parser;
     Request *request;
