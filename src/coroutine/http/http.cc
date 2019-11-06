@@ -176,6 +176,15 @@ void Response::set_header(Buffer *_name, Buffer *_value)
     header[name] = value;
 }
 
+void Response::set_header(std::string _name, std::string _value)
+{
+    Buffer *name = new Buffer(_name.length());
+    name->append(_name);
+    Buffer *value = new Buffer(_value.length());
+    value->append(_value);
+    header[name] = value;
+}
+
 bool Response::update_header(Buffer *_name, Buffer *_value)
 {
     std::map<fsw::Buffer *, fsw::Buffer *>::iterator i;

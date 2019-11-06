@@ -81,6 +81,7 @@ public:
      * if you want to update the value of the header name, you should use update_header.
      */
     void set_header(Buffer *_name, Buffer *_value);
+    void set_header(std::string _name, std::string _value);
 
     /**
      * update_header is looked up based on the c_buffer in the header name, 
