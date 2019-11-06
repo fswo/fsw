@@ -38,3 +38,25 @@ TEST(coroutine_http_response, update_header)
     response->update_header(&header_name1, &header_value2);
     ASSERT_EQ(response->header.size(), 1);
 }
+
+TEST(coroutine_http_response, set_version)
+{
+    Response response;
+
+    response.set_version(100);
+    ASSERT_EQ(response._version, 100);
+}
+
+TEST(coroutine_http_response, get_real_version)
+{
+    Response response;
+    std::string real_version;
+
+    response.set_version(100);
+    real_version = response.get_real_version();
+    ASSERT_EQ(real_version, "1.0");
+
+    response.set_version(400);
+    real_version = response.get_real_version();
+    ASSERT_EQ(real_version, "Unknown version: 400");
+}
