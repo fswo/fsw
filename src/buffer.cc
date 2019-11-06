@@ -15,7 +15,7 @@ Buffer::~Buffer()
     delete[] _buffer;
 }
 
-void Buffer::append(char *str, size_t length)
+Buffer* Buffer::append(char *str, size_t length)
 {
     if (_length + length > _size)
     {
@@ -25,22 +25,23 @@ void Buffer::append(char *str, size_t length)
     memcpy(_buffer + _length, str, length);
     _length += length;
     _buffer[_length] = 0;
+    return this;
 }
 
-void Buffer::append(std::string str)
+Buffer* Buffer::append(std::string str)
 {
-    append((char *)str.c_str(), str.length());
+    return append((char *)str.c_str(), str.length());
 }
 
-void Buffer::append(int value)
+Buffer* Buffer::append(int value)
 {
     auto str = std::to_string(value);
-    append(str);
+    return append(str);
 }
 
-void Buffer::append(Buffer *buffer)
+Buffer* Buffer::append(Buffer *buffer)
 {
-    append(buffer->c_buffer(), buffer->length());
+    return append(buffer->c_buffer(), buffer->length());
 }
 
 Buffer* Buffer::dup()

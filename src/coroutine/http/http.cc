@@ -207,10 +207,7 @@ void Response::build_http_header(int body_length)
     buf->append("HTTP/1.1 200 OK\r\n");
     for(auto h : this->header)
     {
-        buf->append(h.first);
-        buf->append(": ");
-        buf->append(h.second);
-        buf->append("\r\n");
+        buf->append(h.first)->append(": ")->append(h.second)->append("\r\n");
     }
     if (ctx->keep_alive)
     {
@@ -219,16 +216,12 @@ void Response::build_http_header(int body_length)
          * note the addition of content-length, 
          * otherwise the client might not disconnect, for example, curl
          */
-        buf->append("Content-Length: ");
-        buf->append(body_length);
-        buf->append("\r\n");
+        buf->append("Content-Length: ")->append(body_length)->append("\r\n");
     }
     else
     {
         buf->append("Connection: Close\r\n");
-        buf->append("Content-Length: ");
-        buf->append(body_length);
-        buf->append("\r\n");
+        buf->append("Content-Length: ")->append(body_length)->append("\r\n");
     }
     buf->append("\r\n");
 }
@@ -237,8 +230,7 @@ void Response::build_http_body(Buffer *body)
 {
     Buffer* buf = get_write_buf();
 
-    buf->append(body);
-    buf->append("\r\n");
+    buf->append(body)->append("\r\n");
 }
 
 void Response::end(Buffer *body)

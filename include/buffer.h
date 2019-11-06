@@ -13,10 +13,10 @@ class Buffer
 public:
     Buffer(size_t size);
     ~Buffer();
-    void append(char *str, size_t length);
-    void append(std::string str);
-    void append(int value);
-    void append(Buffer *buffer);
+    Buffer* append(char *str, size_t length);
+    Buffer* append(std::string str);
+    Buffer* append(int value);
+    Buffer* append(Buffer *buffer);
     Buffer* dup();
     bool equal(Buffer *target);
     bool deep_equal(Buffer *target);
