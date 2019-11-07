@@ -52,27 +52,78 @@
         <div class="container">
                 <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
     <ul class="nav bs-sidenav">
-        <li class="main active"><a href="#welcome-to-mkdocs">Welcome to MkDocs</a></li>
-            <li><a href="#commands">Commands</a></li>
-            <li><a href="#project-layout">Project layout</a></li>
+        <li class="main active"><a href="#introduction">Introduction</a></li>
+            <li><a href="#docs">docs</a></li>
     </ul>
 </div></div>
                 <div class="col-md-9" role="main">
 
-<h1 id="welcome-to-mkdocs">Welcome to MkDocs</h1>
-<p>For full documentation visit <a href="https://mkdocs.org">mkdocs.org</a>.</p>
-<h2 id="commands">Commands</h2>
-<ul>
-<li><code>mkdocs new [dir-name]</code> - Create a new project.</li>
-<li><code>mkdocs serve</code> - Start the live-reloading docs server.</li>
-<li><code>mkdocs build</code> - Build the documentation site.</li>
-<li><code>mkdocs help</code> - Print this help message.</li>
-</ul>
-<h2 id="project-layout">Project layout</h2>
-<pre><code>mkdocs.yml    # The configuration file.
-docs/
-    index.md  # The documentation homepage.
-    ...       # Other markdown pages, images and other files.
+<h1 id="introduction">Introduction</h1>
+<p><a href="https://travis-ci.org/fswo/fsw"><img alt="Build Status" src="https://travis-ci.org/fswo/fsw.svg?branch=dev" /></a></p>
+<p>fsw is a coroutine component that we can use to quickly develop a high performance server, etc.</p>
+<h2 id="docs">docs</h2>
+<h3 id="coroutine">Coroutine</h3>
+<p>create a coroutine and run it immediately:</p>
+<pre><code class="cpp">long Coroutine::create(coroutine_func_t fn, void * args)
+</code></pre>
+
+<p>get the currently running coroutine:</p>
+<pre><code class="cpp">static fsw::Coroutine *fsw::Coroutine::get_current()
+</code></pre>
+
+<p>swap out the current coroutine:</p>
+<pre><code class="cpp">void fsw::Coroutine::yield()
+</code></pre>
+
+<p>swap in the specified coroutine:</p>
+<pre><code class="cpp">void fsw::Coroutine::resume()
+</code></pre>
+
+<p>delayed execution of tasks:</p>
+<pre><code class="cpp">void fsw::Coroutine::defer(coroutine_func_t _fn, void *_args = (void *)nullptr)
+</code></pre>
+
+<p>let the current coroutine sleep:</p>
+<pre><code class="cpp">static int fsw::Coroutine::sleep(double seconds)
+</code></pre>
+
+<h3 id="channel">Channel</h3>
+<p>create a channel:</p>
+<pre><code class="cpp">fsw::coroutine::Channel::Channel(size_t _capacity = 1UL)
+</code></pre>
+
+<p>push the data into the channel:</p>
+<pre><code class="cpp">bool fsw::coroutine::Channel::push(void *data, double timeout = (-1.0))
+</code></pre>
+
+<p>pop the data from the channel:</p>
+<pre><code class="cpp">void *fsw::coroutine::Channel::pop(double timeout = (-1.0))
+</code></pre>
+
+<h3 id="tcp-server">TCP Server</h3>
+<p>create an TCP server:</p>
+<pre><code class="cpp">Server::Server(char * host, int port)
+</code></pre>
+
+<p>start the TCP Server:</p>
+<pre><code class="cpp">bool Server::start()
+</code></pre>
+
+<p>set the handler to handle the connection</p>
+<pre><code class="cpp">void Server::set_handler(string pattern, on_accept_handler fn)
+</code></pre>
+
+<h3 id="http-server">HTTP Server</h3>
+<p>create an HTTP server:</p>
+<pre><code class="cpp">fsw::coroutine::http::Server::Server(char *host, int port)
+</code></pre>
+
+<p>start the HTTP Server:</p>
+<pre><code class="cpp">bool fsw::coroutine::http::Server::start()
+</code></pre>
+
+<p>set the router:</p>
+<pre><code class="cpp">void fsw::coroutine::http::Server::set_handler(std::string pattern, on_accept_handler fn)
 </code></pre></div>
         </div>
 
@@ -156,5 +207,5 @@ docs/
 
 <!--
 MkDocs version : 1.0.4
-Build Date UTC : 2019-11-07 11:18:24
+Build Date UTC : 2019-11-07 11:20:36
 -->
