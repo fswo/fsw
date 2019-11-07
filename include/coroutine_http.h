@@ -48,9 +48,38 @@ public:
 
     Request();
     ~Request();
-    Request* clear_path();
-    Request* clear_body();
-    Request* clear_header();
+
+    inline void clear()
+    {
+        clear_path()->clear_header()->clear_path();
+    }
+
+    inline Request* clear_path()
+    {
+        delete[] path;
+        path = nullptr;
+        path_len = 0;
+        return this;
+    }
+
+    inline Request* clear_header()
+    {
+        for (auto i = header.begin(); i != header.end(); i++)
+        {
+            delete[] i->first;
+            delete[] i->second;
+        }
+        header.clear();
+        return this;
+    }
+
+    inline Request* clear_body()
+    {
+        delete[] body;
+        body = nullptr;
+        body_length = 0;
+        return this;
+    }
 };
 
 
