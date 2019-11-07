@@ -70,6 +70,14 @@
             
     <li class="toctree-l2"><a href="#channel">Channel</a></li>
     
+        <ul>
+        
+            <li><a class="toctree-l3" href="#create">Create</a></li>
+        
+            <li><a class="toctree-l3" href="#push">push</a></li>
+        
+        </ul>
+    
 
     </ul>
 	    </li>
@@ -117,12 +125,68 @@
             <div class="section">
               
                 <h1 id="channel">Channel</h1>
+<h2 id="create">Create</h2>
 <p>create a channel:</p>
 <pre><code class="cpp">fsw::coroutine::Channel::Channel(size_t _capacity = 1UL)
 </code></pre>
 
+<pre><code class="cpp">#include &quot;fsw/coroutine_channel.h&quot;
+
+
+using fsw::coroutine::Channel;
+
+int main(int argc, char const *argv[])
+{
+    fsw_event_init();
+
+    Channel *chan1 = new Channel();
+    Channel *chan2 = new Channel(2);
+
+    fsw_event_wait();
+
+    return 0;
+}
+</code></pre>
+
+<h2 id="push">push</h2>
 <p>push the data into the channel:</p>
 <pre><code class="cpp">bool fsw::coroutine::Channel::push(void *data, double timeout = (-1.0))
+</code></pre>
+
+<pre><code class="cpp">#include &quot;fsw/coroutine.h&quot;
+#include &quot;fsw/coroutine_channel.h&quot;
+
+using fsw::coroutine::Channel;
+using fsw::Coroutine;
+
+int main(int argc, char const *argv[])
+{
+    Channel *chan = new Channel();
+
+    Coroutine::create([](void *arg)
+    {
+        void *data;
+        Channel *chan = (Channel *)arg;
+        data = chan-&gt;pop();
+        std::cout &lt;&lt; *(std::string *)data &lt;&lt; std::endl;
+    }, (void *)chan);
+
+    Coroutine::create([](void *arg)
+    {
+        bool ret;
+        std::string data = &quot;hello world&quot;;
+        Channel *chan = (Channel *)arg;
+        ret = chan-&gt;push(&amp;data);
+        std::cout &lt;&lt; ret &lt;&lt; std::endl;
+    }, (void *)chan);
+
+    delete chan;
+}
+</code></pre>
+
+<p>it will print:</p>
+<pre><code class="shell">hello world
+1
 </code></pre>
 
 <p>pop the data from the channel:</p>
