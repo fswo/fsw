@@ -6,6 +6,14 @@
 using fsw::Buffer;
 using fsw::coroutine::http::Response;
 
+TEST(coroutine_http_response, get_status_message)
+{
+    Response response;
+    ASSERT_EQ(response.get_status_message(), "200 OK");
+    response.set_status(404);
+    ASSERT_EQ(response.get_status_message(), "404 Not Found");
+}
+
 TEST(coroutine_http_response, set_header_string)
 {
     Response *response = new Response();
