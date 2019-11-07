@@ -53,7 +53,10 @@
                 <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
     <ul class="nav bs-sidenav">
         <li class="main active"><a href="#introduction">Introduction</a></li>
-            <li><a href="#docs">docs</a></li>
+            <li><a href="#coroutine">Coroutine</a></li>
+            <li><a href="#channel">Channel</a></li>
+            <li><a href="#tcp-server">TCP Server</a></li>
+            <li><a href="#http-server">HTTP Server</a></li>
     </ul>
 </div></div>
                 <div class="col-md-9" role="main">
@@ -61,8 +64,7 @@
 <h1 id="introduction">Introduction</h1>
 <p><a href="https://travis-ci.org/fswo/fsw"><img alt="Build Status" src="https://travis-ci.org/fswo/fsw.svg?branch=dev" /></a></p>
 <p>fsw is a coroutine component that we can use to quickly develop a high performance server, etc.</p>
-<h2 id="docs">docs</h2>
-<h3 id="coroutine">Coroutine</h3>
+<h2 id="coroutine">Coroutine</h2>
 <p>create a coroutine and run it immediately:</p>
 <pre><code class="cpp">long Coroutine::create(coroutine_func_t fn, void * args)
 </code></pre>
@@ -87,7 +89,7 @@
 <pre><code class="cpp">static int fsw::Coroutine::sleep(double seconds)
 </code></pre>
 
-<h3 id="channel">Channel</h3>
+<h2 id="channel">Channel</h2>
 <p>create a channel:</p>
 <pre><code class="cpp">fsw::coroutine::Channel::Channel(size_t _capacity = 1UL)
 </code></pre>
@@ -100,7 +102,7 @@
 <pre><code class="cpp">void *fsw::coroutine::Channel::pop(double timeout = (-1.0))
 </code></pre>
 
-<h3 id="tcp-server">TCP Server</h3>
+<h2 id="tcp-server">TCP Server</h2>
 <p>create an TCP server:</p>
 <pre><code class="cpp">Server::Server(char * host, int port)
 </code></pre>
@@ -113,7 +115,7 @@
 <pre><code class="cpp">void Server::set_handler(string pattern, on_accept_handler fn)
 </code></pre>
 
-<h3 id="http-server">HTTP Server</h3>
+<h2 id="http-server">HTTP Server</h2>
 <p>create an HTTP server:</p>
 <pre><code class="cpp">fsw::coroutine::http::Server::Server(char *host, int port)
 </code></pre>
@@ -207,5 +209,5 @@
 
 <!--
 MkDocs version : 1.0.4
-Build Date UTC : 2019-11-07 11:20:36
+Build Date UTC : 2019-11-07 11:22:35
 -->
