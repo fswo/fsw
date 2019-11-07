@@ -15,25 +15,7 @@ Buffer::~Buffer()
     delete[] _buffer;
 }
 
-size_t Buffer::length()
-{
-    return _length;
-}
-
-/**
- * size represents a valid character that can be stored, excluding the last \0
- */
-size_t Buffer::size()
-{
-    return _size;
-}
-
-char* Buffer::c_buffer()
-{
-    return _buffer;
-}
-
-void Buffer::append(char *str, size_t length)
+Buffer* Buffer::append(char *str, size_t length)
 {
     if (_length + length > _size)
     {
@@ -43,36 +25,23 @@ void Buffer::append(char *str, size_t length)
     memcpy(_buffer + _length, str, length);
     _length += length;
     _buffer[_length] = 0;
+    return this;
 }
 
-void Buffer::append(std::string str)
+Buffer* Buffer::append(std::string str)
 {
-    if (_length + str.length() > _size)
-    {
-        fswError("buffer capacity is not enough");
-    }
-
-    memcpy(_buffer + _length, str.c_str(), str.length());
-    _length += str.length();
-    _buffer[_length] = 0;
+    return append((char *)str.c_str(), str.length());
 }
 
-void Buffer::append(Buffer *buffer)
+Buffer* Buffer::append(int value)
 {
-    if (_length + buffer->length() > _size)
-    {
-        fswError("buffer capacity is not enough");
-    }
-
-    memcpy(_buffer + _length, buffer->c_buffer(), buffer->length());
-    _length += buffer->length();
-    _buffer[_length] = 0;
+    auto str = std::to_string(value);
+    return append(str);
 }
 
-void Buffer::clear()
+Buffer* Buffer::append(Buffer *buffer)
 {
-    _length = 0;
-    _buffer[0] = 0;
+    return append(buffer->c_buffer(), buffer->length());
 }
 
 Buffer* Buffer::dup()
@@ -80,4 +49,28 @@ Buffer* Buffer::dup()
     Buffer *ret_buffer = new Buffer(_length);
     ret_buffer->append(this);
     return ret_buffer;
+}
+
+bool Buffer::equal(Buffer *target)
+{
+    if (_length != target->length() || memcmp(_buffer, target->c_buffer(), _length) != 0)
+    {
+        return false;
+    }
+    return true;
+}
+
+bool Buffer::deep_equal(Buffer *target)
+{
+    if (
+        this != target
+        || _size != target->size()
+        || _length != target->length()
+        || _buffer != target->c_buffer()
+        || memcmp(_buffer, target->c_buffer(), _length) != 0
+    )
+    {
+        return false;
+    }
+    return true;
 }

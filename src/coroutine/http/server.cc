@@ -49,11 +49,11 @@ static void http_connection_on_accept(void *arg)
         * Note we pass recved==0 to signal that EOF has been received.
         */
         ctx->parse(recved);
-        string path(ctx->request.path);
+        string path(ctx->request->path);
         on_accept_handler handler = server->get_handler(path);
         if (handler != nullptr)
         {
-            handler(&(ctx->request), &(ctx->response));
+            handler(ctx->request, ctx->response);
         }
         if (!ctx->keep_alive)
         {
