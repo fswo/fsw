@@ -5,4 +5,29 @@
      <lastmod>2019-11-07</lastmod>
      <changefreq>daily</changefreq>
     </url>
+    <url>
+     <loc>https://fswo.github.io/fsw/getting-started/</loc>
+     <lastmod>2019-11-07</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+    <url>
+     <loc>https://fswo.github.io/fsw/coroutine/</loc>
+     <lastmod>2019-11-07</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+    <url>
+     <loc>https://fswo.github.io/fsw/channel/</loc>
+     <lastmod>2019-11-07</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+    <url>
+     <loc>https://fswo.github.io/fsw/tcp-server/</loc>
+     <lastmod>2019-11-07</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+    <url>
+     <loc>https://fswo.github.io/fsw/http-server/</loc>
+     <lastmod>2019-11-07</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
 </urlset>
