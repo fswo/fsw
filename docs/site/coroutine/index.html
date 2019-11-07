@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  
+  <link rel="shortcut icon" href="../img/favicon.ico">
+  <title>Coroutine - fsw document</title>
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  <link rel="stylesheet" href="../css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../css/theme_extra.css" type="text/css" />
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css">
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "Coroutine";
+    var mkdocs_page_input_path = "coroutine.md";
+    var mkdocs_page_url = "/fsw/coroutine/";
+  </script>
+  
+  <script src="../js/jquery-2.1.1.min.js" defer></script>
+  <script src="../js/modernizr-2.8.3.min.js" defer></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script> 
+  
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+      <div class="wy-side-nav-search">
+        <a href=".." class="icon icon-home"> fsw document</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+	<ul class="current">
+	  
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="..">About</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../getting-started/">Getting Started</a>
+	    </li>
+          
+            <li class="toctree-l1 current">
+		
+    <a class="current" href="./">Coroutine</a>
+    <ul class="subnav">
+            
+    <li class="toctree-l2"><a href="#coroutine">Coroutine</a></li>
+    
+        <ul>
+        
+            <li><a class="toctree-l3" href="#create">create</a></li>
+        
+            <li><a class="toctree-l3" href="#get_current">get_current</a></li>
+        
+            <li><a class="toctree-l3" href="#yield">yield</a></li>
+        
+            <li><a class="toctree-l3" href="#resume">resume</a></li>
+        
+            <li><a class="toctree-l3" href="#defer">defer</a></li>
+        
+            <li><a class="toctree-l3" href="#sleep">sleep</a></li>
+        
+        </ul>
+    
+
+    </ul>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../channel/">Channel</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../tcp-server/">TCP Server</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../http-server/">HTTP Server</a>
+	    </li>
+          
+        </ul>
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="..">fsw document</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="..">Docs</a> &raquo;</li>
+    
+      
+    
+    <li>Coroutine</li>
+    <li class="wy-breadcrumbs-aside">
+      
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              
+                <h1 id="coroutine">Coroutine</h1>
+<h2 id="create">create</h2>
+<p>create a coroutine and run it immediately:</p>
+<pre><code class="cpp">long Coroutine::create(coroutine_func_t fn, void * args)
+</code></pre>
+
+<pre><code class="cpp">#include &quot;fsw/coroutine.h&quot;
+
+using fsw::Coroutine;
+
+int main(int argc, char const *argv[])
+{
+    fsw_event_init();
+
+    Coroutine::create([](void *arg)
+    {
+        std::cout &lt;&lt; &quot;coroutine 1&quot; &lt;&lt; std::endl;
+    });
+
+    Coroutine::create([](void *arg)
+    {
+        std::cout &lt;&lt; &quot;coroutine 2&quot; &lt;&lt; std::endl;
+    });
+
+    Coroutine::create([](void *arg)
+    {
+        std::cout &lt;&lt; &quot;coroutine 3&quot; &lt;&lt; std::endl;
+    });
+
+    fsw_event_wait();
+
+    return 0;
+}
+</code></pre>
+
+<h2 id="get_current">get_current</h2>
+<p>get the currently running coroutine:</p>
+<pre><code class="cpp">static fsw::Coroutine *fsw::Coroutine::get_current()
+</code></pre>
+
+<pre><code class="cpp">#include &quot;fsw/coroutine.h&quot;
+
+using fsw::Coroutine;
+
+int main(int argc, char const *argv[])
+{
+    fsw_event_init();
+
+    Coroutine::create([](void *arg)
+    {
+        Coroutine *co = Coroutine::get_current();
+    });
+
+    fsw_event_wait();
+
+    return 0;
+}
+</code></pre>
+
+<h2 id="yield">yield</h2>
+<p>swap out the current coroutine:</p>
+<pre><code class="cpp">void fsw::Coroutine::yield()
+</code></pre>
+
+<pre><code class="cpp">#include &quot;fsw/coroutine.h&quot;
+
+using fsw::Coroutine;
+
+int main(int argc, char const *argv[])
+{
+    fsw_event_init();
+
+    long cid = Coroutine::create([](void *arg)
+    {
+        Coroutine *co = Coroutine::get_current();
+        std::cout &lt;&lt; 1 &lt;&lt; std::endl;
+        co-&gt;yield();
+        std::cout &lt;&lt; 3 &lt;&lt; std::endl;
+    });
+
+    Coroutine::create([](void *arg)
+    {
+        long cid = (long)(uintptr_t)arg;
+        Coroutine *co = Coroutine::get_by_cid(cid);
+        std::cout &lt;&lt; 2 &lt;&lt; std::endl;
+        co-&gt;resume();
+        std::cout &lt;&lt; 4 &lt;&lt; std::endl;
+    }, (void*)(uintptr_t)cid);
+
+    fsw_event_wait();
+
+    return 0;
+}
+</code></pre>
+
+<p>it will print:</p>
+<pre><code class="shell">1
+2
+3
+4
+</code></pre>
+
+<h2 id="resume">resume</h2>
+<p>swap in the specified coroutine:</p>
+<pre><code class="cpp">void fsw::Coroutine::resume()
+</code></pre>
+
+<pre><code class="cpp">#include &quot;fsw/coroutine.h&quot;
+
+using fsw::Coroutine;
+
+int main(int argc, char const *argv[])
+{
+    fsw_event_init();
+
+    long cid = Coroutine::create([](void *arg)
+    {
+        Coroutine *co = Coroutine::get_current();
+        std::cout &lt;&lt; 1 &lt;&lt; std::endl;
+        co-&gt;yield();
+        std::cout &lt;&lt; 3 &lt;&lt; std::endl;
+    });
+
+    Coroutine::create([](void *arg)
+    {
+        long cid = (long)(uintptr_t)arg;
+        Coroutine *co = Coroutine::get_by_cid(cid);
+        std::cout &lt;&lt; 2 &lt;&lt; std::endl;
+        co-&gt;resume();
+        std::cout &lt;&lt; 4 &lt;&lt; std::endl;
+    }, (void*)(uintptr_t)cid);
+
+    fsw_event_wait();
+
+    return 0;
+}
+</code></pre>
+
+<p>it will print:</p>
+<pre><code class="shell">1
+2
+3
+4
+</code></pre>
+
+<h2 id="defer">defer</h2>
+<p>delayed execution of tasks:</p>
+<pre><code class="cpp">void fsw::Coroutine::defer(coroutine_func_t _fn, void *_args = (void *)nullptr)
+</code></pre>
+
+<pre><code class="cpp">#include &quot;fsw/coroutine.h&quot;
+
+using fsw::Coroutine;
+
+int main(int argc, char const *argv[])
+{
+    fsw_event_init();
+
+    long cid = Coroutine::create([](void *arg)
+    {
+        Coroutine *co = Coroutine::get_current();
+        co-&gt;defer([](void *arg)
+        {
+            std::cout &lt;&lt; 1 &lt;&lt; std::endl;
+        });
+        co-&gt;defer([](void *arg)
+        {
+            std::cout &lt;&lt; 2 &lt;&lt; std::endl;
+        });
+        co-&gt;defer([](void *arg)
+        {
+            std::cout &lt;&lt; 3 &lt;&lt; std::endl;
+        });
+    });
+    fsw_event_wait();
+
+    return 0;
+}
+</code></pre>
+
+<p>it will print:</p>
+<pre><code class="shell">3
+2
+1
+</code></pre>
+
+<h2 id="sleep">sleep</h2>
+<p>let the current coroutine sleep:</p>
+<pre><code class="cpp">static int fsw::Coroutine::sleep(double seconds)
+</code></pre>
+
+<pre><code class="cpp">#include &quot;fsw/coroutine.h&quot;
+#include &quot;fsw/timer.h&quot;
+
+
+using fsw::Coroutine;
+using fsw::Timer;
+
+int main(int argc, char const *argv[])
+{
+    fsw_event_init();
+
+    long cid = Coroutine::create([](void *arg)
+    {
+        std::cout &lt;&lt; 1 &lt;&lt; std::endl;
+        Coroutine::sleep(2 * Timer::MILLI_SECOND);
+        std::cout &lt;&lt; 2 &lt;&lt; std::endl;
+    });
+
+    Coroutine::create([](void *arg)
+    {
+        std::cout &lt;&lt; 3 &lt;&lt; std::endl;
+        Coroutine::sleep(1 * Timer::MILLI_SECOND);
+        std::cout &lt;&lt; 4 &lt;&lt; std::endl;
+    }, (void*)(uintptr_t)cid);
+
+    fsw_event_wait();
+
+    return 0;
+}
+</code></pre>
+
+<p>it will print:</p>
+<pre><code class="shell">1
+3
+4
+2
+</code></pre>
+              
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../channel/" class="btn btn-neutral float-right" title="Channel">Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href="../getting-started/" class="btn btn-neutral" title="Getting Started"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+  Built with <a href="http://www.mkdocs.org">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+      
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" style="cursor: pointer">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      
+      
+        <span><a href="../getting-started/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      
+      
+        <span style="margin-left: 15px"><a href="../channel/" style="color: #fcfcfc">Next &raquo;</a></span>
+      
+    </span>
+</div>
+    <script>var base_url = '..';</script>
+    <script src="../js/theme.js" defer></script>
+      <script src="../search/main.js" defer></script>
+
+</body>
+</html>

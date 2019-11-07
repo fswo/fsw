@@ -1,0 +1,10 @@
+site_name: fsw document
+site_url: https://fswo.github.io/fsw/
+nav:
+- About: index.md
+- Getting Started: getting-started.md
+- Coroutine: coroutine.md
+- Channel: channel.md
+- TCP Server: tcp-server.md
+- HTTP Server: http-server.md
+theme: readthedocs
