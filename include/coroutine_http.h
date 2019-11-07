@@ -101,6 +101,8 @@ public:
     Response();
     ~Response();
 
+    std::string get_status_message();
+
     /**
      * in order to prevent the user from modifying the header, 
      * set_header needs to copy the passed parameters.
@@ -121,6 +123,11 @@ public:
     Response* build_http_body(Buffer *body);
     void end(Buffer *body);
     void clear_header();
+
+    inline void set_status(int status)
+    {
+        _status = status;
+    }
 
     inline void set_version(int version)
     {
