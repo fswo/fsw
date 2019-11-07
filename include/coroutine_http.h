@@ -119,6 +119,7 @@ public:
      * so need to iterate through all the headers.
      */
     bool update_header(Buffer *_name, Buffer *_value);
+    Response* build_http_status_line();
     Response* build_http_header(int body_length);
     Response* build_http_body(Buffer *body);
     void end(Buffer *body);

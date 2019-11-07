@@ -296,11 +296,17 @@ bool Response::update_header(Buffer *_name, Buffer *_value)
     return false;
 }
 
+Response* Response::build_http_status_line()
+{
+    Buffer* buf = get_write_buf();
+    buf->append("HTTP/1.1 ")->append(get_status_message())->append("\r\n");
+    return this;
+}
+
 Response* Response::build_http_header(int body_length)
 {
     Buffer* buf = get_write_buf();
 
-    buf->append("HTTP/1.1 200 OK\r\n");
     for(auto h : this->header)
     {
         buf->append(h.first)->append(": ")->append(h.second)->append("\r\n");
@@ -334,7 +340,11 @@ Response* Response::build_http_body(Buffer *body)
 void Response::end(Buffer *body)
 {
     clear_write_buf();
-    build_http_header(body->length())->build_http_body(body)->send_response();
+
+    build_http_status_line()
+        ->build_http_header(body->length())
+        ->build_http_body(body)
+        ->send_response();
 }
 
 void Response::clear_header()
