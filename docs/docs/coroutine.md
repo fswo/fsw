@@ -71,7 +71,7 @@ int main(int argc, char const *argv[])
 swap out the current coroutine:
 
 ```cpp
-void fsw::Coroutine::yield()
+static void fsw::Coroutine::yield()
 ```
 
 ```cpp
@@ -86,6 +86,7 @@ int main(int argc, char const *argv[])
     long cid = Coroutine::create([](void *arg)
     {
         Coroutine *co = Coroutine::get_current();
+
         std::cout << 1 << std::endl;
         co->yield();
         std::cout << 3 << std::endl;
@@ -94,9 +95,9 @@ int main(int argc, char const *argv[])
     Coroutine::create([](void *arg)
     {
         long cid = (long)(uintptr_t)arg;
-        Coroutine *co = Coroutine::get_by_cid(cid);
+
         std::cout << 2 << std::endl;
-        co->resume();
+        Coroutine::resume(cid);
         std::cout << 4 << std::endl;
     }, (void*)(uintptr_t)cid);
 
@@ -120,7 +121,52 @@ it will print:
 swap in the specified coroutine:
 
 ```cpp
-void fsw::Coroutine::resume()
+static void resume(long cid)
+```
+
+```cpp
+#include "fsw/coroutine.h"
+
+using fsw::Coroutine;
+
+int main(int argc, char const *argv[])
+{
+    fsw_event_init();
+
+    long cid = Coroutine::create([](void *arg)
+    {
+        Coroutine *co = Coroutine::get_current();
+        std::cout << 1 << std::endl;
+        co->yield();
+        std::cout << 3 << std::endl;
+    });
+
+    Coroutine::create([](void *arg)
+    {
+        long cid = (long)(uintptr_t)arg;
+
+        std::cout << 2 << std::endl;
+        Coroutine::resume(cid);
+        std::cout << 4 << std::endl;
+    }, (void*)(uintptr_t)cid);
+
+    fsw_event_wait();
+
+    return 0;
+}
+```
+
+it will print:
+
+```shell
+1
+2
+3
+4
+```
+
+```cpp
+static void fsw::Coroutine::resume(fsw::Coroutine *co)
 ```
 
 ```cpp
@@ -144,8 +190,9 @@ int main(int argc, char const *argv[])
     {
         long cid = (long)(uintptr_t)arg;
         Coroutine *co = Coroutine::get_by_cid(cid);
+
         std::cout << 2 << std::endl;
-        co->resume();
+        Coroutine::resume(co);
         std::cout << 4 << std::endl;
     }, (void*)(uintptr_t)cid);
 
@@ -163,6 +210,10 @@ it will print:
 3
 4
 ```
+
+> notice: if you have already got a pointer to the coroutine,
+> then please call directly resume(fsw::Coroutine *co) instead of resume(long cid),
+> which will reduce the lookup of the map.
 
 ## defer
 
