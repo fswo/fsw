@@ -28,8 +28,7 @@ static void http_connection_on_accept(void *arg)
     Server *server = ((http_accept_handler_args *)arg)->server;
     Socket *conn = ((http_accept_handler_args *)arg)->conn;
     Ctx *ctx = new Ctx(conn);
-    Coroutine *co = Coroutine::get_current();
-    co->defer([](void *arg)
+    Coroutine::defer([](void *arg)
     {
         Ctx *ctx = (Ctx *)arg;
         delete ctx;

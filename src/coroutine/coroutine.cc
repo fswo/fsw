@@ -95,6 +95,12 @@ void Coroutine::_resume()
 
 void Coroutine::defer(coroutine_func_t _fn, void* _args)
 {
+    Coroutine *co = Coroutine::get_current();
+    co->_defer(_fn, _args);
+}
+
+void Coroutine::_defer(coroutine_func_t _fn, void* _args)
+{
     ctx.defer(_fn, _args);
 }
 
