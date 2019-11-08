@@ -54,13 +54,30 @@ long Coroutine::create(coroutine_func_t fn, void* args)
 
 void Coroutine::yield()
 {
+    Coroutine *co = Coroutine::get_current();
+    co->_yield();
+}
+
+void Coroutine::_yield()
+{
     assert(current == this);
     fswTrace("coroutine[%ld] yield", cid);
     current = origin;
     ctx.swap_out();
 }
 
-void Coroutine::resume()
+void Coroutine::resume(long cid)
+{
+    Coroutine *co = Coroutine::get_by_cid(cid);
+    co->_resume();
+}
+
+void Coroutine::resume(Coroutine *co)
+{
+    co->_resume();
+}
+
+void Coroutine::_resume()
 {
     assert(current != this);
     fswTrace("coroutine[%ld] resume", cid);
@@ -83,15 +100,14 @@ void Coroutine::defer(coroutine_func_t _fn, void* _args)
 
 static void sleep_timeout(void *param)
 {
-    ((Coroutine *) param)->resume();
+    Coroutine::resume((Coroutine *) param);
 }
 
 int Coroutine::sleep(double seconds)
 {
-    Coroutine *co = Coroutine::get_current();
-    fswTrace("coroutine[%ld] sleep", co->cid);
+    fswTrace("coroutine[%ld] sleep", current->cid);
 
-    timer_manager.add_timer(seconds * Timer::SECOND, sleep_timeout, (void*)co);
-    co->yield();
+    timer_manager.add_timer(seconds * Timer::SECOND, sleep_timeout, (void*)current);
+    Coroutine::yield();
     return 0;
 }

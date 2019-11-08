@@ -21,8 +21,9 @@ public:
     void* get_task();
     static Coroutine* get_current();
     void set_task(void *_task);
-    void yield();
-    void resume();
+    static void yield();
+    static void resume(long cid);
+    static void resume(Coroutine *co);
     void defer(coroutine_func_t _fn, void* _args = nullptr);
     static int sleep(double seconds);
 
@@ -45,6 +46,9 @@ protected:
     Context ctx;
     long cid;
     static long last_cid;
+
+    void _yield();
+    void _resume();
 
     Coroutine(coroutine_func_t fn, void *private_data) :
             ctx(stack_size, fn, private_data)
