@@ -211,9 +211,11 @@ it will print:
 4
 ```
 
-> notice: if you have already got a pointer to the coroutine,
-> then please call directly resume(fsw::Coroutine *co) instead of resume(long cid),
-> which will reduce the lookup of the map.
+```txt
+notice: if you have already got a pointer to the coroutine,
+then please call directly resume(fsw::Coroutine *co) instead of resume(long cid),
+which will reduce the lookup of the map.
+```
 
 ## defer
 
