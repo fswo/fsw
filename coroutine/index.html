@@ -320,11 +320,11 @@ int main(int argc, char const *argv[])
 4
 </code></pre>
 
-<blockquote>
-<p>notice: if you have already got a pointer to the coroutine,
+<pre><code class="txt">notice: if you have already got a pointer to the coroutine,
 then please call directly resume(fsw::Coroutine *co) instead of resume(long cid),
-which will reduce the lookup of the map.</p>
-</blockquote>
+which will reduce the lookup of the map.
+</code></pre>
+
 <h2 id="defer">defer</h2>
 <p>delayed execution of tasks:</p>
 <pre><code class="cpp">static void defer(coroutine_func_t _fn, void* _args = nullptr)
