@@ -193,7 +193,7 @@ int main(int argc, char const *argv[])
 
 <h2 id="yield">yield</h2>
 <p>swap out the current coroutine:</p>
-<pre><code class="cpp">void fsw::Coroutine::yield()
+<pre><code class="cpp">static void fsw::Coroutine::yield()
 </code></pre>
 
 <pre><code class="cpp">#include &quot;fsw/coroutine.h&quot;
@@ -207,6 +207,7 @@ int main(int argc, char const *argv[])
     long cid = Coroutine::create([](void *arg)
     {
         Coroutine *co = Coroutine::get_current();
+
         std::cout &lt;&lt; 1 &lt;&lt; std::endl;
         co-&gt;yield();
         std::cout &lt;&lt; 3 &lt;&lt; std::endl;
@@ -215,9 +216,9 @@ int main(int argc, char const *argv[])
     Coroutine::create([](void *arg)
     {
         long cid = (long)(uintptr_t)arg;
-        Coroutine *co = Coroutine::get_by_cid(cid);
+
         std::cout &lt;&lt; 2 &lt;&lt; std::endl;
-        co-&gt;resume();
+        Coroutine::resume(cid);
         std::cout &lt;&lt; 4 &lt;&lt; std::endl;
     }, (void*)(uintptr_t)cid);
 
@@ -236,7 +237,48 @@ int main(int argc, char const *argv[])
 
 <h2 id="resume">resume</h2>
 <p>swap in the specified coroutine:</p>
-<pre><code class="cpp">void fsw::Coroutine::resume()
+<pre><code class="cpp">static void resume(long cid)
+</code></pre>
+
+<pre><code class="cpp">#include &quot;fsw/coroutine.h&quot;
+
+using fsw::Coroutine;
+
+int main(int argc, char const *argv[])
+{
+    fsw_event_init();
+
+    long cid = Coroutine::create([](void *arg)
+    {
+        Coroutine *co = Coroutine::get_current();
+        std::cout &lt;&lt; 1 &lt;&lt; std::endl;
+        co-&gt;yield();
+        std::cout &lt;&lt; 3 &lt;&lt; std::endl;
+    });
+
+    Coroutine::create([](void *arg)
+    {
+        long cid = (long)(uintptr_t)arg;
+
+        std::cout &lt;&lt; 2 &lt;&lt; std::endl;
+        Coroutine::resume(cid);
+        std::cout &lt;&lt; 4 &lt;&lt; std::endl;
+    }, (void*)(uintptr_t)cid);
+
+    fsw_event_wait();
+
+    return 0;
+}
+</code></pre>
+
+<p>it will print:</p>
+<pre><code class="shell">1
+2
+3
+4
+</code></pre>
+
+<pre><code class="cpp">static void fsw::Coroutine::resume(fsw::Coroutine *co)
 </code></pre>
 
 <pre><code class="cpp">#include &quot;fsw/coroutine.h&quot;
@@ -259,8 +301,9 @@ int main(int argc, char const *argv[])
     {
         long cid = (long)(uintptr_t)arg;
         Coroutine *co = Coroutine::get_by_cid(cid);
+
         std::cout &lt;&lt; 2 &lt;&lt; std::endl;
-        co-&gt;resume();
+        Coroutine::resume(co);
         std::cout &lt;&lt; 4 &lt;&lt; std::endl;
     }, (void*)(uintptr_t)cid);
 
@@ -277,9 +320,14 @@ int main(int argc, char const *argv[])
 4
 </code></pre>
 
+<blockquote>
+<p>notice: if you have already got a pointer to the coroutine,
+then please call directly resume(fsw::Coroutine *co) instead of resume(long cid),
+which will reduce the lookup of the map.</p>
+</blockquote>
 <h2 id="defer">defer</h2>
 <p>delayed execution of tasks:</p>
-<pre><code class="cpp">void fsw::Coroutine::defer(coroutine_func_t _fn, void *_args = (void *)nullptr)
+<pre><code class="cpp">static void defer(coroutine_func_t _fn, void* _args = nullptr)
 </code></pre>
 
 <pre><code class="cpp">#include &quot;fsw/coroutine.h&quot;
@@ -292,16 +340,15 @@ int main(int argc, char const *argv[])
 
     long cid = Coroutine::create([](void *arg)
     {
-        Coroutine *co = Coroutine::get_current();
-        co-&gt;defer([](void *arg)
+        Coroutine::defer([](void *arg)
         {
             std::cout &lt;&lt; 1 &lt;&lt; std::endl;
         });
-        co-&gt;defer([](void *arg)
+        Coroutine::defer([](void *arg)
         {
             std::cout &lt;&lt; 2 &lt;&lt; std::endl;
         });
-        co-&gt;defer([](void *arg)
+        Coroutine::defer([](void *arg)
         {
             std::cout &lt;&lt; 3 &lt;&lt; std::endl;
         });
