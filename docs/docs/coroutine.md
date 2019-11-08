@@ -220,7 +220,7 @@ it will print:
 delayed execution of tasks:
 
 ```cpp
-void fsw::Coroutine::defer(coroutine_func_t _fn, void *_args = (void *)nullptr)
+static void defer(coroutine_func_t _fn, void* _args = nullptr)
 ```
 
 ```cpp
@@ -234,16 +234,15 @@ int main(int argc, char const *argv[])
 
     long cid = Coroutine::create([](void *arg)
     {
-        Coroutine *co = Coroutine::get_current();
-        co->defer([](void *arg)
+        Coroutine::defer([](void *arg)
         {
             std::cout << 1 << std::endl;
         });
-        co->defer([](void *arg)
+        Coroutine::defer([](void *arg)
         {
             std::cout << 2 << std::endl;
         });
-        co->defer([](void *arg)
+        Coroutine::defer([](void *arg)
         {
             std::cout << 3 << std::endl;
         });
