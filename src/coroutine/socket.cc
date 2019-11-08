@@ -129,7 +129,7 @@ bool Socket::wait_event(int event)
     }
     (FswG.poll->event_num)++;
 
-    co->yield();
+    Coroutine::yield();;
 
     fswTrace("remove sockfd[%d] %s event", sockfd, "EPOLL_CTL_DEL");
 
