@@ -12,3 +12,4 @@ include/config.h
 clean_cmake.sh
 bin
 runtest
+docs/site
