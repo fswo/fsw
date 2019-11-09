@@ -7,6 +7,7 @@
 #include "buffer.h"
 
 using fsw::coroutine::http::Request;
+using fsw::coroutine::http::Response;
 using fsw::coroutine::http::Server;
 using fsw::coroutine::http::Ctx;
 using fsw::coroutine::Socket;
@@ -18,6 +19,21 @@ struct http_accept_handler_args
     Server *server;
     Socket *conn;
 };
+
+static bool call_http_handler(on_accept_handler handler, Ctx *ctx)
+{
+    if (ctx->request->has_sec_websocket_key())
+    {
+        Buffer bad_body(32);
+        bad_body.append("no support websocket");
+        
+        ctx->response->set_status(400);
+        ctx->response->end(&bad_body);
+        return false;
+    }
+    handler(ctx->request, ctx->response);
+    return true;
+}
 
 static void http_connection_on_accept(void *arg)
 {
@@ -38,6 +54,8 @@ static void http_connection_on_accept(void *arg)
 
     while (true)
     {
+        on_accept_handler handler;
+
         recved = conn->recv(conn->get_read_buf()->c_buffer(), READ_BUF_MAX_SIZE);
         if (recved == 0)
         {
@@ -49,10 +67,13 @@ static void http_connection_on_accept(void *arg)
         */
         ctx->parse(recved);
         string path(ctx->request->path);
-        on_accept_handler handler = server->get_http_handler(path);
+        handler = server->get_http_handler(path);
         if (handler != nullptr)
         {
-            handler(ctx->request, ctx->response);
+            if (!call_http_handler(handler, ctx))
+            {
+                break;
+            }
         }
         if (!ctx->keep_alive)
         {
