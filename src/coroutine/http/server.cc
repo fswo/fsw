@@ -6,6 +6,8 @@
 #include "http_parser.h"
 #include "buffer.h"
 
+using namespace fsw::coroutine::http;
+
 using fsw::coroutine::http::Request;
 using fsw::coroutine::http::Server;
 using fsw::coroutine::http::Ctx;
@@ -49,7 +51,7 @@ static void http_connection_on_accept(void *arg)
         */
         ctx->parse(recved);
         string path(ctx->request->path);
-        on_accept_handler handler = server->get_handler(path);
+        on_accept_handler handler = server->get_handler(path, Server::handler_type::HTTP);
         if (handler != nullptr)
         {
             handler(ctx->request, ctx->response);
@@ -104,19 +106,26 @@ bool Server::shutdown()
     return true;
 }
 
-void Server::set_handler(string pattern, on_accept_handler fn)
+void Server::set_handler(string pattern, on_accept_handler fn, handler_type type)
 {
-    handlers[pattern] = fn;
+    if (type == handler_type::HTTP)
+    {
+        http_handlers[pattern] = fn;
+    }
 }
 
-on_accept_handler Server::get_handler(string pattern)
+on_accept_handler Server::get_handler(string pattern, handler_type type)
 {
-    for (auto i = handlers.begin(); i != handlers.end(); i++)
+    if (type == handler_type::HTTP)
     {
-        if (strncasecmp(i->first.c_str(), pattern.c_str(), i->first.length()) == 0 && i->first.length() == pattern.length())
+        for (auto i = http_handlers.begin(); i != http_handlers.end(); i++)
         {
-            return i->second;
+            if (strncasecmp(i->first.c_str(), pattern.c_str(), i->first.length()) == 0 && i->first.length() == pattern.length())
+            {
+                return i->second;
+            }
         }
     }
+    
     return nullptr;
 }

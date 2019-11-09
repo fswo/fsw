@@ -17,16 +17,22 @@ class Server
 {
 private:
     Socket *socket;
-    map<string, on_accept_handler> handlers;
+    map<string, on_accept_handler> http_handlers;
     bool running;
     
 public:
+    enum handler_type
+    {
+        HTTP = 1,
+        WEBSOCKET = 2,
+    };
+
     Server(char *host, int port);
     ~Server();
     bool start();
     bool shutdown();
-    void set_handler(string pattern, on_accept_handler fn);
-    on_accept_handler get_handler(string pattern);
+    void set_handler(string pattern, on_accept_handler fn, handler_type type);
+    on_accept_handler get_handler(string pattern, handler_type type);
 };
 }
 }

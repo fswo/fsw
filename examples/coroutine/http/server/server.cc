@@ -3,6 +3,8 @@
 #include "fsw/coroutine.h"
 #include "fsw/buffer.h"
 
+using namespace fsw::coroutine::http;
+
 using fsw::Coroutine;
 using fsw::coroutine::http::Request;
 using fsw::coroutine::http::Response;
@@ -30,7 +32,7 @@ int main(int argc, char const *argv[])
         char ip[] = "127.0.0.1";
 
         Server *serv = new Server(ip, 80);
-        serv->set_handler("/index", handler);
+        serv->set_handler("/index", handler, Server::handler_type::HTTP);
         serv->start();
     });
 
