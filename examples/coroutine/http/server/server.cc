@@ -11,7 +11,7 @@ using fsw::coroutine::http::Response;
 using fsw::coroutine::http::Server;
 using fsw::Buffer;
 
-void handler(Request *request, Response *response)
+void http_handler(Request *request, Response *response)
 {
     char response_body[] = "hello world";
     Buffer buffer(1024);
@@ -32,7 +32,7 @@ int main(int argc, char const *argv[])
         char ip[] = "127.0.0.1";
 
         Server *serv = new Server(ip, 80);
-        serv->set_http_handler("/index", handler);
+        serv->set_http_handler("/index", http_handler);
         serv->start();
     });
 
