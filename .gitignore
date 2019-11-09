@@ -13,3 +13,4 @@ clean_cmake.sh
 bin
 runtest
 docs/site
+design.md
