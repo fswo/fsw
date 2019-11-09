@@ -49,14 +49,25 @@ public:
     Request();
     ~Request();
 
+    inline bool has_header(char *header_name, int length)
+    {
+        for(auto h : header)
+        {
+            if (memcmp(h.first, header_name, length) == 0)
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
     inline bool has_sec_websocket_key()
     {
         char key[] = "sec-websocket-key";
-        auto it = header.find(key);
-        if (it == header.end())
+        if (!has_header(key, sizeof(key) - 1))
         {
             return false;
-        }
+        };
         return true;
     }
 
