@@ -105,7 +105,7 @@ public:
      * 200 => 2.0
      */
     int _version;
-    int _status;
+    int _status = 200;
     std::string _reason;
     std::map<Buffer*, Buffer*> header;
 
