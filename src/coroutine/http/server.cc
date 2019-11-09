@@ -6,8 +6,6 @@
 #include "http_parser.h"
 #include "buffer.h"
 
-using namespace fsw::coroutine::http;
-
 using fsw::coroutine::http::Request;
 using fsw::coroutine::http::Server;
 using fsw::coroutine::http::Ctx;
@@ -51,7 +49,7 @@ static void http_connection_on_accept(void *arg)
         */
         ctx->parse(recved);
         string path(ctx->request->path);
-        on_accept_handler handler = server->get_handler(path, Server::handler_type::HTTP);
+        on_accept_handler handler = server->get_http_handler(path);
         if (handler != nullptr)
         {
             handler(ctx->request, ctx->response);
@@ -106,24 +104,38 @@ bool Server::shutdown()
     return true;
 }
 
-void Server::set_handler(string pattern, on_accept_handler fn, handler_type type)
+void Server::set_http_handler(string pattern, on_accept_handler fn)
 {
-    if (type == handler_type::HTTP)
-    {
-        http_handlers[pattern] = fn;
-    }
+    set_handler(pattern, fn, &http_handlers);
 }
 
-on_accept_handler Server::get_handler(string pattern, handler_type type)
+void Server::set_websocket_handler(string pattern, on_accept_handler fn)
 {
-    if (type == handler_type::HTTP)
+    set_handler(pattern, fn, &websocket_handlers);
+}
+
+void Server::set_handler(string pattern, on_accept_handler fn, std::map<std::string, on_accept_handler> *handlers)
+{
+    (*handlers)[pattern] = fn;
+}
+
+on_accept_handler Server::get_http_handler(string pattern)
+{
+    return get_handler(pattern, &http_handlers);
+}
+
+on_accept_handler Server::get_websocket_handler(string pattern)
+{
+    return get_handler(pattern, &websocket_handlers);
+}
+
+on_accept_handler Server::get_handler(string pattern, std::map<std::string, on_accept_handler> *handlers)
+{
+    for (auto i = handlers->begin(); i != handlers->end(); i++)
     {
-        for (auto i = http_handlers.begin(); i != http_handlers.end(); i++)
+        if (strncasecmp(i->first.c_str(), pattern.c_str(), i->first.length()) == 0 && i->first.length() == pattern.length())
         {
-            if (strncasecmp(i->first.c_str(), pattern.c_str(), i->first.length()) == 0 && i->first.length() == pattern.length())
-            {
-                return i->second;
-            }
+            return i->second;
         }
     }
     

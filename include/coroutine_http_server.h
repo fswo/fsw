@@ -14,12 +14,7 @@ typedef void (*on_accept_handler)(Request*, Response*);
 
 namespace fsw { namespace coroutine { namespace http {
 class Server
-{
-private:
-    Socket *socket;
-    map<string, on_accept_handler> http_handlers;
-    bool running;
-    
+{  
 public:
     enum handler_type
     {
@@ -31,8 +26,19 @@ public:
     ~Server();
     bool start();
     bool shutdown();
-    void set_handler(string pattern, on_accept_handler fn, handler_type type);
-    on_accept_handler get_handler(string pattern, handler_type type);
+    void set_http_handler(string pattern, on_accept_handler fn);
+    void set_websocket_handler(string pattern, on_accept_handler fn);
+    on_accept_handler get_http_handler(string pattern);
+    on_accept_handler get_websocket_handler(string pattern);
+
+private:
+    Socket *socket;
+    map<string, on_accept_handler> http_handlers;
+    map<string, on_accept_handler> websocket_handlers;
+    bool running;
+
+    void set_handler(string pattern, on_accept_handler fn, std::map<std::string, on_accept_handler> *handlers);
+    on_accept_handler get_handler(string pattern, std::map<std::string, on_accept_handler> *http_handlers);
 };
 }
 }
