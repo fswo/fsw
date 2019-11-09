@@ -49,6 +49,17 @@ public:
     Request();
     ~Request();
 
+    inline bool has_sec_websocket_key()
+    {
+        char key[] = "sec-websocket-key";
+        auto it = header.find(key);
+        if (it == header.end())
+        {
+            return false;
+        }
+        return true;
+    }
+
     inline void clear()
     {
         clear_path()->clear_header()->clear_path();
