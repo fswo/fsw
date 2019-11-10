@@ -23,6 +23,18 @@ void http_handler(Request *request, Response *response)
     return;
 }
 
+void websocket_handler(Request *request, Response *response)
+{
+    char response_body[] = "hello websocket";
+    Buffer buffer(1024);
+    buffer.append(response_body, sizeof(response_body) - 1);
+
+    response->set_header("Content-Type", "text/html");
+    response->end(&buffer);
+
+    return;
+}
+
 int main(int argc, char const *argv[])
 {
     fsw_event_init();
@@ -33,6 +45,7 @@ int main(int argc, char const *argv[])
 
         Server *serv = new Server(ip, 80);
         serv->set_http_handler("/index", http_handler);
+        serv->set_websocket_handler("/websocket", websocket_handler);
         serv->start();
     });
 

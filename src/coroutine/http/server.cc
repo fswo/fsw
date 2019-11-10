@@ -35,6 +35,22 @@ static bool call_http_handler(on_accept_handler handler, Ctx *ctx)
     return true;
 }
 
+static bool call_websocket_handler(on_accept_handler handler, Ctx *ctx)
+{
+    if (!ctx->request->has_sec_websocket_key())
+    {
+        std::string data = "websocket: not a websocket handshake: 'Sec-WebSocket-Key' header is missing or blank";
+        Buffer bad_body(data.length());
+        bad_body.append(data);
+        
+        ctx->response->set_status(400);
+        ctx->response->end(&bad_body);
+        return false;
+    }
+    handler(ctx->request, ctx->response);
+    return true;
+}
+
 static void http_connection_on_accept(void *arg)
 {
     ssize_t recved;
@@ -73,6 +89,17 @@ static void http_connection_on_accept(void *arg)
             if (!call_http_handler(handler, ctx))
             {
                 break;
+            }
+        }
+        else
+        {
+            handler = server->get_websocket_handler(path);
+            if (handler != nullptr)
+            {
+                if (!call_websocket_handler(handler, ctx))
+                {
+                    break;
+                }
             }
         }
         if (!ctx->keep_alive)
