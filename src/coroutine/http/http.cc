@@ -360,6 +360,17 @@ void Response::clear_header()
     header.clear();
 }
 
+bool Response::upgrade()
+{
+    std::string bad_handshake = "websocket handshake error: ";
+    if (!ctx->request->has_sec_websocket_key())
+    {
+        ctx->response->send_bad_request_response(bad_handshake + "'Sec-WebSocket-Key' header is missing or blank");
+        return false;
+    }
+    return true;
+}
+
 Ctx::Ctx(Socket *_conn)
 {
     request = new Request();

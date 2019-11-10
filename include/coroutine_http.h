@@ -130,6 +130,7 @@ public:
     Response* build_http_body(Buffer *body);
     void end(Buffer *body = nullptr);
     void clear_header();
+    bool upgrade();
 
     inline void set_status(int status)
     {

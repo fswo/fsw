@@ -33,9 +33,8 @@ static bool call_http_handler(on_accept_handler handler, Ctx *ctx)
 
 static bool call_websocket_handler(on_accept_handler handler, Ctx *ctx)
 {
-    if (!ctx->request->has_sec_websocket_key())
+    if (!ctx->response->upgrade())
     {
-        ctx->response->send_bad_request_response("websocket handshake error: 'Sec-WebSocket-Key' header is missing or blank");
         return false;
     }
     handler(ctx->request, ctx->response);
