@@ -75,6 +75,7 @@ static int http_request_on_header_value(http_parser *parser, const char *at, siz
     std::string header_value(at, length);
 
     std::transform(header_name.begin(), header_name.end(), header_name.begin(), ::tolower);
+    std::transform(header_value.begin(), header_value.end(), header_value.begin(), ::tolower);
     headers[header_name] = header_value;
     
     return 0;
@@ -363,6 +364,12 @@ void Response::clear_header()
 bool Response::upgrade()
 {
     std::string bad_handshake = "websocket handshake error: ";
+
+    if (!ctx->request->header_contain_value("connection", "upgrade"))
+    {
+        ctx->response->send_bad_request_response(bad_handshake + "'upgrade' token not found in 'Connection' header");
+        return false;
+    }
     if (!ctx->request->has_sec_websocket_key())
     {
         ctx->response->send_bad_request_response(bad_handshake + "'Sec-WebSocket-Key' header is missing or blank");
