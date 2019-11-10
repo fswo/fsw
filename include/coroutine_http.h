@@ -44,31 +44,20 @@ public:
     uint32_t path_len;
     char *body = nullptr;
     size_t body_length;
-    std::map<char*, char*> header;
+    std::map<std::string, std::string> header;
 
     Request();
     ~Request();
 
-    inline bool has_header(char *header_name, int length)
+    inline bool has_header(std::string header_name)
     {
-        for(auto h : header)
-        {
-            if (memcmp(h.first, header_name, length) == 0)
-            {
-                return true;
-            }
-        }
-        return false;
+        return header.find(header_name) != header.end();
     }
 
     inline bool has_sec_websocket_key()
     {
-        char key[] = "sec-websocket-key";
-        if (!has_header(key, sizeof(key) - 1))
-        {
-            return false;
-        };
-        return true;
+        std::string key = "sec-websocket-key";
+        return has_header(key);
     }
 
     inline void clear()
@@ -86,11 +75,6 @@ public:
 
     inline Request* clear_header()
     {
-        for (auto i = header.begin(); i != header.end(); i++)
-        {
-            delete[] i->first;
-            delete[] i->second;
-        }
         header.clear();
         return this;
     }
