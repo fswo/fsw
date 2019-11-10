@@ -24,11 +24,7 @@ static bool call_http_handler(on_accept_handler handler, Ctx *ctx)
 {
     if (ctx->request->has_sec_websocket_key())
     {
-        Buffer bad_body(32);
-        bad_body.append("no support websocket");
-        
-        ctx->response->set_status(400);
-        ctx->response->end(&bad_body);
+        ctx->response->send_bad_request_response("no support websocket");
         return false;
     }
     handler(ctx->request, ctx->response);
@@ -39,12 +35,7 @@ static bool call_websocket_handler(on_accept_handler handler, Ctx *ctx)
 {
     if (!ctx->request->has_sec_websocket_key())
     {
-        std::string data = "websocket: not a websocket handshake: 'Sec-WebSocket-Key' header is missing or blank";
-        Buffer bad_body(data.length());
-        bad_body.append(data);
-        
-        ctx->response->set_status(400);
-        ctx->response->end(&bad_body);
+        ctx->response->send_bad_request_response("websocket handshake error: 'Sec-WebSocket-Key' header is missing or blank");
         return false;
     }
     handler(ctx->request, ctx->response);

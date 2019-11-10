@@ -177,6 +177,15 @@ public:
         Buffer *buf = get_write_buf();
         return ctx->conn->send(buf->c_buffer(), buf->length());
     }
+
+    inline void send_bad_request_response(std::string body)
+    {
+        Buffer bad_body(body.length());
+        bad_body.append(body);
+        
+        ctx->response->set_status(400);
+        ctx->response->end(&bad_body);
+    }
 };
 }
 }
