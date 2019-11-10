@@ -365,9 +365,24 @@ bool Response::upgrade()
 {
     std::string bad_handshake = "websocket handshake error: ";
 
+    if (ctx->request->method != "GET")
+    {
+        ctx->response->send_bad_request_response(bad_handshake + "request method is not GET");
+        return false;
+    }
     if (!ctx->request->header_contain_value("connection", "upgrade"))
     {
         ctx->response->send_bad_request_response(bad_handshake + "'upgrade' token not found in 'Connection' header");
+        return false;
+    }
+    if (!ctx->request->header_contain_value("upgrade", "websocket"))
+    {
+        ctx->response->send_bad_request_response(bad_handshake + "'websocket' token not found in 'Upgrade' header");
+        return false;
+    }
+    if (!ctx->request->header_contain_value("sec-websocket-version", "13"))
+    {
+        ctx->response->send_bad_request_response(bad_handshake + "websocket: unsupported version: 13 not found in 'Sec-Websocket-Version' header");
         return false;
     }
     if (!ctx->request->has_sec_websocket_key())
