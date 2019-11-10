@@ -44,6 +44,10 @@ public:
     uint32_t path_len;
     char *body = nullptr;
     size_t body_length;
+
+    /**
+     * header_name is converted to lowercase
+     */
     std::map<std::string, std::string> header;
 
     Request();
@@ -52,6 +56,16 @@ public:
     inline bool has_header(std::string header_name)
     {
         return header.find(header_name) != header.end();
+    }
+
+    inline bool header_contain_value(std::string header_name, std::string header_value)
+    {
+        auto it = header.find(header_name);
+        if (it == header.end() || it->second != header_value)
+        {
+            return false;
+        }
+        return true;
     }
 
     inline bool has_sec_websocket_key()
