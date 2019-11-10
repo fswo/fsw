@@ -325,17 +325,27 @@ Response* Response::build_http_header(int body_length)
 Response* Response::build_http_body(Buffer *body)
 {
     Buffer* buf = get_write_buf();
-
-    buf->append(body)->append("\r\n");
+    if (body)
+    {
+        buf->append(body)->append("\r\n");
+    }
+    
     return this;
 }
 
 void Response::end(Buffer *body)
 {
+    size_t body_length = 0;
+
     clear_write_buf();
 
+    if (body)
+    {
+        body_length = body->length();
+    }
+
     build_http_status_line()
-        ->build_http_header(body->length())
+        ->build_http_header(body_length)
         ->build_http_body(body)
         ->send_response();
 }

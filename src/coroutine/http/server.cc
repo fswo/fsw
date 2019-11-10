@@ -74,24 +74,23 @@ static void http_connection_on_accept(void *arg)
         */
         ctx->parse(recved);
         string path(ctx->request->path);
-        handler = server->get_http_handler(path);
-        if (handler != nullptr)
+        if ((handler = server->get_http_handler(path)) != nullptr)
         {
             if (!call_http_handler(handler, ctx))
             {
                 break;
             }
         }
+        else if ((handler = server->get_websocket_handler(path)) != nullptr)
+        {
+            if (!call_websocket_handler(handler, ctx))
+            {
+                break;
+            }
+        }
         else
         {
-            handler = server->get_websocket_handler(path);
-            if (handler != nullptr)
-            {
-                if (!call_websocket_handler(handler, ctx))
-                {
-                    break;
-                }
-            }
+            ctx->response->send_not_found_response();
         }
         if (!ctx->keep_alive)
         {

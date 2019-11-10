@@ -128,7 +128,7 @@ public:
     Response* build_http_status_line();
     Response* build_http_header(int body_length);
     Response* build_http_body(Buffer *body);
-    void end(Buffer *body);
+    void end(Buffer *body = nullptr);
     void clear_header();
 
     inline void set_status(int status)
@@ -176,6 +176,12 @@ public:
     {
         Buffer *buf = get_write_buf();
         return ctx->conn->send(buf->c_buffer(), buf->length());
+    }
+
+    inline void send_not_found_response()
+    {
+        ctx->response->set_status(404);
+        ctx->response->end();
     }
 
     inline void send_bad_request_response(std::string body)
