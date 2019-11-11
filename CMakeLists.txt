@@ -4,10 +4,27 @@ cmake_minimum_required(VERSION 2.8)
 
 enable_language(ASM)
 set(FSW_VERSION 0.0.1)
-# set(FSW_CLFLAGS pthread uv)
+set(FSW_CLFLAGS ssl crypt crypto)
 set(CMAKE_CXX_STANDARD 11)
 set(ENABLE_DEBUG OFF)
 set(ENABLE_TRACE OFF)
+
+# check library
+find_library(LIB_SSL ssl)
+if(NOT LIB_SSL)
+  message(FATAL_ERROR "libssl not found")
+endif()
+
+find_library(LIB_CRYPT crypt)
+if(NOT LIB_CRYPT)
+  message(FATAL_ERROR "libcrypt not found")
+endif()
+
+find_library(LIB_CRYPTO crypto)
+if(NOT LIB_CRYPTO)
+  message(FATAL_ERROR "libcrypto not found")
+endif()
+# check library end
 
 include(CheckFunctionExists)
 check_function_exists(epoll_create HAVE_EPOLL)
