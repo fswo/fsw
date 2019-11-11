@@ -19,6 +19,15 @@ static int http_request_on_headers_complete(http_parser *parser);
 static int http_request_on_body(http_parser *parser, const char *at, size_t length);
 static int http_request_on_message_complete(http_parser *parser);
 
+inline static std::string compute_accept_key(std::string sec_websocket_key)
+{
+    std::string origin = sec_websocket_key + WEBSOCKET_GUID;
+    unsigned char hash[SHA_DIGEST_LENGTH];
+    SHA1((const unsigned char *)origin.c_str(), origin.length(), hash);
+    std::string base64_origin = base64_encode(hash, SHA_DIGEST_LENGTH);
+    return base64_origin;
+}
+
 inline void set_http_version(Ctx *ctx, http_parser *parser)
 {
     ctx->request->version = parser->http_major * 100 + parser->http_minor;
@@ -400,11 +409,8 @@ bool Response::upgrade()
     ctx->response->set_header("Upgrade", "websocket");
     ctx->response->set_header("Connection", "Upgrade");
 
-    std::string origin = sec_websocket_key + WEBSOCKET_GUID;
-    unsigned char hash[SHA_DIGEST_LENGTH];
-    SHA1((const unsigned char *)origin.c_str(), origin.length(), hash);
-    std::string base64_origin = base64_encode(hash, SHA_DIGEST_LENGTH);
-    ctx->response->set_header("Sec-WebSocket-Accept", base64_origin);
+    std::string accept_key = compute_accept_key(sec_websocket_key);
+    ctx->response->set_header("Sec-WebSocket-Accept", accept_key);
     ctx->response->end();
 
     return true;
