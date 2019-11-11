@@ -1,10 +1,14 @@
 #include "coroutine_http.h"
 #include "log.h"
+#include "base64.h"
+#include <openssl/sha.h>
 
 using fsw::coroutine::http::Request;
 using fsw::coroutine::http::Response;
 using fsw::coroutine::http::Ctx;
 using fsw::coroutine::Socket;
+
+#define WEBSOCKET_GUID "258EAFA5-E914-47DA-95CA-C5AB0DC85B11"
 
 static int http_request_on_message_begin(http_parser *parser);
 static int http_request_on_url(http_parser *parser, const char *at, size_t length);
@@ -385,11 +389,24 @@ bool Response::upgrade()
         ctx->response->send_bad_request_response(bad_handshake + "websocket: unsupported version: 13 not found in 'Sec-Websocket-Version' header");
         return false;
     }
-    if (!ctx->request->has_sec_websocket_key())
+    std::string sec_websocket_key = ctx->request->get_header("sec-websocket-key");
+    if (sec_websocket_key.empty())
     {
         ctx->response->send_bad_request_response(bad_handshake + "'Sec-WebSocket-Key' header is missing or blank");
         return false;
     }
+    
+    ctx->response->set_status(101);
+    ctx->response->set_header("Upgrade", "websocket");
+    ctx->response->set_header("Connection", "Upgrade");
+
+    std::string origin = sec_websocket_key + WEBSOCKET_GUID;
+    unsigned char hash[SHA_DIGEST_LENGTH];
+    SHA1((const unsigned char *)origin.c_str(), origin.length(), hash);
+    std::string base64_origin = base64_encode(hash, SHA_DIGEST_LENGTH);
+    ctx->response->set_header("Sec-WebSocket-Accept", base64_origin);
+    ctx->response->end();
+
     return true;
 }
 
