@@ -58,6 +58,16 @@ public:
         return header.find(header_name) != header.end();
     }
 
+    inline std::string get_header(std::string header_name)
+    {
+        auto it = header.find(header_name);
+        if (it == header.end())
+        {
+            return "";
+        }
+        return it->second;
+    }
+
     inline bool header_contain_value(std::string header_name, std::string header_value)
     {
         auto it = header.find(header_name);
