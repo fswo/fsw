@@ -6,6 +6,7 @@
 #include "http_parser.h"
 #include "buffer.h"
 #include "log.h"
+#include "websocket_frame.h"
 
 using fsw::coroutine::Socket;
 using fsw::Buffer;
@@ -131,6 +132,7 @@ public:
     Response();
     ~Response();
 
+    void recv_frame(struct fsw::websocket::Frame *frame);
     std::string get_status_message();
 
     /**

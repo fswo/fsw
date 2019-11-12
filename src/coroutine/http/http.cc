@@ -145,6 +145,17 @@ Response::Response()
     
 }
 
+void Response::recv_frame(struct fsw::websocket::Frame *frame)
+{
+    ssize_t recved;
+    Socket *conn = ctx->conn;
+    recved = conn->recv(conn->get_read_buf()->c_buffer(), READ_BUF_MAX_SIZE);
+    Buffer buf(recved);
+    buf.append(conn->get_read_buf()->c_buffer(), recved);
+
+    fsw::websocket::decode_frame(&buf, frame);
+}
+
 Response::~Response()
 {
     clear_header();

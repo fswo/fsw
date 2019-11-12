@@ -23,16 +23,5 @@ void decode_frame(Buffer *buffer, struct Frame *frame)
     char *payload = buffer->c_buffer() + HEADER_LEN;
 }
 
-size_t recv(Ctx *ctx, struct Frame *frame)
-{
-    ssize_t recved;
-    Socket *conn = ctx->conn;
-    recved = conn->recv(conn->get_read_buf()->c_buffer(), READ_BUF_MAX_SIZE);
-    Buffer buf(recved);
-    buf.append(conn->get_read_buf()->c_buffer(), recved);
-
-    decode_frame(&buf, frame);
-}
-
 }
 }
