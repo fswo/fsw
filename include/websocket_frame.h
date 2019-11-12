@@ -3,8 +3,10 @@
 
 #include "fsw.h"
 #include "buffer.h"
+#include "fsw/coroutine_http.h"
 
 using fsw::Buffer;
+using fsw::coroutine::http::Ctx;
 
 namespace fsw { namespace websocket {
 
@@ -28,6 +30,9 @@ struct Frame
     char mask_key[MASK_LEN];
     char *payload;
 };
+
+void decode_frame(Buffer *buffer, struct Frame *frame);
+size_t recv(Ctx *ctx, struct Frame *frame);
 
 }
 }
