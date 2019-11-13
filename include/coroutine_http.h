@@ -72,10 +72,19 @@ public:
     inline bool header_contain_value(std::string header_name, std::string header_value)
     {
         auto it = header.find(header_name);
-        if (it == header.end() || it->second != header_value)
+        if (it == header.end())
+        {
+            return false;
+        
+        }
+
+        std::string real_value_lowercase = it->second;
+        std::transform(real_value_lowercase.begin(), real_value_lowercase.end(), real_value_lowercase.begin(), ::tolower);
+        if (real_value_lowercase != header_value)
         {
             return false;
         }
+
         return true;
     }
 
