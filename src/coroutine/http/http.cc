@@ -88,7 +88,6 @@ static int http_request_on_header_value(http_parser *parser, const char *at, siz
     std::string header_value(at, length);
 
     std::transform(header_name.begin(), header_name.end(), header_name.begin(), ::tolower);
-    std::transform(header_value.begin(), header_value.end(), header_value.begin(), ::tolower);
     headers[header_name] = header_value;
     
     return 0;
