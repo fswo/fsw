@@ -155,6 +155,19 @@ void Response::recv_frame(struct fsw::websocket::Frame *frame)
     fsw::websocket::decode_frame(&buf, frame);
 }
 
+void Response::send_frame(Buffer *data)
+{
+    Buffer *copy_data = data->dup();
+
+    clear_write_buf();
+    Buffer *encode_buffer = get_write_buf();
+
+    fsw::websocket::encode_frame(encode_buffer, data);
+    send_response();
+
+    delete copy_data;
+}
+
 Response::~Response()
 {
     clear_header();

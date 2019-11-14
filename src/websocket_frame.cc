@@ -23,5 +23,23 @@ void decode_frame(Buffer *buffer, struct Frame *frame)
     char *payload = buffer->c_buffer() + HEADER_LEN;
 }
 
+void encode_frame(Buffer *encode_buffer, Buffer *data)
+{
+
+    char frame_header[2];
+    struct Frame *header = (struct Frame *)frame_header;
+
+    header->header.fin = 0;
+    header->header.rsv1 = 0;
+    header->header.rsv2 = 0;
+    header->header.rsv3 = 0;
+    header->header.opcode = 1;
+    header->header.mask = 0;
+    header->header.payload_len = data->length();
+
+    encode_buffer->append(frame_header, sizeof(frame_header));
+    encode_buffer->append(data);
+}
+
 }
 }

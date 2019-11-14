@@ -142,6 +142,7 @@ public:
     ~Response();
 
     void recv_frame(struct fsw::websocket::Frame *frame);
+    void send_frame(Buffer *data);
     std::string get_status_message();
 
     /**
