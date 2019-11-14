@@ -28,7 +28,11 @@ void websocket_handler(Request *request, Response *response)
     char response_body[] = "hello websocket";
     Buffer buffer(1024);
     buffer.append(response_body, sizeof(response_body) - 1);
-    response->send_frame(&buffer);
+    while (true)
+    {
+        Coroutine::sleep(1);
+        response->send_frame(&buffer);
+    }
 
     return;
 }
