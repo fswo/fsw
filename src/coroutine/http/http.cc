@@ -1,10 +1,14 @@
 #include "coroutine_http.h"
 #include "log.h"
+#include "base64.h"
+#include <openssl/sha.h>
 
 using fsw::coroutine::http::Request;
 using fsw::coroutine::http::Response;
 using fsw::coroutine::http::Ctx;
 using fsw::coroutine::Socket;
+
+#define WEBSOCKET_GUID "258EAFA5-E914-47DA-95CA-C5AB0DC85B11"
 
 static int http_request_on_message_begin(http_parser *parser);
 static int http_request_on_url(http_parser *parser, const char *at, size_t length);
@@ -14,6 +18,15 @@ static int http_request_on_header_value(http_parser *parser, const char *at, siz
 static int http_request_on_headers_complete(http_parser *parser);
 static int http_request_on_body(http_parser *parser, const char *at, size_t length);
 static int http_request_on_message_complete(http_parser *parser);
+
+inline static std::string compute_accept_key(std::string sec_websocket_key)
+{
+    std::string origin = sec_websocket_key + WEBSOCKET_GUID;
+    unsigned char hash[SHA_DIGEST_LENGTH];
+    SHA1((const unsigned char *)origin.c_str(), origin.length(), hash);
+    std::string base64_origin = base64_encode(hash, SHA_DIGEST_LENGTH);
+    return base64_origin;
+}
 
 inline void set_http_version(Ctx *ctx, http_parser *parser)
 {
@@ -70,18 +83,11 @@ static int http_request_on_header_field(http_parser *parser, const char *at, siz
 static int http_request_on_header_value(http_parser *parser, const char *at, size_t length)
 {
     Ctx *ctx = (Ctx *)parser->data;
-    std::map<char *, char *> &headers = ctx->request->header;
-    size_t header_len = ctx->current_header_name_len;
-    char *header_name = new char[header_len + 1]();
+    std::map<std::string, std::string> &headers = ctx->request->header;
+    std::string header_name(ctx->current_header_name, ctx->current_header_name_len);
+    std::string header_value(at, length);
 
-    memcpy(header_name, ctx->current_header_name, header_len);
-    for (size_t i = 0; i < header_len; i++)
-    {
-        header_name[i] = tolower(header_name[i]);
-    }
-
-    char *header_value = new char[length + 1]();
-    memcpy(header_value, at, length);
+    std::transform(header_name.begin(), header_name.end(), header_name.begin(), ::tolower);
     headers[header_name] = header_value;
     
     return 0;
@@ -136,6 +142,30 @@ Request::~Request()
 Response::Response()
 {
     
+}
+
+void Response::recv_frame(struct fsw::websocket::Frame *frame)
+{
+    ssize_t recved;
+    Socket *conn = ctx->conn;
+    recved = conn->recv(conn->get_read_buf()->c_buffer(), READ_BUF_MAX_SIZE);
+    Buffer buf(recved);
+    buf.append(conn->get_read_buf()->c_buffer(), recved);
+
+    fsw::websocket::decode_frame(&buf, frame);
+}
+
+void Response::send_frame(Buffer *data)
+{
+    Buffer *copy_data = data->dup();
+
+    clear_write_buf();
+    Buffer *encode_buffer = get_write_buf();
+
+    fsw::websocket::encode_frame(encode_buffer, data);
+    send_response();
+
+    delete copy_data;
 }
 
 Response::~Response()
@@ -332,17 +362,27 @@ Response* Response::build_http_header(int body_length)
 Response* Response::build_http_body(Buffer *body)
 {
     Buffer* buf = get_write_buf();
-
-    buf->append(body)->append("\r\n");
+    if (body)
+    {
+        buf->append(body)->append("\r\n");
+    }
+    
     return this;
 }
 
 void Response::end(Buffer *body)
 {
+    size_t body_length = 0;
+
     clear_write_buf();
 
+    if (body)
+    {
+        body_length = body->length();
+    }
+
     build_http_status_line()
-        ->build_http_header(body->length())
+        ->build_http_header(body_length)
         ->build_http_body(body)
         ->send_response();
 }
@@ -355,6 +395,48 @@ void Response::clear_header()
         delete i->second;
     }
     header.clear();
+}
+
+bool Response::upgrade()
+{
+    std::string bad_handshake = "websocket handshake error: ";
+
+    if (ctx->request->method != "GET")
+    {
+        ctx->response->send_bad_request_response(bad_handshake + "request method is not GET");
+        return false;
+    }
+    if (!ctx->request->header_contain_value("connection", "upgrade"))
+    {
+        ctx->response->send_bad_request_response(bad_handshake + "'upgrade' token not found in 'Connection' header");
+        return false;
+    }
+    if (!ctx->request->header_contain_value("upgrade", "websocket"))
+    {
+        ctx->response->send_bad_request_response(bad_handshake + "'websocket' token not found in 'Upgrade' header");
+        return false;
+    }
+    if (!ctx->request->header_contain_value("sec-websocket-version", "13"))
+    {
+        ctx->response->send_bad_request_response(bad_handshake + "websocket: unsupported version: 13 not found in 'Sec-Websocket-Version' header");
+        return false;
+    }
+    std::string sec_websocket_key = ctx->request->get_header("sec-websocket-key");
+    if (sec_websocket_key.empty())
+    {
+        ctx->response->send_bad_request_response(bad_handshake + "'Sec-WebSocket-Key' header is missing or blank");
+        return false;
+    }
+    
+    ctx->response->set_status(101);
+    ctx->response->set_header("Upgrade", "websocket");
+    ctx->response->set_header("Connection", "Upgrade");
+
+    std::string accept_key = compute_accept_key(sec_websocket_key);
+    ctx->response->set_header("Sec-WebSocket-Accept", accept_key);
+    ctx->response->end();
+
+    return true;
 }
 
 Ctx::Ctx(Socket *_conn)

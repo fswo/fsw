@@ -6,6 +6,7 @@
 #include "http_parser.h"
 #include "buffer.h"
 #include "log.h"
+#include "websocket_frame.h"
 
 using fsw::coroutine::Socket;
 using fsw::Buffer;
@@ -44,10 +45,54 @@ public:
     uint32_t path_len;
     char *body = nullptr;
     size_t body_length;
-    std::map<char*, char*> header;
+
+    /**
+     * header_name is converted to lowercase
+     */
+    std::map<std::string, std::string> header;
 
     Request();
     ~Request();
+
+    inline bool has_header(std::string header_name)
+    {
+        return header.find(header_name) != header.end();
+    }
+
+    inline std::string get_header(std::string header_name)
+    {
+        auto it = header.find(header_name);
+        if (it == header.end())
+        {
+            return "";
+        }
+        return it->second;
+    }
+
+    inline bool header_contain_value(std::string header_name, std::string header_value)
+    {
+        auto it = header.find(header_name);
+        if (it == header.end())
+        {
+            return false;
+        
+        }
+
+        std::string real_value_lowercase = it->second;
+        std::transform(real_value_lowercase.begin(), real_value_lowercase.end(), real_value_lowercase.begin(), ::tolower);
+        if (real_value_lowercase != header_value)
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+    inline bool has_sec_websocket_key()
+    {
+        std::string key = "sec-websocket-key";
+        return has_header(key);
+    }
 
     inline void clear()
     {
@@ -64,11 +109,6 @@ public:
 
     inline Request* clear_header()
     {
-        for (auto i = header.begin(); i != header.end(); i++)
-        {
-            delete[] i->first;
-            delete[] i->second;
-        }
         header.clear();
         return this;
     }
@@ -94,13 +134,15 @@ public:
      * 200 => 2.0
      */
     int _version;
-    int _status;
+    int _status = 200;
     std::string _reason;
     std::map<Buffer*, Buffer*> header;
 
     Response();
     ~Response();
 
+    void recv_frame(struct fsw::websocket::Frame *frame);
+    void send_frame(Buffer *data);
     std::string get_status_message();
 
     /**
@@ -122,8 +164,9 @@ public:
     Response* build_http_status_line();
     Response* build_http_header(int body_length);
     Response* build_http_body(Buffer *body);
-    void end(Buffer *body);
+    void end(Buffer *body = nullptr);
     void clear_header();
+    bool upgrade();
 
     inline void set_status(int status)
     {
@@ -170,6 +213,21 @@ public:
     {
         Buffer *buf = get_write_buf();
         return ctx->conn->send(buf->c_buffer(), buf->length());
+    }
+
+    inline void send_not_found_response()
+    {
+        ctx->response->set_status(404);
+        ctx->response->end();
+    }
+
+    inline void send_bad_request_response(std::string body)
+    {
+        Buffer bad_body(body.length());
+        bad_body.append(body);
+        
+        ctx->response->set_status(400);
+        ctx->response->end(&bad_body);
     }
 };
 }

@@ -19,7 +19,7 @@ Channel::~Channel()
 
 static void sleep_timeout(void *param)
 {
-    ((Coroutine *) param)->resume();
+    Coroutine::resume((Coroutine *) param);
 }
 
 void* Channel::pop(double timeout)
@@ -34,7 +34,7 @@ void* Channel::pop(double timeout)
             timer_manager.add_timer(timeout * Timer::SECOND, sleep_timeout, (void*)co);
         }
         consumer_queue.push(co);
-        co->yield();
+        Coroutine::yield();;
     }
 
     if (data_queue.empty())
@@ -52,7 +52,7 @@ void* Channel::pop(double timeout)
     {
         co = producer_queue.front();
         producer_queue.pop();
-        co->resume();
+        Coroutine::resume(co);
     }
 
     return data;
@@ -68,7 +68,7 @@ bool Channel::push(void *data, double timeout)
             timer_manager.add_timer(timeout * Timer::SECOND, sleep_timeout, (void*)co);
         }
         producer_queue.push(co);
-        co->yield();
+        Coroutine::yield();;
     }
 
     /**
@@ -88,7 +88,7 @@ bool Channel::push(void *data, double timeout)
     {
         co = consumer_queue.front();
         consumer_queue.pop();
-        co->resume();
+        Coroutine::resume(co);
     }
 
     return true;

@@ -92,15 +92,13 @@ int fsw_event_wait()
         for (int i = 0; i < n; i++)
         {
             int fd;
-            int id;
+            int cid;
             struct epoll_event *p = &events[i];
             uint64_t u64 = p->data.u64;
-            Coroutine *co;
 
-            fromuint64(u64, &fd, &id);
-            fswTrace("coroutine[%d] resume", id);
-            co = Coroutine::get_by_cid(id);
-            co->resume();
+            fromuint64(u64, &fd, &cid);
+            fswTrace("coroutine[%d] resume", cid);
+            Coroutine::resume(cid);
         }
 
         timer_manager.run_timers();

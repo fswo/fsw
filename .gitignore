@@ -12,4 +12,5 @@ include/config.h
 clean_cmake.sh
 bin
 runtest
-docs
+docs/site
+design.md

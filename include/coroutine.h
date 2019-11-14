@@ -15,16 +15,13 @@ class Coroutine
 public:
     static std::unordered_map<long, Coroutine*> coroutines;
 
-    long run();
-    static void* get_current_task();
     static long create(coroutine_func_t fn, void* args = nullptr);
-    void* get_task();
-    static Coroutine* get_current();
-    void set_task(void *_task);
-    void yield();
-    void resume();
-    void defer(coroutine_func_t _fn, void* _args = nullptr);
+    static void yield();
+    static void resume(long cid);
+    static void resume(Coroutine *co);
     static int sleep(double seconds);
+    static void defer(coroutine_func_t _fn, void* _args = nullptr);
+    static Coroutine* get_current();
 
     inline long get_cid()
     {
@@ -45,6 +42,14 @@ protected:
     Context ctx;
     long cid;
     static long last_cid;
+
+    long run();
+    void _yield();
+    void _resume();
+    void* get_task();
+    void set_task(void *_task);
+    static void* get_current_task();
+    void _defer(coroutine_func_t _fn, void* _args = nullptr);
 
     Coroutine(coroutine_func_t fn, void *private_data) :
             ctx(stack_size, fn, private_data)

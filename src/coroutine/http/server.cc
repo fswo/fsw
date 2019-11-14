@@ -7,6 +7,7 @@
 #include "buffer.h"
 
 using fsw::coroutine::http::Request;
+using fsw::coroutine::http::Response;
 using fsw::coroutine::http::Server;
 using fsw::coroutine::http::Ctx;
 using fsw::coroutine::Socket;
@@ -19,6 +20,27 @@ struct http_accept_handler_args
     Socket *conn;
 };
 
+static bool call_http_handler(on_accept_handler handler, Ctx *ctx)
+{
+    if (ctx->request->has_sec_websocket_key())
+    {
+        ctx->response->send_bad_request_response("no support websocket");
+        return false;
+    }
+    handler(ctx->request, ctx->response);
+    return true;
+}
+
+static bool call_websocket_handler(on_accept_handler handler, Ctx *ctx)
+{
+    if (!ctx->response->upgrade())
+    {
+        return false;
+    }
+    handler(ctx->request, ctx->response);
+    return true;
+}
+
 static void http_connection_on_accept(void *arg)
 {
     ssize_t recved;
@@ -28,8 +50,7 @@ static void http_connection_on_accept(void *arg)
     Server *server = ((http_accept_handler_args *)arg)->server;
     Socket *conn = ((http_accept_handler_args *)arg)->conn;
     Ctx *ctx = new Ctx(conn);
-    Coroutine *co = Coroutine::get_current();
-    co->defer([](void *arg)
+    Coroutine::defer([](void *arg)
     {
         Ctx *ctx = (Ctx *)arg;
         delete ctx;
@@ -39,6 +60,8 @@ static void http_connection_on_accept(void *arg)
 
     while (true)
     {
+        on_accept_handler handler;
+
         recved = conn->recv(conn->get_read_buf()->c_buffer(), READ_BUF_MAX_SIZE);
         if (recved == 0)
         {
@@ -50,10 +73,23 @@ static void http_connection_on_accept(void *arg)
         */
         ctx->parse(recved);
         string path(ctx->request->path);
-        on_accept_handler handler = server->get_handler(path);
-        if (handler != nullptr)
+        if ((handler = server->get_http_handler(path)) != nullptr)
         {
-            handler(ctx->request, ctx->response);
+            if (!call_http_handler(handler, ctx))
+            {
+                break;
+            }
+        }
+        else if ((handler = server->get_websocket_handler(path)) != nullptr)
+        {
+            if (!call_websocket_handler(handler, ctx))
+            {
+                break;
+            }
+        }
+        else
+        {
+            ctx->response->send_not_found_response();
         }
         if (!ctx->keep_alive)
         {
@@ -105,19 +141,40 @@ bool Server::shutdown()
     return true;
 }
 
-void Server::set_handler(string pattern, on_accept_handler fn)
+void Server::set_http_handler(string pattern, on_accept_handler fn)
 {
-    handlers[pattern] = fn;
+    set_handler(pattern, fn, &http_handlers);
 }
 
-on_accept_handler Server::get_handler(string pattern)
+void Server::set_websocket_handler(string pattern, on_accept_handler fn)
 {
-    for (auto i = handlers.begin(); i != handlers.end(); i++)
+    set_handler(pattern, fn, &websocket_handlers);
+}
+
+void Server::set_handler(string pattern, on_accept_handler fn, std::map<std::string, on_accept_handler> *handlers)
+{
+    (*handlers)[pattern] = fn;
+}
+
+on_accept_handler Server::get_http_handler(string pattern)
+{
+    return get_handler(pattern, &http_handlers);
+}
+
+on_accept_handler Server::get_websocket_handler(string pattern)
+{
+    return get_handler(pattern, &websocket_handlers);
+}
+
+on_accept_handler Server::get_handler(string pattern, std::map<std::string, on_accept_handler> *handlers)
+{
+    for (auto i = handlers->begin(); i != handlers->end(); i++)
     {
         if (strncasecmp(i->first.c_str(), pattern.c_str(), i->first.length()) == 0 && i->first.length() == pattern.length())
         {
             return i->second;
         }
     }
+    
     return nullptr;
 }
