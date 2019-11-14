@@ -42,6 +42,7 @@
 #include <stack>
 #include <string>
 #include <iostream>
+#include <algorithm>
 
 #include "config.h"
 
