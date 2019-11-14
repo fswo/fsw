@@ -13,13 +13,13 @@ static unsigned int const HEADER_LEN = 2;
 
 struct FrameHeader
 {
-    unsigned char fin :1;
-    unsigned char rsv1 :1;
-    unsigned char rsv2 :1;
-    unsigned char rsv3 :1;
     unsigned char opcode :4;
-    unsigned char mask :1;
+    unsigned char rsv3 :1;
+    unsigned char rsv2 :1;
+    unsigned char rsv1 :1;
+    unsigned char fin :1;
     unsigned char payload_len :7;
+    unsigned char mask :1;
 };
 
 struct Frame
