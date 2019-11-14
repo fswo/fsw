@@ -8,7 +8,7 @@
   
   
   <link rel="shortcut icon" href="../img/favicon.ico">
-  <title>HTTP Server - fsw document</title>
+  <title>Websocket Server - fsw document</title>
   <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
 
   <link rel="stylesheet" href="../css/theme.css" type="text/css" />
@@ -17,9 +17,9 @@
   
   <script>
     // Current page data
-    var mkdocs_page_name = "HTTP Server";
-    var mkdocs_page_input_path = "http-server.md";
-    var mkdocs_page_url = "/fsw/http-server/";
+    var mkdocs_page_name = "Websocket Server";
+    var mkdocs_page_input_path = "websocket-server.md";
+    var mkdocs_page_url = "/fsw/websocket-server/";
   </script>
   
   <script src="../js/jquery-2.1.1.min.js" defer></script>
@@ -73,20 +73,32 @@
     <a class="" href="../tcp-server/">TCP Server</a>
 	    </li>
           
+            <li class="toctree-l1">
+		
+    <a class="" href="../http-server/">HTTP Server</a>
+	    </li>
+          
             <li class="toctree-l1 current">
 		
-    <a class="current" href="./">HTTP Server</a>
+    <a class="current" href="./">Websocket Server</a>
     <ul class="subnav">
             
-    <li class="toctree-l2"><a href="#http-server">HTTP Server</a></li>
+    <li class="toctree-l2"><a href="#websocket-server">Websocket Server</a></li>
+    
+        <ul>
+        
+            <li><a class="toctree-l3" href="#set_websocket_handler">set_websocket_handler</a></li>
+        
+            <li><a class="toctree-l3" href="#recv_frame">recv_frame</a></li>
+        
+            <li><a class="toctree-l3" href="#send_frame">send_frame</a></li>
+        
+            <li><a class="toctree-l3" href="#websocket-example">websocket example</a></li>
+        
+        </ul>
     
 
     </ul>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="../websocket-server/">Websocket Server</a>
 	    </li>
           
         </ul>
@@ -111,7 +123,7 @@
     
       
     
-    <li>HTTP Server</li>
+    <li>Websocket Server</li>
     <li class="wy-breadcrumbs-aside">
       
     </li>
@@ -121,23 +133,30 @@
           <div role="main">
             <div class="section">
               
-                <h1 id="http-server">HTTP Server</h1>
-<p>create an HTTP server:</p>
-<pre><code class="cpp">fsw::coroutine::http::Server::Server(char *host, int port)
+                <h1 id="websocket-server">Websocket Server</h1>
+<p>Websocket Server is based on HTTP Server, so we can upgrade the protocol on the basis of HTTP Server.</p>
+<h2 id="set_websocket_handler">set_websocket_handler</h2>
+<p>set websocket handler:</p>
+<pre><code class="cpp">void fsw::coroutine::http::Server::set_websocket_handler(std::string pattern, on_accept_handler fn)
 </code></pre>
 
-<p>start the HTTP Server:</p>
-<pre><code class="cpp">bool fsw::coroutine::http::Server::start()
+<h2 id="recv_frame">recv_frame</h2>
+<p>recevie the frame from websocket client:</p>
+<pre><code class="cpp">void fsw::coroutine::http::Response::recv_frame(fsw::websocket::Frame *frame)
 </code></pre>
 
-<p>set the router:</p>
-<pre><code class="cpp">void fsw::coroutine::http::Server::set_handler(std::string pattern, on_accept_handler fn)
+<h2 id="send_frame">send_frame</h2>
+<p>send the frame to websocket client:</p>
+<pre><code class="cpp">void fsw::coroutine::http::Response::send_frame(fsw::Buffer *data)
 </code></pre>
 
+<h2 id="websocket-example">websocket example</h2>
 <pre><code class="cpp">#include &quot;fsw/coroutine_http.h&quot;
 #include &quot;fsw/coroutine_http_server.h&quot;
 #include &quot;fsw/coroutine.h&quot;
 #include &quot;fsw/buffer.h&quot;
+
+using namespace fsw::coroutine::http;
 
 using fsw::Coroutine;
 using fsw::coroutine::http::Request;
@@ -145,14 +164,16 @@ using fsw::coroutine::http::Response;
 using fsw::coroutine::http::Server;
 using fsw::Buffer;
 
-void handler(Request *request, Response *response)
+void websocket_handler(Request *request, Response *response)
 {
-    char response_body[] = &quot;hello world&quot;;
+    char response_body[] = &quot;hello websocket&quot;;
     Buffer buffer(1024);
     buffer.append(response_body, sizeof(response_body) - 1);
-
-    response-&gt;set_header(&quot;Content-Type&quot;, &quot;text/html&quot;);
-    response-&gt;end(&amp;buffer);
+    while (true)
+    {
+        Coroutine::sleep(1);
+        response-&gt;send_frame(&amp;buffer);
+    }
 
     return;
 }
@@ -166,7 +187,7 @@ int main(int argc, char const *argv[])
         char ip[] = &quot;127.0.0.1&quot;;
 
         Server *serv = new Server(ip, 80);
-        serv-&gt;set_handler(&quot;/index&quot;, handler);
+        serv-&gt;set_websocket_handler(&quot;/websocket&quot;, websocket_handler);
         serv-&gt;start();
     });
 
@@ -182,10 +203,8 @@ int main(int argc, char const *argv[])
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="../websocket-server/" class="btn btn-neutral float-right" title="Websocket Server">Next <span class="icon icon-circle-arrow-right"></span></a>
       
-      
-        <a href="../tcp-server/" class="btn btn-neutral" title="TCP Server"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../http-server/" class="btn btn-neutral" title="HTTP Server"><span class="icon icon-circle-arrow-left"></span> Previous</a>
       
     </div>
   
@@ -211,10 +230,8 @@ int main(int argc, char const *argv[])
     <span class="rst-current-version" data-toggle="rst-current-version">
       
       
-        <span><a href="../tcp-server/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+        <span><a href="../http-server/" style="color: #fcfcfc;">&laquo; Previous</a></span>
       
-      
-        <span style="margin-left: 15px"><a href="../websocket-server/" style="color: #fcfcfc">Next &raquo;</a></span>
       
     </span>
 </div>
