@@ -7,4 +7,5 @@ nav:
 - Channel: channel.md
 - TCP Server: tcp-server.md
 - HTTP Server: http-server.md
+- Websocket Server: websocket-server.md
 theme: readthedocs
