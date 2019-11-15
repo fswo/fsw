@@ -2,6 +2,7 @@
 #include "fsw/coroutine_http_server.h"
 #include "fsw/coroutine.h"
 #include "fsw/buffer.h"
+#include "fsw/websocket_frame.h"
 
 using namespace fsw::coroutine::http;
 
@@ -10,6 +11,7 @@ using fsw::coroutine::http::Request;
 using fsw::coroutine::http::Response;
 using fsw::coroutine::http::Server;
 using fsw::Buffer;
+using fsw::websocket::Frame;
 
 void http_handler(Request *request, Response *response)
 {
@@ -25,13 +27,14 @@ void http_handler(Request *request, Response *response)
 
 void websocket_handler(Request *request, Response *response)
 {
-    char response_body[] = "hello websocket";
-    Buffer buffer(1024);
-    buffer.append(response_body, sizeof(response_body) - 1);
     while (true)
     {
+        struct Frame frame;
         Coroutine::sleep(1);
-        response->send_frame(&buffer);
+        response->recv_frame(&frame);
+        std::string recv_data(frame.payload, frame.payload_length);
+        std::cout << frame.payload_length << std::endl;
+        std::cout << recv_data << std::endl;
     }
 
     return;
