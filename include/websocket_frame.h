@@ -18,7 +18,11 @@ struct FrameHeader
     unsigned char rsv2 :1;
     unsigned char rsv1 :1;
     unsigned char fin :1;
-    unsigned char payload_len :7;
+    /**
+     * if length < 126, length is payload's true length,
+     * else length >= 126, length is not payload's true length.
+     */
+    unsigned char length :7;
     unsigned char mask :1;
 };
 
@@ -26,6 +30,8 @@ struct Frame
 {
     struct FrameHeader header;
     char mask_key[MASK_LEN];
+    uint16_t header_length; // header's true length
+    size_t payload_length; // payload's true length
     char *payload;
 };
 
