@@ -158,15 +158,11 @@ void Response::recv_frame(struct fsw::websocket::Frame *frame)
 
 void Response::send_frame(Buffer *data)
 {
-    Buffer *copy_data = data->dup();
-
     clear_write_buf();
-    Buffer *encode_buffer = get_write_buf();
+    Buffer *write_buf = get_write_buf();
 
-    fsw::websocket::encode_frame(encode_buffer, copy_data);
+    fsw::websocket::encode_frame(write_buf, data);
     send_response();
-
-    delete copy_data;
 }
 
 Response::~Response()
