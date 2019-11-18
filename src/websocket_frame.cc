@@ -164,7 +164,6 @@ void encode_frame(Buffer *encode_buffer, Buffer *data)
         if (data->length() > 0)
         {
             size_t offset = encode_buffer->length();
-            // Warn: buffer may be extended, string pointer will change
             encode_buffer->append(data);
             mask(encode_buffer->c_buffer() + offset, data->length(), "258E");
         }
