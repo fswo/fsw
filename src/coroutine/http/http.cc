@@ -163,7 +163,7 @@ void Response::send_frame(Buffer *data)
     clear_write_buf();
     Buffer *encode_buffer = get_write_buf();
 
-    fsw::websocket::encode_frame(encode_buffer, data);
+    fsw::websocket::encode_frame(encode_buffer, copy_data);
     send_response();
 
     delete copy_data;
