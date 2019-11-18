@@ -130,7 +130,7 @@ void encode_frame(Buffer *encode_buffer, Buffer *data)
     char frame_header[16];
     struct FrameHeader *header = (struct FrameHeader *)frame_header;
 
-    header->fin = 0;
+    header->fin = 1;
     header->opcode = 1;
     header->rsv1 = 0;
     header->rsv2 = 0;
