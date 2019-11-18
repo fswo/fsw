@@ -148,24 +148,21 @@ void Response::recv_frame(struct fsw::websocket::Frame *frame)
 {
     ssize_t recved;
     Socket *conn = ctx->conn;
-    recved = conn->recv(conn->get_read_buf()->c_buffer(), READ_BUF_MAX_SIZE);
-    Buffer buf(recved);
-    buf.append(conn->get_read_buf()->c_buffer(), recved);
+    Buffer buf(READ_BUF_MAX_SIZE);
+    Buffer *read_buf = conn->get_read_buf();
+    recved = conn->recv(buf.c_buffer(), READ_BUF_MAX_SIZE);
+    read_buf->append(buf.c_buffer(), recved);
 
-    fsw::websocket::decode_frame(&buf, frame);
+    fsw::websocket::decode_frame(read_buf, frame);
 }
 
 void Response::send_frame(Buffer *data)
 {
-    Buffer *copy_data = data->dup();
-
     clear_write_buf();
-    Buffer *encode_buffer = get_write_buf();
+    Buffer *write_buf = get_write_buf();
 
-    fsw::websocket::encode_frame(encode_buffer, data);
+    fsw::websocket::encode_frame(write_buf, data);
     send_response();
-
-    delete copy_data;
 }
 
 Response::~Response()

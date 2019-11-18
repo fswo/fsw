@@ -1,6 +1,7 @@
 #include "buffer.h"
 #include "websocket_frame.h"
 #include "coroutine_socket.h"
+#include "log.h"
 
 using fsw::Buffer;
 using fsw::coroutine::Socket;
@@ -45,6 +46,22 @@ static inline uint64_t ntoh64(uint64_t net)
     return ret;
 }
 
+static inline uint64_t hton64(uint64_t host)
+{
+    uint64_t ret = 0;
+    uint32_t high, low;
+
+    low = host & 0xFFFFFFFF;
+    high = (host >> 32) & 0xFFFFFFFF;
+    low = htonl(low);
+    high = htonl(high);
+
+    ret = low;
+    ret <<= 32;
+    ret |= high;
+    return ret;
+}
+
 static inline void mask(char *data, size_t len, const char *mask_key)
 {
     size_t n = len / 8;
@@ -62,22 +79,9 @@ static inline void mask(char *data, size_t len, const char *mask_key)
     }
 }
 
-static inline void fetch_fin(struct Frame *frame, char *msg)
+static inline void fetch_header(struct Frame *frame, char *msg)
 {
-    frame->header.fin = (unsigned char)msg[0] & 0x80;
-    return;
-}
-
-static inline void fetch_mask(struct Frame *frame, char *msg)
-{
-    frame->header.mask = (unsigned char)msg[1] & 0x80;
-    return;
-}
-
-static inline void fetch_opcode(struct Frame *frame, char *msg)
-{
-    frame->header.opcode = (unsigned char) msg[0] & 0x0F;
-    return;
+    memcpy(frame, msg, HEADER_LEN);
 }
 
 static inline void fetch_payload(struct Frame *frame, char *msg)
@@ -116,28 +120,74 @@ static inline void fetch_payload(struct Frame *frame, char *msg)
 
 void decode_frame(Buffer *buffer, struct Frame *frame)
 {
-    fetch_fin(frame, buffer->c_buffer());
-    fetch_opcode(frame, buffer->c_buffer());
-    fetch_mask(frame, buffer->c_buffer());
+    fetch_header(frame, buffer->c_buffer());
     fetch_payload(frame, buffer->c_buffer());
 }
 
 void encode_frame(Buffer *encode_buffer, Buffer *data)
 {
+    int pos = 0;
+    char frame_header[16];
+    struct FrameHeader *header = (struct FrameHeader *)frame_header;
 
-    char frame_header[2];
-    struct Frame *header = (struct Frame *)frame_header;
+    header->fin = 1;
+    header->opcode = 1;
+    header->rsv1 = 0;
+    header->rsv2 = 0;
+    header->rsv3 = 0;
+    header->mask = 0;
+    pos = 2;
 
-    header->header.fin = 0;
-    header->header.rsv1 = 0;
-    header->header.rsv2 = 0;
-    header->header.rsv3 = 0;
-    header->header.opcode = 1;
-    header->header.mask = 0;
-    header->payload_length = data->length();
+    if (data->length() < 126)
+    {
+        header->length = data->length();
+    }
+    else if (data->length() < 65536)
+    {
+        header->length = 126;
+        uint16_t *length_ptr = (uint16_t *) (frame_header + pos);
+        *length_ptr = htons(data->length());
+        pos += sizeof(*length_ptr);
+    }
+    else
+    {
+        header->length = 127;
+        uint64_t *length_ptr = (uint64_t *)(frame_header + pos);
+        *length_ptr = hton64(data->length());
+        pos += sizeof(*length_ptr);
+    }
+    encode_buffer->append(frame_header, pos);
 
-    encode_buffer->append(frame_header, sizeof(frame_header));
-    encode_buffer->append(data);
+    if (header->mask)
+    {
+        encode_buffer->append("258E");
+        if (data->length() > 0)
+        {
+            size_t offset = encode_buffer->length();
+            encode_buffer->append(data);
+            mask(encode_buffer->c_buffer() + offset, data->length(), "258E");
+        }
+    }
+    else
+    {
+        if (data->length() > 0)
+        {
+            encode_buffer->append(data);
+        }
+    }
+}
+
+void debug_frame(struct Frame *frame)
+{
+    fswDebug("header->header.fin: %u", frame->header.fin);
+    fswDebug("header->header.rsv1: %u", frame->header.rsv1);
+    fswDebug("header->header.rsv2: %u", frame->header.rsv2);
+    fswDebug("header->header.rsv3: %u", frame->header.rsv3);
+    fswDebug("header->header.opcode: %u", frame->header.opcode);
+    fswDebug("header->header.mask: %u", frame->header.mask);
+    fswDebug("header->header.length: %u", frame->header.length);
+    fswDebug("header->header.header_length: %u", frame->header_length);
+    fswDebug("header->header.payload_length: %zu", frame->payload_length);
 }
 
 }
