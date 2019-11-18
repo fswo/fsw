@@ -37,6 +37,7 @@ struct Frame
 
 void decode_frame(Buffer *buffer, struct Frame *frame);
 void encode_frame(Buffer *encode_buffer, Buffer *data);
+void debug_frame(struct Frame *frame);
 
 }
 }
