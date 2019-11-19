@@ -143,7 +143,7 @@ public:
     ~Response();
 
     void recv_frame(Frame *frame);
-    void send_frame(Buffer *data);
+    void send_frame(Buffer *data, uint8_t opcode = 1, uint8_t finish = 1);
     std::string get_status_message();
 
     /**

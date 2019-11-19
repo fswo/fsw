@@ -120,14 +120,14 @@ void Frame::decode(Buffer *buffer)
     fetch_payload(buffer->c_buffer());
 }
 
-void Frame::encode(Buffer *encode_buffer, Buffer *data)
+void Frame::encode(Buffer *encode_buffer, Buffer *data, uint8_t opcode, uint8_t finish)
 {
     int pos = 0;
     char frame_header[16];
     struct FrameHeader *header = (struct FrameHeader *)frame_header;
 
-    header->fin = 1;
-    header->opcode = 1;
+    header->fin = finish;
+    header->opcode = opcode;
     header->rsv1 = 0;
     header->rsv2 = 0;
     header->rsv3 = 0;

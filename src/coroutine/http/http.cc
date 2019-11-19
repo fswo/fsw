@@ -158,12 +158,12 @@ void Response::recv_frame(Frame *frame)
     frame->decode(read_buf);
 }
 
-void Response::send_frame(Buffer *data)
+void Response::send_frame(Buffer *data, uint8_t opcode, uint8_t finish)
 {
     clear_write_buf();
     Buffer *write_buf = get_write_buf();
 
-    Frame::encode(write_buf, data);
+    Frame::encode(write_buf, data, opcode, finish);
     send_response();
 }
 

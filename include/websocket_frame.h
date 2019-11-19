@@ -36,7 +36,7 @@ public:
     char *payload;
 
     void decode(Buffer *buffer);
-    static void encode(Buffer *encode_buffer, Buffer *data);
+    static void encode(Buffer *encode_buffer, Buffer *data, uint8_t opcode = 1, uint8_t finish = 1);
     void debug();
     void fetch_payload(char *msg);
 
