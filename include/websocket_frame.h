@@ -26,19 +26,25 @@ struct FrameHeader
     unsigned char mask :1;
 };
 
-struct Frame
+class Frame
 {
+public:
     struct FrameHeader header;
     char mask_key[MASK_LEN];
-    uint16_t header_length; // header's true length
-    size_t payload_length; // payload's true length
+    uint16_t header_length;
+    size_t payload_length;
     char *payload;
+
+    void decode(Buffer *buffer);
+    static void encode(Buffer *encode_buffer, Buffer *data);
+    void debug();
+    void fetch_payload(char *msg);
+
+    inline void fetch_header(char *msg)
+    {
+        memcpy(&header, msg, HEADER_LEN);
+    }
 };
-
-void decode_frame(Buffer *buffer, struct Frame *frame);
-void encode_frame(Buffer *encode_buffer, Buffer *data);
-void debug_frame(struct Frame *frame);
-
 }
 }
 

@@ -30,7 +30,11 @@ void websocket_handler(Request *request, Response *response)
     std::string data = "hello websocket";
     while (true)
     {
-        struct Frame frame;
+        Frame frame;
+        response->recv_frame(&frame);
+        std::string recv_data(frame.payload, frame.payload_length);
+        std::cout << recv_data << std::endl;
+
         Buffer send_data(data.length());
         send_data.append(data);
         response->send_frame(&send_data);

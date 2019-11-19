@@ -5,6 +5,7 @@
 
 using fsw::Buffer;
 using fsw::coroutine::Socket;
+using fsw::websocket::Frame;
 
 /*  The following is websocket data frame:
  +-+-+-+-+-------+-+-------------+-------------------------------+
@@ -79,52 +80,47 @@ static inline void mask(char *data, size_t len, const char *mask_key)
     }
 }
 
-static inline void fetch_header(struct Frame *frame, char *msg)
+void Frame::fetch_payload(char *msg)
 {
-    memcpy(frame, msg, HEADER_LEN);
-}
-
-static inline void fetch_payload(struct Frame *frame, char *msg)
-{
-    uint8_t header_length = HEADER_LEN;
-    frame->header.length = msg[1] & 0x7f;
-    size_t payload_length = frame->header.length;
+    uint8_t header_len = HEADER_LEN;
+    header.length = msg[1] & 0x7f;
+    size_t payload_len = header.length;
     char *buf = msg + HEADER_LEN;
 
-    if (frame->header.length == 126)
-    {  
-        payload_length = ntohs(*((uint16_t *) buf));
-        header_length += 2;
-    }  
-    else if (frame->header.length == 127)
-    {  
+    if (header.length == 126)
+    {
+        payload_len = ntohs(*((uint16_t *) buf));
+        header_len += 2;
+    }
+    else if (header.length == 127)
+    {
 
-        payload_length = ntoh64(*((uint64_t *) buf));
-        header_length += 8;
+        payload_len = ntoh64(*((uint64_t *) buf));
+        header_len += 8;
     }
 
-    if (frame->header.mask)
+    if (header.mask)
     {
-        memcpy(frame->mask_key, msg + header_length, MASK_LEN);
-        header_length += MASK_LEN;
-        if (payload_length > 0)
+        memcpy(mask_key, msg + header_len, MASK_LEN);
+        header_len += MASK_LEN;
+        if (payload_len > 0)
         {
-            mask(msg + header_length, payload_length, frame->mask_key);
+            mask(msg + header_len, payload_len, mask_key);
         }
     }
-    frame->header_length = header_length;
-    frame->payload = msg + header_length;
-    frame->payload_length = payload_length;
+    header_length = header_len;
+    payload = msg + header_length;
+    payload_length = payload_len;
     return;
 }
 
-void decode_frame(Buffer *buffer, struct Frame *frame)
+void Frame::decode(Buffer *buffer)
 {
-    fetch_header(frame, buffer->c_buffer());
-    fetch_payload(frame, buffer->c_buffer());
+    fetch_header(buffer->c_buffer());
+    fetch_payload(buffer->c_buffer());
 }
 
-void encode_frame(Buffer *encode_buffer, Buffer *data)
+void Frame::encode(Buffer *encode_buffer, Buffer *data)
 {
     int pos = 0;
     char frame_header[16];
@@ -177,18 +173,17 @@ void encode_frame(Buffer *encode_buffer, Buffer *data)
     }
 }
 
-void debug_frame(struct Frame *frame)
+void Frame::debug()
 {
-    fswDebug("header->header.fin: %u", frame->header.fin);
-    fswDebug("header->header.rsv1: %u", frame->header.rsv1);
-    fswDebug("header->header.rsv2: %u", frame->header.rsv2);
-    fswDebug("header->header.rsv3: %u", frame->header.rsv3);
-    fswDebug("header->header.opcode: %u", frame->header.opcode);
-    fswDebug("header->header.mask: %u", frame->header.mask);
-    fswDebug("header->header.length: %u", frame->header.length);
-    fswDebug("header->header.header_length: %u", frame->header_length);
-    fswDebug("header->header.payload_length: %zu", frame->payload_length);
+    fswDebug("header->header.fin: %u", header.fin);
+    fswDebug("header->header.rsv1: %u", header.rsv1);
+    fswDebug("header->header.rsv2: %u", header.rsv2);
+    fswDebug("header->header.rsv3: %u", header.rsv3);
+    fswDebug("header->header.opcode: %u", header.opcode);
+    fswDebug("header->header.mask: %u", header.mask);
+    fswDebug("header->header.length: %u", header.length);
+    fswDebug("header->header.header_length: %u", header_length);
+    fswDebug("header->header.payload_length: %zu", payload_length);
 }
-
 }
 }

@@ -7,6 +7,7 @@ using fsw::coroutine::http::Request;
 using fsw::coroutine::http::Response;
 using fsw::coroutine::http::Ctx;
 using fsw::coroutine::Socket;
+using fsw::websocket::Frame;
 
 #define WEBSOCKET_GUID "258EAFA5-E914-47DA-95CA-C5AB0DC85B11"
 
@@ -144,16 +145,17 @@ Response::Response()
     
 }
 
-void Response::recv_frame(struct fsw::websocket::Frame *frame)
+void Response::recv_frame(Frame *frame)
 {
     ssize_t recved;
     Socket *conn = ctx->conn;
     Buffer buf(READ_BUF_MAX_SIZE);
     Buffer *read_buf = conn->get_read_buf();
+    read_buf->clear();
     recved = conn->recv(buf.c_buffer(), READ_BUF_MAX_SIZE);
     read_buf->append(buf.c_buffer(), recved);
 
-    fsw::websocket::decode_frame(read_buf, frame);
+    frame->decode(read_buf);
 }
 
 void Response::send_frame(Buffer *data)
@@ -161,7 +163,7 @@ void Response::send_frame(Buffer *data)
     clear_write_buf();
     Buffer *write_buf = get_write_buf();
 
-    fsw::websocket::encode_frame(write_buf, data);
+    Frame::encode(write_buf, data);
     send_response();
 }
 
