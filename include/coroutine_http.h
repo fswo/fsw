@@ -10,6 +10,7 @@
 
 using fsw::coroutine::Socket;
 using fsw::Buffer;
+using fsw::websocket::Frame;
 
 namespace fsw { namespace coroutine { namespace http {
 
@@ -141,7 +142,7 @@ public:
     Response();
     ~Response();
 
-    void recv_frame(struct fsw::websocket::Frame *frame);
+    void recv_frame(Frame *frame);
     void send_frame(Buffer *data);
     std::string get_status_message();
 
