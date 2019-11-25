@@ -139,17 +139,16 @@
 
 <pre><code class="cpp">#include &quot;fsw/coroutine_channel.h&quot;
 
-
 using fsw::coroutine::Channel;
+using fsw::coroutine::run;
 
 int main(int argc, char const *argv[])
 {
-    fsw_event_init();
-
-    Channel *chan1 = new Channel();
-    Channel *chan2 = new Channel(2);
-
-    fsw_event_wait();
+    run([](void *args)
+    {
+        Channel *chan1 = new Channel();
+        Channel *chan2 = new Channel(2);
+    });
 
     return 0;
 }
@@ -165,29 +164,33 @@ int main(int argc, char const *argv[])
 
 using fsw::coroutine::Channel;
 using fsw::Coroutine;
+using fsw::coroutine::run;
 
 int main(int argc, char const *argv[])
 {
-    Channel *chan = new Channel();
-
-    Coroutine::create([](void *arg)
+    run([](void *args)
     {
-        void *data;
-        Channel *chan = (Channel *)arg;
-        data = chan-&gt;pop();
-        std::cout &lt;&lt; *(std::string *)data &lt;&lt; std::endl;
-    }, (void *)chan);
+        Channel *chan = new Channel();
 
-    Coroutine::create([](void *arg)
-    {
-        bool ret;
-        std::string data = &quot;hello world&quot;;
-        Channel *chan = (Channel *)arg;
-        ret = chan-&gt;push(&amp;data);
-        std::cout &lt;&lt; ret &lt;&lt; std::endl;
-    }, (void *)chan);
+        Coroutine::create([](void *arg)
+        {
+            void *data;
+            Channel *chan = (Channel *)arg;
+            data = chan-&gt;pop();
+            std::cout &lt;&lt; *(std::string *)data &lt;&lt; std::endl;
+        }, (void *)chan);
 
-    delete chan;
+        Coroutine::create([](void *arg)
+        {
+            bool ret;
+            std::string data = &quot;hello world&quot;;
+            Channel *chan = (Channel *)arg;
+            ret = chan-&gt;push(&amp;data);
+            std::cout &lt;&lt; ret &lt;&lt; std::endl;
+        }, (void *)chan);
+
+        delete chan;
+    });
 }
 </code></pre>
 

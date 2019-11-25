@@ -131,7 +131,7 @@
 </code></pre>
 
 <p>set the router:</p>
-<pre><code class="cpp">void fsw::coroutine::http::Server::set_handler(std::string pattern, on_accept_handler fn)
+<pre><code class="cpp">void fsw::coroutine::http::Server::set_http_handler(std::string pattern, on_accept_handler fn)
 </code></pre>
 
 <pre><code class="cpp">#include &quot;fsw/coroutine_http.h&quot;
@@ -144,6 +144,7 @@ using fsw::coroutine::http::Request;
 using fsw::coroutine::http::Response;
 using fsw::coroutine::http::Server;
 using fsw::Buffer;
+using fsw::coroutine::run;
 
 void handler(Request *request, Response *response)
 {
@@ -159,18 +160,14 @@ void handler(Request *request, Response *response)
 
 int main(int argc, char const *argv[])
 {
-    fsw_event_init();
-
-    Coroutine::create([](void *arg)
+    run([](void *args)
     {
         char ip[] = &quot;127.0.0.1&quot;;
 
         Server *serv = new Server(ip, 80);
-        serv-&gt;set_handler(&quot;/index&quot;, handler);
+        serv-&gt;set_http_handler(&quot;/index&quot;, handler);
         serv-&gt;start();
     });
-
-    fsw_event_wait();
 
     return 0;
 }
