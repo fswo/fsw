@@ -12,27 +12,27 @@ long Coroutine::create(coroutine_func_t fn, void * args)
 #include "fsw/coroutine.h"
 
 using fsw::Coroutine;
+using fsw::coroutine::run;
 
 int main(int argc, char const *argv[])
 {
-    fsw_event_init();
-
-    Coroutine::create([](void *arg)
+    run([](void *args)
     {
-        std::cout << "coroutine 1" << std::endl;
-    });
+        Coroutine::create([](void *arg)
+        {
+            std::cout << "coroutine 1" << std::endl;
+        });
 
-    Coroutine::create([](void *arg)
-    {
-        std::cout << "coroutine 2" << std::endl;
-    });
+        Coroutine::create([](void *arg)
+        {
+            std::cout << "coroutine 2" << std::endl;
+        });
 
-    Coroutine::create([](void *arg)
-    {
-        std::cout << "coroutine 3" << std::endl;
+        Coroutine::create([](void *arg)
+        {
+            std::cout << "coroutine 3" << std::endl;
+        });
     });
-
-    fsw_event_wait();
 
     return 0;
 }
@@ -50,17 +50,17 @@ static fsw::Coroutine *fsw::Coroutine::get_current()
 #include "fsw/coroutine.h"
 
 using fsw::Coroutine;
+using fsw::coroutine::run;
 
 int main(int argc, char const *argv[])
 {
-    fsw_event_init();
-
-    Coroutine::create([](void *arg)
+    run([](void *args)
     {
-        Coroutine *co = Coroutine::get_current();
+        Coroutine::create([](void *arg)
+        {
+            Coroutine *co = Coroutine::get_current();
+        });
     });
-
-    fsw_event_wait();
 
     return 0;
 }
@@ -78,30 +78,31 @@ static void fsw::Coroutine::yield()
 #include "fsw/coroutine.h"
 
 using fsw::Coroutine;
+using fsw::coroutine::run;
 
 int main(int argc, char const *argv[])
 {
-    fsw_event_init();
-
-    long cid = Coroutine::create([](void *arg)
+    run([](void *args)
     {
-        Coroutine *co = Coroutine::get_current();
+        long cid = Coroutine::create([](void *arg)
+        {
+            Coroutine *co = Coroutine::get_current();
 
-        std::cout << 1 << std::endl;
-        co->yield();
-        std::cout << 3 << std::endl;
+            std::cout << 1 << std::endl;
+            co->yield();
+            std::cout << 3 << std::endl;
+        });
+
+        Coroutine::create([](void *arg)
+        {
+            long cid = (long)(uintptr_t)arg;
+
+            std::cout << 2 << std::endl;
+            Coroutine::resume(cid);
+            std::cout << 4 << std::endl;
+        }, (void*)(uintptr_t)cid);
+
     });
-
-    Coroutine::create([](void *arg)
-    {
-        long cid = (long)(uintptr_t)arg;
-
-        std::cout << 2 << std::endl;
-        Coroutine::resume(cid);
-        std::cout << 4 << std::endl;
-    }, (void*)(uintptr_t)cid);
-
-    fsw_event_wait();
 
     return 0;
 }
@@ -128,29 +129,30 @@ static void resume(long cid)
 #include "fsw/coroutine.h"
 
 using fsw::Coroutine;
+using fsw::coroutine::run;
 
 int main(int argc, char const *argv[])
 {
-    fsw_event_init();
-
-    long cid = Coroutine::create([](void *arg)
+    run([](void *args)
     {
-        Coroutine *co = Coroutine::get_current();
-        std::cout << 1 << std::endl;
-        co->yield();
-        std::cout << 3 << std::endl;
+        long cid = Coroutine::create([](void *arg)
+        {
+            Coroutine *co = Coroutine::get_current();
+            std::cout << 1 << std::endl;
+            co->yield();
+            std::cout << 3 << std::endl;
+        });
+
+        Coroutine::create([](void *arg)
+        {
+            long cid = (long)(uintptr_t)arg;
+
+            std::cout << 2 << std::endl;
+            Coroutine::resume(cid);
+            std::cout << 4 << std::endl;
+        }, (void*)(uintptr_t)cid);
+
     });
-
-    Coroutine::create([](void *arg)
-    {
-        long cid = (long)(uintptr_t)arg;
-
-        std::cout << 2 << std::endl;
-        Coroutine::resume(cid);
-        std::cout << 4 << std::endl;
-    }, (void*)(uintptr_t)cid);
-
-    fsw_event_wait();
 
     return 0;
 }
@@ -173,30 +175,30 @@ static void fsw::Coroutine::resume(fsw::Coroutine *co)
 #include "fsw/coroutine.h"
 
 using fsw::Coroutine;
+using fsw::coroutine::run;
 
 int main(int argc, char const *argv[])
 {
-    fsw_event_init();
-
-    long cid = Coroutine::create([](void *arg)
+    run([](void *args)
     {
-        Coroutine *co = Coroutine::get_current();
-        std::cout << 1 << std::endl;
-        co->yield();
-        std::cout << 3 << std::endl;
+        long cid = Coroutine::create([](void *arg)
+        {
+            Coroutine *co = Coroutine::get_current();
+            std::cout << 1 << std::endl;
+            co->yield();
+            std::cout << 3 << std::endl;
+        });
+
+        Coroutine::create([](void *arg)
+        {
+            long cid = (long)(uintptr_t)arg;
+            Coroutine *co = Coroutine::get_by_cid(cid);
+
+            std::cout << 2 << std::endl;
+            Coroutine::resume(co);
+            std::cout << 4 << std::endl;
+        }, (void*)(uintptr_t)cid);
     });
-
-    Coroutine::create([](void *arg)
-    {
-        long cid = (long)(uintptr_t)arg;
-        Coroutine *co = Coroutine::get_by_cid(cid);
-
-        std::cout << 2 << std::endl;
-        Coroutine::resume(co);
-        std::cout << 4 << std::endl;
-    }, (void*)(uintptr_t)cid);
-
-    fsw_event_wait();
 
     return 0;
 }
@@ -229,27 +231,28 @@ static void defer(coroutine_func_t _fn, void* _args = nullptr)
 #include "fsw/coroutine.h"
 
 using fsw::Coroutine;
+using fsw::coroutine::run;
 
 int main(int argc, char const *argv[])
 {
-    fsw_event_init();
-
-    long cid = Coroutine::create([](void *arg)
+    run([](void *args)
     {
-        Coroutine::defer([](void *arg)
+        long cid = Coroutine::create([](void *arg)
         {
-            std::cout << 1 << std::endl;
-        });
-        Coroutine::defer([](void *arg)
-        {
-            std::cout << 2 << std::endl;
-        });
-        Coroutine::defer([](void *arg)
-        {
-            std::cout << 3 << std::endl;
+            Coroutine::defer([](void *arg)
+            {
+                std::cout << 1 << std::endl;
+            });
+            Coroutine::defer([](void *arg)
+            {
+                std::cout << 2 << std::endl;
+            });
+            Coroutine::defer([](void *arg)
+            {
+                std::cout << 3 << std::endl;
+            });
         });
     });
-    fsw_event_wait();
 
     return 0;
 }
@@ -278,26 +281,27 @@ static int fsw::Coroutine::sleep(double seconds)
 
 using fsw::Coroutine;
 using fsw::Timer;
+using fsw::coroutine::run;
 
 int main(int argc, char const *argv[])
 {
-    fsw_event_init();
-
-    long cid = Coroutine::create([](void *arg)
+    run([](void *args)
     {
-        std::cout << 1 << std::endl;
-        Coroutine::sleep(2 * Timer::MILLI_SECOND);
-        std::cout << 2 << std::endl;
+        long cid = Coroutine::create([](void *arg)
+        {
+            std::cout << 1 << std::endl;
+            Coroutine::sleep(2 * Timer::MILLI_SECOND);
+            std::cout << 2 << std::endl;
+        });
+
+        Coroutine::create([](void *arg)
+        {
+            std::cout << 3 << std::endl;
+            Coroutine::sleep(1 * Timer::MILLI_SECOND);
+            std::cout << 4 << std::endl;
+        }, (void*)(uintptr_t)cid);
+
     });
-
-    Coroutine::create([](void *arg)
-    {
-        std::cout << 3 << std::endl;
-        Coroutine::sleep(1 * Timer::MILLI_SECOND);
-        std::cout << 4 << std::endl;
-    }, (void*)(uintptr_t)cid);
-
-    fsw_event_wait();
 
     return 0;
 }
