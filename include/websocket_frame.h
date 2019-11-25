@@ -18,20 +18,33 @@ struct FrameHeader
     unsigned char rsv2 :1;
     unsigned char rsv1 :1;
     unsigned char fin :1;
-    unsigned char payload_len :7;
+    /**
+     * if length < 126, length is payload's true length,
+     * else length >= 126, length is not payload's true length.
+     */
+    unsigned char length :7;
     unsigned char mask :1;
 };
 
-struct Frame
+class Frame
 {
+public:
     struct FrameHeader header;
     char mask_key[MASK_LEN];
+    uint16_t header_length;
+    size_t payload_length;
     char *payload;
+
+    void decode(Buffer *buffer);
+    static void encode(Buffer *encode_buffer, Buffer *data, uint8_t opcode = 1, uint8_t finish = 1);
+    void debug();
+    void fetch_payload(char *msg);
+
+    inline void fetch_header(char *msg)
+    {
+        memcpy(&header, msg, HEADER_LEN);
+    }
 };
-
-void decode_frame(Buffer *buffer, struct Frame *frame);
-void encode_frame(Buffer *encode_buffer, Buffer *data);
-
 }
 }
 

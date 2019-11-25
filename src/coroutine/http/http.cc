@@ -7,6 +7,7 @@ using fsw::coroutine::http::Request;
 using fsw::coroutine::http::Response;
 using fsw::coroutine::http::Ctx;
 using fsw::coroutine::Socket;
+using fsw::websocket::Frame;
 
 #define WEBSOCKET_GUID "258EAFA5-E914-47DA-95CA-C5AB0DC85B11"
 
@@ -144,28 +145,26 @@ Response::Response()
     
 }
 
-void Response::recv_frame(struct fsw::websocket::Frame *frame)
+void Response::recv_frame(Frame *frame)
 {
     ssize_t recved;
     Socket *conn = ctx->conn;
-    recved = conn->recv(conn->get_read_buf()->c_buffer(), READ_BUF_MAX_SIZE);
-    Buffer buf(recved);
-    buf.append(conn->get_read_buf()->c_buffer(), recved);
+    Buffer buf(READ_BUF_MAX_SIZE);
+    Buffer *read_buf = conn->get_read_buf();
+    read_buf->clear();
+    recved = conn->recv(buf.c_buffer(), READ_BUF_MAX_SIZE);
+    read_buf->append(buf.c_buffer(), recved);
 
-    fsw::websocket::decode_frame(&buf, frame);
+    frame->decode(read_buf);
 }
 
-void Response::send_frame(Buffer *data)
+void Response::send_frame(Buffer *data, uint8_t opcode, uint8_t finish)
 {
-    Buffer *copy_data = data->dup();
-
     clear_write_buf();
-    Buffer *encode_buffer = get_write_buf();
+    Buffer *write_buf = get_write_buf();
 
-    fsw::websocket::encode_frame(encode_buffer, data);
+    Frame::encode(write_buf, data, opcode, finish);
     send_response();
-
-    delete copy_data;
 }
 
 Response::~Response()
