@@ -58,6 +58,16 @@ protected:
         coroutines[cid] = this;
     }
 };
+
+namespace coroutine
+{
+    inline void run(coroutine_func_t fn, void* args = nullptr)
+    {
+        fsw_event_init();
+        Coroutine::create(fn, args);
+        fsw_event_wait();
+    }
+}
 }
 
 #endif	/* COROUTINE_H */
