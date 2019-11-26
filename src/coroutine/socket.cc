@@ -2,6 +2,7 @@
 #include "coroutine.h"
 #include "socket.h"
 #include "log.h"
+#include "help.h"
 
 using fsw::Coroutine;
 using fsw::coroutine::Socket;
@@ -120,7 +121,7 @@ bool Socket::wait_event(int event)
     ev = FswG.poll->events;
 
     ev->events = event == fsw::event::fswEvent_type::FSW_EVENT_READ ? EPOLLIN : EPOLLOUT;
-    ev->data.u64 = fsw::event::touint64(sockfd, id);
+    ev->data.u64 = fsw::help::touint64(sockfd, id);
 
     fswTrace("add sockfd[%d] %s event", sockfd, "EPOLL_CTL_ADD");
     if (epoll_ctl(FswG.poll->epollfd, EPOLL_CTL_ADD, sockfd, ev) < 0)
