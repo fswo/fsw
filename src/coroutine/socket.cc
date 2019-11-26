@@ -5,6 +5,7 @@
 
 using fsw::Coroutine;
 using fsw::coroutine::Socket;
+using fsw::event::FswG;
 
 Socket::Socket(int domain, int type, int protocol)
 {
@@ -46,7 +47,7 @@ Socket* Socket::accept()
     do
     {
         connfd = fswSocket_accept(sockfd);
-    } while (connfd < 0 && errno == EAGAIN && wait_event(FSW_EVENT_READ));
+    } while (connfd < 0 && errno == EAGAIN && wait_event(fsw::event::fswEvent_type::FSW_EVENT_READ));
 
     return (new Socket(connfd));
 }
@@ -58,7 +59,7 @@ ssize_t Socket::recv(void *buf, size_t len)
     do
     {
         ret = fswSocket_recv(sockfd, buf, len, 0);
-    } while (ret < 0 && errno == EAGAIN && wait_event(FSW_EVENT_READ));
+    } while (ret < 0 && errno == EAGAIN && wait_event(fsw::event::fswEvent_type::FSW_EVENT_READ));
     
     return ret;
 }
@@ -70,7 +71,7 @@ ssize_t Socket::send(const void *buf, size_t len)
     do
     {
         ret = fswSocket_send(sockfd, buf, len, 0);
-    } while (ret < 0 && errno == EAGAIN && wait_event(FSW_EVENT_WRITE));
+    } while (ret < 0 && errno == EAGAIN && wait_event(fsw::event::fswEvent_type::FSW_EVENT_WRITE));
     
     return ret;
 }
@@ -118,8 +119,8 @@ bool Socket::wait_event(int event)
     }
     ev = FswG.poll->events;
 
-    ev->events = event == FSW_EVENT_READ ? EPOLLIN : EPOLLOUT;
-    ev->data.u64 = touint64(sockfd, id);
+    ev->events = event == fsw::event::fswEvent_type::FSW_EVENT_READ ? EPOLLIN : EPOLLOUT;
+    ev->data.u64 = fsw::event::touint64(sockfd, id);
 
     fswTrace("add sockfd[%d] %s event", sockfd, "EPOLL_CTL_ADD");
     if (epoll_ctl(FswG.poll->epollfd, EPOLL_CTL_ADD, sockfd, ev) < 0)

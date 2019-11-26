@@ -8,6 +8,7 @@ using fsw::Timer;
 using fsw::TimerManager;
 using fsw::timer_manager;
 
+namespace fsw { namespace event {
 fswGlobal_t FswG;
 
 int init_fswPoll()
@@ -114,4 +115,7 @@ int fsw_event_free()
     FswG.running = 0;
     free_fswPoll();
     return 0;
+}
+
+}
 }

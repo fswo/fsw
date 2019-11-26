@@ -5,6 +5,8 @@
 
 #define FSW_EPOLL_CAP 16;
 
+namespace fsw { namespace event {
+
 typedef struct
 {
     int epollfd;
@@ -51,6 +53,9 @@ static inline void fromuint64(uint64_t v, int *fd, int *id)
 {
     *fd = (int)(v >> 32);
     *id = (int)(v & 0xffffffff);
+}
+
+}
 }
 
 #endif /* EVENT_H_ */

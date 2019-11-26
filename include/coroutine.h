@@ -64,9 +64,9 @@ namespace coroutine
 {
     inline void run(coroutine_func_t fn, void* args = nullptr)
     {
-        fsw_event_init();
+        fsw::event::fsw_event_init();
         Coroutine::create(fn, args);
-        fsw_event_wait();
+        fsw::event::fsw_event_wait();
     }
 }
 }
