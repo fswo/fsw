@@ -5,6 +5,7 @@
 #include "context.h"
 #include "fsw.h"
 #include "log.h"
+#include "event.h"
 
 #define DEFAULT_C_STACK_SIZE          (2 *1024 * 1024)
 
