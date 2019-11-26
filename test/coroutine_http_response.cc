@@ -20,40 +20,7 @@ TEST(coroutine_http_response, set_header_string)
     response->set_header("Connection", "Close");
     response->set_header("Content-Type", "text/html");
     response->set_header("Content-Type", "text/html");
-    ASSERT_EQ(response->header.size(), 3);
-}
-
-TEST(coroutine_http_response, set_header_buffer)
-{
-    Buffer header_name1(16);
-    Buffer header_value1(16);
-    header_name1.append("Connection");
-    header_value1.append("Close");
-    Buffer header_name2(16);
-    Buffer header_value2(16);
-    header_name2.append("Content-Type");
-    header_value2.append("text/html");
-    Response *response = new Response();
-    response->set_header(&header_name1, &header_value1);
-    response->set_header(&header_name2, &header_value2);
-    response->set_header(&header_name2, &header_value2);
-    ASSERT_EQ(response->header.size(), 3);
-    ASSERT_NE(response->header[&header_name1], &header_value1);
-    ASSERT_NE(response->header[&header_name2], &header_value2);
-}
-
-TEST(coroutine_http_response, update_header)
-{
-    Buffer header_name1(16);
-    Buffer header_value1(16);
-    header_name1.append("Connection");
-    header_value1.append("Close");
-    Buffer header_value2(16);
-    header_value2.append("Keep-Alive");
-    Response *response = new Response();
-    response->set_header(&header_name1, &header_value1);
-    response->update_header(&header_name1, &header_value2);
-    ASSERT_EQ(response->header.size(), 1);
+    ASSERT_EQ(response->header.size(), 2);
 }
 
 TEST(coroutine_http_response, set_version)
