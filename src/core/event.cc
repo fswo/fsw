@@ -2,12 +2,14 @@
 #include "coroutine.h"
 #include "log.h"
 #include "timer.h"
+#include "help.h"
 
 using fsw::Coroutine;
 using fsw::Timer;
 using fsw::TimerManager;
 using fsw::timer_manager;
 
+namespace fsw { namespace event {
 fswGlobal_t FswG;
 
 int init_fswPoll()
@@ -96,7 +98,7 @@ int fsw_event_wait()
             struct epoll_event *p = &events[i];
             uint64_t u64 = p->data.u64;
 
-            fromuint64(u64, &fd, &cid);
+            fsw::help::fromuint64(u64, &fd, &cid);
             fswTrace("coroutine[%d] resume", cid);
             Coroutine::resume(cid);
         }
@@ -114,4 +116,7 @@ int fsw_event_free()
     FswG.running = 0;
     free_fswPoll();
     return 0;
+}
+
+}
 }
