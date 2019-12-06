@@ -47,7 +47,7 @@ void websocket_handler(Request *request, Response *response)
 
 int main(int argc, char const *argv[])
 {
-    run([](void *arg)
+    run([]()
     {
         char ip[] = "127.0.0.1";
 

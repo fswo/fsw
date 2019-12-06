@@ -44,6 +44,8 @@
 #include <iostream>
 #include <algorithm>
 
+#include <functional>
+
 #include "config.h"
 
 #ifdef HAVE_EPOLL

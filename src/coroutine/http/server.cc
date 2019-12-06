@@ -130,7 +130,7 @@ bool Server::start()
         }
 
         http_accept_handler_args arg = {this, conn};
-        Coroutine::create(http_connection_on_accept, (void *)&arg);
+        Coroutine::create(std::bind(http_connection_on_accept, (void *)&arg));
     }
     return true;
 }

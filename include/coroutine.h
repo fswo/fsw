@@ -16,7 +16,7 @@ class Coroutine
 public:
     static std::unordered_map<long, Coroutine*> coroutines;
 
-    static long create(coroutine_func_t fn, void* args = nullptr);
+    static long create(std::function<void()> fn);
     static void yield();
     static void resume(long cid);
     static void resume(Coroutine *co);
@@ -52,8 +52,8 @@ protected:
     static void* get_current_task();
     void _defer(coroutine_func_t _fn, void* _args = nullptr);
 
-    Coroutine(coroutine_func_t fn, void *private_data) :
-            ctx(stack_size, fn, private_data)
+    Coroutine(std::function<void ()> fn) :
+            ctx(stack_size, fn)
     {
         cid = ++last_cid;
         coroutines[cid] = this;
@@ -62,10 +62,10 @@ protected:
 
 namespace coroutine
 {
-    inline void run(coroutine_func_t fn, void* args = nullptr)
+    inline void run(std::function<void()> fn)
     {
         fsw::event::fsw_event_init();
-        Coroutine::create(fn, args);
+        Coroutine::create(fn);
         fsw::event::fsw_event_wait();
     }
 }

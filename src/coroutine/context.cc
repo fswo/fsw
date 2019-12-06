@@ -4,8 +4,8 @@
 
 using namespace fsw;
 
-Context::Context(size_t stack_size, coroutine_func_t fn, void* private_data) :
-        fn_(fn), stack_size_(stack_size), private_data_(private_data)
+Context::Context(size_t stack_size, std::function<void ()> fn) :
+        fn_(fn), stack_size_(stack_size)
 {
     swap_ctx_ = nullptr;
 
@@ -46,7 +46,7 @@ bool Context::swap_out()
 void Context::context_func(void *arg)
 {
     Context *_this = (Context *) arg;
-    _this->fn_(_this->private_data_);
+    _this->fn_();
     _this->execute_defer_tasks();
     _this->end_ = true;
     _this->swap_out();
