@@ -41,14 +41,12 @@ static bool call_websocket_handler(on_accept_handler handler, Ctx *ctx)
     return true;
 }
 
-static void http_connection_on_accept(void *arg)
+static void http_connection_on_accept(Server *serv, Socket* conn)
 {
     ssize_t recved;
     /**
      * Note that the coroutine cannot be switched out, otherwise the member content in arg may change.
      */
-    Server *server = ((http_accept_handler_args *)arg)->server;
-    Socket *conn = ((http_accept_handler_args *)arg)->conn;
     Ctx *ctx = new Ctx(conn);
     Coroutine::defer([](void *arg)
     {
@@ -73,14 +71,14 @@ static void http_connection_on_accept(void *arg)
         */
         ctx->parse(recved);
         string path(ctx->request->path);
-        if ((handler = server->get_http_handler(path)) != nullptr)
+        if ((handler = serv->get_http_handler(path)) != nullptr)
         {
             if (!call_http_handler(handler, ctx))
             {
                 break;
             }
         }
-        else if ((handler = server->get_websocket_handler(path)) != nullptr)
+        else if ((handler = serv->get_websocket_handler(path)) != nullptr)
         {
             if (!call_websocket_handler(handler, ctx))
             {
@@ -129,8 +127,7 @@ bool Server::start()
             return false;
         }
 
-        http_accept_handler_args arg = {this, conn};
-        Coroutine::create(std::bind(http_connection_on_accept, (void *)&arg));
+        Coroutine::create(std::bind(http_connection_on_accept, this, conn));
     }
     return true;
 }
