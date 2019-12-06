@@ -14,12 +14,6 @@ using fsw::coroutine::Socket;
 using fsw::Coroutine;
 using fsw::Buffer;
 
-struct http_accept_handler_args
-{
-    Server *server;
-    Socket *conn;
-};
-
 static bool call_http_handler(on_accept_handler handler, Ctx *ctx)
 {
     if (ctx->request->has_sec_websocket_key())
