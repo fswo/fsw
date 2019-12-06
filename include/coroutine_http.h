@@ -137,7 +137,7 @@ public:
     int _version;
     int _status = 200;
     std::string _reason;
-    std::map<Buffer*, Buffer*> header;
+    std::map<std::string, std::string> header;
 
     Response();
     ~Response();
@@ -146,22 +146,7 @@ public:
     void send_frame(Buffer *data, uint8_t opcode = 1, uint8_t finish = 1);
     std::string get_status_message();
 
-    /**
-     * in order to prevent the user from modifying the header, 
-     * set_header needs to copy the passed parameters.
-     * 
-     * in order to improve performance, set_header does not check if header name is set,
-     * so you can't use it to update the header value.
-     * if you want to update the value of the header name, you should use update_header.
-     */
-    void set_header(Buffer *_name, Buffer *_value);
-    void set_header(std::string _name, std::string _value);
-
-    /**
-     * update_header is looked up based on the c_buffer in the header name, 
-     * so need to iterate through all the headers.
-     */
-    bool update_header(Buffer *_name, Buffer *_value);
+    void set_header(std::string name, std::string value);
     Response* build_http_status_line();
     Response* build_http_header(int body_length);
     Response* build_http_body(Buffer *body);

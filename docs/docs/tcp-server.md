@@ -25,6 +25,7 @@ void Server::set_handler(string pattern, on_accept_handler fn)
 using fsw::Coroutine;
 using fsw::coroutine::Server;
 using fsw::coroutine::Socket;
+using fsw::coroutine::run;
 
 char response_str[] = "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\nConnection: close\r\nContent-Length: 11\r\n\r\nhello world\r\n";
 
@@ -50,9 +51,7 @@ void handler(void *args)
 
 int main(int argc, char const *argv[])
 {
-    fsw_event_init();
-
-    Coroutine::create([](void *arg)
+    run([](void *arg)
     {
         char ip[] = "127.0.0.1";
 
@@ -60,8 +59,6 @@ int main(int argc, char const *argv[])
         serv->set_handler(handler);
         serv->start();
     });
-
-    fsw_event_wait();
 
     return 0;
 }

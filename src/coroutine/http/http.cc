@@ -294,35 +294,9 @@ std::string Response::get_status_message()
     }
 }
 
-void Response::set_header(Buffer *_name, Buffer *_value)
+void Response::set_header(std::string name, std::string value)
 {
-    Buffer *name = _name->dup();
-    Buffer *value = _value->dup();
     header[name] = value;
-}
-
-void Response::set_header(std::string _name, std::string _value)
-{
-    Buffer *name = new Buffer(_name.length());
-    name->append(_name);
-    Buffer *value = new Buffer(_value.length());
-    value->append(_value);
-    header[name] = value;
-}
-
-bool Response::update_header(Buffer *_name, Buffer *_value)
-{
-    std::map<fsw::Buffer *, fsw::Buffer *>::iterator i;
-    for (i = header.begin(); i != header.end(); i++)
-    {
-        if (memcpy(i->first->c_buffer(), _name->c_buffer(), i->first->length()) == 0)
-        {
-            Buffer *value = _value->dup();
-            i->second = value;
-            return true;
-        }
-    }
-    return false;
 }
 
 Response* Response::build_http_status_line()
@@ -388,11 +362,6 @@ void Response::end(Buffer *body)
 
 void Response::clear_header()
 {
-    for (auto i = header.begin(); i != header.end(); i++)
-    {
-        delete i->first;
-        delete i->second;
-    }
     header.clear();
 }
 

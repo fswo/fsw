@@ -12,6 +12,7 @@ using fsw::coroutine::http::Response;
 using fsw::coroutine::http::Server;
 using fsw::Buffer;
 using fsw::websocket::Frame;
+using fsw::coroutine::run;
 
 void http_handler(Request *request, Response *response)
 {
@@ -46,9 +47,7 @@ void websocket_handler(Request *request, Response *response)
 
 int main(int argc, char const *argv[])
 {
-    fsw_event_init();
-
-    Coroutine::create([](void *arg)
+    run([](void *arg)
     {
         char ip[] = "127.0.0.1";
 
@@ -57,8 +56,6 @@ int main(int argc, char const *argv[])
         serv->set_websocket_handler("/websocket", websocket_handler);
         serv->start();
     });
-
-    fsw_event_wait();
 
     return 0;
 }

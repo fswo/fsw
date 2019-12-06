@@ -5,6 +5,7 @@
 #include "context.h"
 #include "fsw.h"
 #include "log.h"
+#include "event.h"
 
 #define DEFAULT_C_STACK_SIZE          (2 *1024 * 1024)
 
@@ -58,6 +59,16 @@ protected:
         coroutines[cid] = this;
     }
 };
+
+namespace coroutine
+{
+    inline void run(coroutine_func_t fn, void* args = nullptr)
+    {
+        fsw::event::fsw_event_init();
+        Coroutine::create(fn, args);
+        fsw::event::fsw_event_wait();
+    }
+}
 }
 
 #endif	/* COROUTINE_H */
