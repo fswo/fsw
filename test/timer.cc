@@ -18,7 +18,7 @@ void print_num(void *arg)
 
 TEST(timer, add_timer)
 {
-    run([](void *args)
+    run([]()
     {
         timer_manager.add_timer(1 * Timer::MILLI_SECOND, print_num, (void *)(uintptr_t)1);
         timer_manager.add_timer(2 * Timer::MILLI_SECOND, print_num, (void *)(uintptr_t)2);

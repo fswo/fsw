@@ -47,9 +47,9 @@ void Coroutine::set_task(void *_task)
     task = _task;
 }
 
-long Coroutine::create(coroutine_func_t fn, void* args)
+long Coroutine::create(std::function<void()> fn)
 {
-    return (new Coroutine(fn, args))->run();
+    return (new Coroutine(fn))->run();
 }
 
 void Coroutine::yield()

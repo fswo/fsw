@@ -97,7 +97,7 @@ public:
 
     inline void clear()
     {
-        clear_path()->clear_header()->clear_path();
+        clear_path()->clear_header()->clear_body();
     }
 
     inline Request* clear_path()
