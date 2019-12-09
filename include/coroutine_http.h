@@ -146,7 +146,6 @@ public:
     void send_frame(Buffer *data, uint8_t opcode = 1, uint8_t finish = 1);
     std::string get_status_message();
 
-    void set_header(std::string name, std::string value);
     Response* build_http_status_line();
     Response* build_http_header(int body_length);
     Response* build_http_body(Buffer *body);

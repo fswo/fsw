@@ -294,11 +294,6 @@ std::string Response::get_status_message()
     }
 }
 
-void Response::set_header(std::string name, std::string value)
-{
-    header[name] = value;
-}
-
 Response* Response::build_http_status_line()
 {
     Buffer* buf = get_write_buf();
@@ -397,11 +392,11 @@ bool Response::upgrade()
     }
     
     ctx->response->set_status(101);
-    ctx->response->set_header("Upgrade", "websocket");
-    ctx->response->set_header("Connection", "Upgrade");
+    ctx->response->header["Upgrade"] = "websocket";
+    ctx->response->header["Connection"] = "Upgrade";
 
     std::string accept_key = compute_accept_key(sec_websocket_key);
-    ctx->response->set_header("Sec-WebSocket-Accept", accept_key);
+    ctx->response->header["Sec-WebSocket-Accept"] = accept_key;
     ctx->response->end();
 
     return true;
