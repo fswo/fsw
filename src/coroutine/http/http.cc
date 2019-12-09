@@ -294,11 +294,6 @@ std::string Response::get_status_message()
     }
 }
 
-void Response::set_header(std::string name, std::string value)
-{
-    header[name] = value;
-}
-
 Response* Response::build_http_status_line()
 {
     Buffer* buf = get_write_buf();
@@ -365,7 +360,7 @@ void Response::clear_header()
     header.clear();
 }
 
-bool Response::upgrade()
+bool Response::check_websocket_upgrade(std::string sec_websocket_key)
 {
     std::string bad_handshake = "websocket handshake error: ";
 
@@ -389,19 +384,30 @@ bool Response::upgrade()
         ctx->response->send_bad_request_response(bad_handshake + "websocket: unsupported version: 13 not found in 'Sec-Websocket-Version' header");
         return false;
     }
-    std::string sec_websocket_key = ctx->request->get_header("sec-websocket-key");
     if (sec_websocket_key.empty())
     {
         ctx->response->send_bad_request_response(bad_handshake + "'Sec-WebSocket-Key' header is missing or blank");
         return false;
     }
+
+    return true;
+}
+
+bool Response::upgrade()
+{
+    std::string sec_websocket_key = ctx->request->get_header("sec-websocket-key");
+
+    if (!ctx->response->check_websocket_upgrade(sec_websocket_key))
+    {
+        return false;
+    }
     
     ctx->response->set_status(101);
-    ctx->response->set_header("Upgrade", "websocket");
-    ctx->response->set_header("Connection", "Upgrade");
+    ctx->response->header["Upgrade"] = "websocket";
+    ctx->response->header["Connection"] = "Upgrade";
 
     std::string accept_key = compute_accept_key(sec_websocket_key);
-    ctx->response->set_header("Sec-WebSocket-Accept", accept_key);
+    ctx->response->header["Sec-WebSocket-Accept"] = accept_key;
     ctx->response->end();
 
     return true;

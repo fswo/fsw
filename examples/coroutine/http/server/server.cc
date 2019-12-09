@@ -20,7 +20,7 @@ void http_handler(Request *request, Response *response)
     Buffer buffer(1024);
     buffer.append(response_body, sizeof(response_body) - 1);
 
-    response->set_header("Content-Type", "text/html");
+    response->header["Content-Type"] = "text/html";
     response->end(&buffer);
 
     return;

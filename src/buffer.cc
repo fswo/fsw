@@ -60,6 +60,15 @@ bool Buffer::equal(Buffer *target)
     return true;
 }
 
+bool Buffer::equal(std::string target)
+{
+    if (_length != target.length() || memcmp(_buffer, target.c_str(), _length) != 0)
+    {
+        return false;
+    }
+    return true;
+}
+
 bool Buffer::deep_equal(Buffer *target)
 {
     if (
