@@ -4,7 +4,9 @@
 #include "gtest/gtest.h"
 
 using fsw::Buffer;
+using fsw::coroutine::http::Ctx;
 using fsw::coroutine::http::Response;
+using fsw::coroutine::http::Request;
 
 TEST(coroutine_http_response, get_status_message)
 {
@@ -14,13 +16,16 @@ TEST(coroutine_http_response, get_status_message)
     ASSERT_EQ(response.get_status_message(), "404 Not Found");
 }
 
-TEST(coroutine_http_response, set_header_string)
+TEST(coroutine_http_response, build_http_status_line)
 {
-    Response *response = new Response();
-    response->set_header("Connection", "Close");
-    response->set_header("Content-Type", "text/html");
-    response->set_header("Content-Type", "text/html");
-    ASSERT_EQ(response->header.size(), 2);
+    Response response;
+    Socket *sock = new Socket(1);
+    Ctx *ctx = new Ctx(sock);
+    response.ctx = ctx;
+    response.set_status(404);
+    response.build_http_status_line();
+    Buffer *buf = response.get_write_buf();
+    ASSERT_TRUE(buf->equal("HTTP/1.1 404 Not Found\r\n"));
 }
 
 TEST(coroutine_http_response, set_version)
@@ -43,4 +48,36 @@ TEST(coroutine_http_response, get_real_version)
     response.set_version(400);
     real_version = response.get_real_version();
     ASSERT_EQ(real_version, "Unknown version: 400");
+}
+
+TEST(coroutine_http_response, clear_header)
+{
+    Response response;
+    Socket *sock = new Socket(1);
+    Ctx *ctx = new Ctx(sock);
+    response.ctx = ctx;
+    response.header["fsw"] = "hello";
+    response.clear_header();
+    ASSERT_EQ(response.header.size(), 0);
+}
+
+TEST(coroutine_http_response, check_websocket_upgrade)
+{
+    Request request;
+    Response response;
+    Socket *sock = new Socket(1);
+    Ctx *ctx = new Ctx(sock);
+
+    ctx->request = &request;
+    ctx->response = &response;
+    response.ctx = ctx;
+
+    request.method = "GET";
+    request.header["connection"] = "upgrade";
+    request.header["upgrade"] = "websocket";
+    request.header["sec-websocket-version"] = "13";
+    request.header["sec-websocket-key"] = "xxxx";
+
+    std::string sec_websocket_key = ctx->request->get_header("sec-websocket-key");
+    ASSERT_TRUE(ctx->response->check_websocket_upgrade(sec_websocket_key));
 }
