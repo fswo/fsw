@@ -360,7 +360,7 @@ void Response::clear_header()
     header.clear();
 }
 
-bool Response::upgrade()
+bool Response::check_websocket_upgrade(std::string sec_websocket_key)
 {
     std::string bad_handshake = "websocket handshake error: ";
 
@@ -384,10 +384,21 @@ bool Response::upgrade()
         ctx->response->send_bad_request_response(bad_handshake + "websocket: unsupported version: 13 not found in 'Sec-Websocket-Version' header");
         return false;
     }
-    std::string sec_websocket_key = ctx->request->get_header("sec-websocket-key");
     if (sec_websocket_key.empty())
     {
         ctx->response->send_bad_request_response(bad_handshake + "'Sec-WebSocket-Key' header is missing or blank");
+        return false;
+    }
+
+    return true;
+}
+
+bool Response::upgrade()
+{
+    std::string sec_websocket_key = ctx->request->get_header("sec-websocket-key");
+
+    if (!ctx->response->check_websocket_upgrade(sec_websocket_key))
+    {
         return false;
     }
     

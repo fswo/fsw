@@ -151,6 +151,7 @@ public:
     Response* build_http_body(Buffer *body);
     void end(Buffer *body = nullptr);
     void clear_header();
+    bool check_websocket_upgrade(std::string sec_websocket_key);
     bool upgrade();
 
     inline void set_status(int status)
