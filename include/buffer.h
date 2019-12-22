@@ -19,6 +19,7 @@ public:
     Buffer* append(Buffer *buffer);
     Buffer* dup();
     bool equal(Buffer *target);
+    bool equal(std::string target);
     bool deep_equal(Buffer *target);
 
     inline size_t length()

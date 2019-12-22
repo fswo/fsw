@@ -19,7 +19,7 @@ class Context
 public:
     std::stack<defer_task *> *defer_tasks = nullptr;
 
-    Context(size_t stack_size, coroutine_func_t fn, void* private_data);
+    Context(size_t stack_size, std::function<void()> fn);
     ~Context();
     bool swap_in();
     bool swap_out();
@@ -35,7 +35,7 @@ public:
 protected:
     coroutine_context_t ctx_;
     coroutine_context_t swap_ctx_;
-    coroutine_func_t fn_;
+    std::function<void()> fn_;
     char* stack_;
     uint32_t stack_size_;
     void *private_data_;

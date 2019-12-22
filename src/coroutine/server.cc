@@ -37,7 +37,7 @@ bool Server::start()
             return false;
         }
 
-        Coroutine::create(handler, (void *)conn);
+        Coroutine::create(std::bind(handler, (void *)conn));
     }
     return true;
 }

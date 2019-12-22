@@ -39,6 +39,7 @@ private:
 
     void set_handler(string pattern, on_accept_handler fn, std::map<std::string, on_accept_handler> *handlers);
     on_accept_handler get_handler(string pattern, std::map<std::string, on_accept_handler> *http_handlers);
+    void on_accept(Socket* conn);
 };
 }
 }

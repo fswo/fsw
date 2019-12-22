@@ -97,7 +97,7 @@ public:
 
     inline void clear()
     {
-        clear_path()->clear_header()->clear_path();
+        clear_path()->clear_header()->clear_body();
     }
 
     inline Request* clear_path()
@@ -146,12 +146,12 @@ public:
     void send_frame(Buffer *data, uint8_t opcode = 1, uint8_t finish = 1);
     std::string get_status_message();
 
-    void set_header(std::string name, std::string value);
     Response* build_http_status_line();
     Response* build_http_header(int body_length);
     Response* build_http_body(Buffer *body);
     void end(Buffer *body = nullptr);
     void clear_header();
+    bool check_websocket_upgrade(std::string sec_websocket_key);
     bool upgrade();
 
     inline void set_status(int status)

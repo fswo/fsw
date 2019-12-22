@@ -20,7 +20,7 @@ void http_handler(Request *request, Response *response)
     Buffer buffer(1024);
     buffer.append(response_body, sizeof(response_body) - 1);
 
-    response->set_header("Content-Type", "text/html");
+    response->header["Content-Type"] = "text/html";
     response->end(&buffer);
 
     return;
@@ -47,7 +47,7 @@ void websocket_handler(Request *request, Response *response)
 
 int main(int argc, char const *argv[])
 {
-    run([](void *arg)
+    run([]()
     {
         char ip[] = "127.0.0.1";
 
