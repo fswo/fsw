@@ -405,282 +405,301 @@
                 <h1 id="coroutine">Coroutine</h1>
 <h2 id="create">create</h2>
 <p>create a coroutine and run it immediately:</p>
-<pre><code class="cpp">long Coroutine::create(coroutine_func_t fn, void * args)
-</code></pre>
+<div class="codehilite"><pre><span></span><span class="kt">long</span> <span class="n">Coroutine</span><span class="o">::</span><span class="n">create</span><span class="p">(</span><span class="n">coroutine_func_t</span> <span class="n">fn</span><span class="p">,</span> <span class="kt">void</span> <span class="o">*</span> <span class="n">args</span><span class="p">)</span>
+</pre></div>
 
-<pre><code class="cpp">#include &quot;fsw/coroutine.h&quot;
 
-using fsw::Coroutine;
-using fsw::coroutine::run;
+<div class="codehilite"><pre><span></span><span class="cp">#include</span> <span class="cpf">&quot;fsw/coroutine.h&quot;</span><span class="cp"></span>
 
-int main(int argc, char const *argv[])
-{
-    run([](void *args)
-    {
-        Coroutine::create([](void *arg)
-        {
-            std::cout &lt;&lt; &quot;coroutine 1&quot; &lt;&lt; std::endl;
-        });
+<span class="k">using</span> <span class="n">fsw</span><span class="o">::</span><span class="n">Coroutine</span><span class="p">;</span>
+<span class="k">using</span> <span class="n">fsw</span><span class="o">::</span><span class="n">coroutine</span><span class="o">::</span><span class="n">run</span><span class="p">;</span>
 
-        Coroutine::create([](void *arg)
-        {
-            std::cout &lt;&lt; &quot;coroutine 2&quot; &lt;&lt; std::endl;
-        });
+<span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span> <span class="k">const</span> <span class="o">*</span><span class="n">argv</span><span class="p">[])</span>
+<span class="p">{</span>
+    <span class="n">run</span><span class="p">([](</span><span class="kt">void</span> <span class="o">*</span><span class="n">args</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">Coroutine</span><span class="o">::</span><span class="n">create</span><span class="p">([](</span><span class="kt">void</span> <span class="o">*</span><span class="n">arg</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;coroutine 1&quot;</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+        <span class="p">});</span>
 
-        Coroutine::create([](void *arg)
-        {
-            std::cout &lt;&lt; &quot;coroutine 3&quot; &lt;&lt; std::endl;
-        });
-    });
+        <span class="n">Coroutine</span><span class="o">::</span><span class="n">create</span><span class="p">([](</span><span class="kt">void</span> <span class="o">*</span><span class="n">arg</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;coroutine 2&quot;</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+        <span class="p">});</span>
 
-    return 0;
-}
-</code></pre>
+        <span class="n">Coroutine</span><span class="o">::</span><span class="n">create</span><span class="p">([](</span><span class="kt">void</span> <span class="o">*</span><span class="n">arg</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;coroutine 3&quot;</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+        <span class="p">});</span>
+    <span class="p">});</span>
+
+    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+
 
 <h2 id="get_current">get_current</h2>
 <p>get the currently running coroutine:</p>
-<pre><code class="cpp">static fsw::Coroutine *fsw::Coroutine::get_current()
-</code></pre>
+<div class="codehilite"><pre><span></span><span class="k">static</span> <span class="n">fsw</span><span class="o">::</span><span class="n">Coroutine</span> <span class="o">*</span><span class="n">fsw</span><span class="o">::</span><span class="n">Coroutine</span><span class="o">::</span><span class="n">get_current</span><span class="p">()</span>
+</pre></div>
 
-<pre><code class="cpp">#include &quot;fsw/coroutine.h&quot;
 
-using fsw::Coroutine;
-using fsw::coroutine::run;
+<div class="codehilite"><pre><span></span><span class="cp">#include</span> <span class="cpf">&quot;fsw/coroutine.h&quot;</span><span class="cp"></span>
 
-int main(int argc, char const *argv[])
-{
-    run([](void *args)
-    {
-        Coroutine::create([](void *arg)
-        {
-            Coroutine *co = Coroutine::get_current();
-        });
-    });
+<span class="k">using</span> <span class="n">fsw</span><span class="o">::</span><span class="n">Coroutine</span><span class="p">;</span>
+<span class="k">using</span> <span class="n">fsw</span><span class="o">::</span><span class="n">coroutine</span><span class="o">::</span><span class="n">run</span><span class="p">;</span>
 
-    return 0;
-}
-</code></pre>
+<span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span> <span class="k">const</span> <span class="o">*</span><span class="n">argv</span><span class="p">[])</span>
+<span class="p">{</span>
+    <span class="n">run</span><span class="p">([](</span><span class="kt">void</span> <span class="o">*</span><span class="n">args</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">Coroutine</span><span class="o">::</span><span class="n">create</span><span class="p">([](</span><span class="kt">void</span> <span class="o">*</span><span class="n">arg</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="n">Coroutine</span> <span class="o">*</span><span class="n">co</span> <span class="o">=</span> <span class="n">Coroutine</span><span class="o">::</span><span class="n">get_current</span><span class="p">();</span>
+        <span class="p">});</span>
+    <span class="p">});</span>
+
+    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+
 
 <h2 id="yield">yield</h2>
 <p>swap out the current coroutine:</p>
-<pre><code class="cpp">static void fsw::Coroutine::yield()
-</code></pre>
+<div class="codehilite"><pre><span></span><span class="k">static</span> <span class="kt">void</span> <span class="n">fsw</span><span class="o">::</span><span class="n">Coroutine</span><span class="o">::</span><span class="n">yield</span><span class="p">()</span>
+</pre></div>
 
-<pre><code class="cpp">#include &quot;fsw/coroutine.h&quot;
 
-using fsw::Coroutine;
-using fsw::coroutine::run;
+<div class="codehilite"><pre><span></span><span class="cp">#include</span> <span class="cpf">&quot;fsw/coroutine.h&quot;</span><span class="cp"></span>
 
-int main(int argc, char const *argv[])
-{
-    run([](void *args)
-    {
-        long cid = Coroutine::create([](void *arg)
-        {
-            Coroutine *co = Coroutine::get_current();
+<span class="k">using</span> <span class="n">fsw</span><span class="o">::</span><span class="n">Coroutine</span><span class="p">;</span>
+<span class="k">using</span> <span class="n">fsw</span><span class="o">::</span><span class="n">coroutine</span><span class="o">::</span><span class="n">run</span><span class="p">;</span>
 
-            std::cout &lt;&lt; 1 &lt;&lt; std::endl;
-            co-&gt;yield();
-            std::cout &lt;&lt; 3 &lt;&lt; std::endl;
-        });
+<span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span> <span class="k">const</span> <span class="o">*</span><span class="n">argv</span><span class="p">[])</span>
+<span class="p">{</span>
+    <span class="n">run</span><span class="p">([](</span><span class="kt">void</span> <span class="o">*</span><span class="n">args</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="kt">long</span> <span class="n">cid</span> <span class="o">=</span> <span class="n">Coroutine</span><span class="o">::</span><span class="n">create</span><span class="p">([](</span><span class="kt">void</span> <span class="o">*</span><span class="n">arg</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="n">Coroutine</span> <span class="o">*</span><span class="n">co</span> <span class="o">=</span> <span class="n">Coroutine</span><span class="o">::</span><span class="n">get_current</span><span class="p">();</span>
 
-        Coroutine::create([](void *arg)
-        {
-            long cid = (long)(uintptr_t)arg;
+            <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+            <span class="n">co</span><span class="o">-&gt;</span><span class="n">yield</span><span class="p">();</span>
+            <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="mi">3</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+        <span class="p">});</span>
 
-            std::cout &lt;&lt; 2 &lt;&lt; std::endl;
-            Coroutine::resume(cid);
-            std::cout &lt;&lt; 4 &lt;&lt; std::endl;
-        }, (void*)(uintptr_t)cid);
+        <span class="n">Coroutine</span><span class="o">::</span><span class="n">create</span><span class="p">([](</span><span class="kt">void</span> <span class="o">*</span><span class="n">arg</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="kt">long</span> <span class="n">cid</span> <span class="o">=</span> <span class="p">(</span><span class="kt">long</span><span class="p">)(</span><span class="kt">uintptr_t</span><span class="p">)</span><span class="n">arg</span><span class="p">;</span>
 
-    });
+            <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="mi">2</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+            <span class="n">Coroutine</span><span class="o">::</span><span class="n">resume</span><span class="p">(</span><span class="n">cid</span><span class="p">);</span>
+            <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="mi">4</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+        <span class="p">},</span> <span class="p">(</span><span class="kt">void</span><span class="o">*</span><span class="p">)(</span><span class="kt">uintptr_t</span><span class="p">)</span><span class="n">cid</span><span class="p">);</span>
 
-    return 0;
-}
-</code></pre>
+    <span class="p">});</span>
+
+    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+
 
 <p>it will print:</p>
-<pre><code class="shell">1
-2
-3
-4
-</code></pre>
+<div class="codehilite"><pre><span></span><span class="m">1</span>
+<span class="m">2</span>
+<span class="m">3</span>
+<span class="m">4</span>
+</pre></div>
+
 
 <h2 id="resume">resume</h2>
 <p>swap in the specified coroutine:</p>
-<pre><code class="cpp">static void resume(long cid)
-</code></pre>
+<div class="codehilite"><pre><span></span><span class="k">static</span> <span class="kt">void</span> <span class="n">resume</span><span class="p">(</span><span class="kt">long</span> <span class="n">cid</span><span class="p">)</span>
+</pre></div>
 
-<pre><code class="cpp">#include &quot;fsw/coroutine.h&quot;
 
-using fsw::Coroutine;
-using fsw::coroutine::run;
+<div class="codehilite"><pre><span></span><span class="cp">#include</span> <span class="cpf">&quot;fsw/coroutine.h&quot;</span><span class="cp"></span>
 
-int main(int argc, char const *argv[])
-{
-    run([](void *args)
-    {
-        long cid = Coroutine::create([](void *arg)
-        {
-            Coroutine *co = Coroutine::get_current();
-            std::cout &lt;&lt; 1 &lt;&lt; std::endl;
-            co-&gt;yield();
-            std::cout &lt;&lt; 3 &lt;&lt; std::endl;
-        });
+<span class="k">using</span> <span class="n">fsw</span><span class="o">::</span><span class="n">Coroutine</span><span class="p">;</span>
+<span class="k">using</span> <span class="n">fsw</span><span class="o">::</span><span class="n">coroutine</span><span class="o">::</span><span class="n">run</span><span class="p">;</span>
 
-        Coroutine::create([](void *arg)
-        {
-            long cid = (long)(uintptr_t)arg;
+<span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span> <span class="k">const</span> <span class="o">*</span><span class="n">argv</span><span class="p">[])</span>
+<span class="p">{</span>
+    <span class="n">run</span><span class="p">([](</span><span class="kt">void</span> <span class="o">*</span><span class="n">args</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="kt">long</span> <span class="n">cid</span> <span class="o">=</span> <span class="n">Coroutine</span><span class="o">::</span><span class="n">create</span><span class="p">([](</span><span class="kt">void</span> <span class="o">*</span><span class="n">arg</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="n">Coroutine</span> <span class="o">*</span><span class="n">co</span> <span class="o">=</span> <span class="n">Coroutine</span><span class="o">::</span><span class="n">get_current</span><span class="p">();</span>
+            <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+            <span class="n">co</span><span class="o">-&gt;</span><span class="n">yield</span><span class="p">();</span>
+            <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="mi">3</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+        <span class="p">});</span>
 
-            std::cout &lt;&lt; 2 &lt;&lt; std::endl;
-            Coroutine::resume(cid);
-            std::cout &lt;&lt; 4 &lt;&lt; std::endl;
-        }, (void*)(uintptr_t)cid);
+        <span class="n">Coroutine</span><span class="o">::</span><span class="n">create</span><span class="p">([](</span><span class="kt">void</span> <span class="o">*</span><span class="n">arg</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="kt">long</span> <span class="n">cid</span> <span class="o">=</span> <span class="p">(</span><span class="kt">long</span><span class="p">)(</span><span class="kt">uintptr_t</span><span class="p">)</span><span class="n">arg</span><span class="p">;</span>
 
-    });
+            <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="mi">2</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+            <span class="n">Coroutine</span><span class="o">::</span><span class="n">resume</span><span class="p">(</span><span class="n">cid</span><span class="p">);</span>
+            <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="mi">4</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+        <span class="p">},</span> <span class="p">(</span><span class="kt">void</span><span class="o">*</span><span class="p">)(</span><span class="kt">uintptr_t</span><span class="p">)</span><span class="n">cid</span><span class="p">);</span>
 
-    return 0;
-}
-</code></pre>
+    <span class="p">});</span>
 
-<p>it will print:</p>
-<pre><code class="shell">1
-2
-3
-4
-</code></pre>
+    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
 
-<pre><code class="cpp">static void fsw::Coroutine::resume(fsw::Coroutine *co)
-</code></pre>
-
-<pre><code class="cpp">#include &quot;fsw/coroutine.h&quot;
-
-using fsw::Coroutine;
-using fsw::coroutine::run;
-
-int main(int argc, char const *argv[])
-{
-    run([](void *args)
-    {
-        long cid = Coroutine::create([](void *arg)
-        {
-            Coroutine *co = Coroutine::get_current();
-            std::cout &lt;&lt; 1 &lt;&lt; std::endl;
-            co-&gt;yield();
-            std::cout &lt;&lt; 3 &lt;&lt; std::endl;
-        });
-
-        Coroutine::create([](void *arg)
-        {
-            long cid = (long)(uintptr_t)arg;
-            Coroutine *co = Coroutine::get_by_cid(cid);
-
-            std::cout &lt;&lt; 2 &lt;&lt; std::endl;
-            Coroutine::resume(co);
-            std::cout &lt;&lt; 4 &lt;&lt; std::endl;
-        }, (void*)(uintptr_t)cid);
-    });
-
-    return 0;
-}
-</code></pre>
 
 <p>it will print:</p>
-<pre><code class="shell">1
-2
-3
-4
-</code></pre>
+<div class="codehilite"><pre><span></span><span class="m">1</span>
+<span class="m">2</span>
+<span class="m">3</span>
+<span class="m">4</span>
+</pre></div>
 
-<pre><code class="txt">notice: if you have already got a pointer to the coroutine,
-then please call directly resume(fsw::Coroutine *co) instead of resume(long cid),
-which will reduce the lookup of the map.
-</code></pre>
+
+<div class="codehilite"><pre><span></span><span class="k">static</span> <span class="kt">void</span> <span class="n">fsw</span><span class="o">::</span><span class="n">Coroutine</span><span class="o">::</span><span class="n">resume</span><span class="p">(</span><span class="n">fsw</span><span class="o">::</span><span class="n">Coroutine</span> <span class="o">*</span><span class="n">co</span><span class="p">)</span>
+</pre></div>
+
+
+<div class="codehilite"><pre><span></span><span class="cp">#include</span> <span class="cpf">&quot;fsw/coroutine.h&quot;</span><span class="cp"></span>
+
+<span class="k">using</span> <span class="n">fsw</span><span class="o">::</span><span class="n">Coroutine</span><span class="p">;</span>
+<span class="k">using</span> <span class="n">fsw</span><span class="o">::</span><span class="n">coroutine</span><span class="o">::</span><span class="n">run</span><span class="p">;</span>
+
+<span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span> <span class="k">const</span> <span class="o">*</span><span class="n">argv</span><span class="p">[])</span>
+<span class="p">{</span>
+    <span class="n">run</span><span class="p">([](</span><span class="kt">void</span> <span class="o">*</span><span class="n">args</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="kt">long</span> <span class="n">cid</span> <span class="o">=</span> <span class="n">Coroutine</span><span class="o">::</span><span class="n">create</span><span class="p">([](</span><span class="kt">void</span> <span class="o">*</span><span class="n">arg</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="n">Coroutine</span> <span class="o">*</span><span class="n">co</span> <span class="o">=</span> <span class="n">Coroutine</span><span class="o">::</span><span class="n">get_current</span><span class="p">();</span>
+            <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+            <span class="n">co</span><span class="o">-&gt;</span><span class="n">yield</span><span class="p">();</span>
+            <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="mi">3</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+        <span class="p">});</span>
+
+        <span class="n">Coroutine</span><span class="o">::</span><span class="n">create</span><span class="p">([](</span><span class="kt">void</span> <span class="o">*</span><span class="n">arg</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="kt">long</span> <span class="n">cid</span> <span class="o">=</span> <span class="p">(</span><span class="kt">long</span><span class="p">)(</span><span class="kt">uintptr_t</span><span class="p">)</span><span class="n">arg</span><span class="p">;</span>
+            <span class="n">Coroutine</span> <span class="o">*</span><span class="n">co</span> <span class="o">=</span> <span class="n">Coroutine</span><span class="o">::</span><span class="n">get_by_cid</span><span class="p">(</span><span class="n">cid</span><span class="p">);</span>
+
+            <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="mi">2</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+            <span class="n">Coroutine</span><span class="o">::</span><span class="n">resume</span><span class="p">(</span><span class="n">co</span><span class="p">);</span>
+            <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="mi">4</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+        <span class="p">},</span> <span class="p">(</span><span class="kt">void</span><span class="o">*</span><span class="p">)(</span><span class="kt">uintptr_t</span><span class="p">)</span><span class="n">cid</span><span class="p">);</span>
+    <span class="p">});</span>
+
+    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+
+
+<p>it will print:</p>
+<div class="codehilite"><pre><span></span><span class="m">1</span>
+<span class="m">2</span>
+<span class="m">3</span>
+<span class="m">4</span>
+</pre></div>
+
+
+<div class="codehilite"><pre><span></span><span class="nv">notice</span>: <span class="k">if</span> <span class="nv">you</span> <span class="nv">have</span> <span class="nv">already</span> <span class="nv">got</span> <span class="nv">a</span> <span class="nv">pointer</span> <span class="nv">to</span> <span class="nv">the</span> <span class="nv">coroutine</span>,
+<span class="k">then</span> <span class="nv">please</span> <span class="k">call</span> <span class="nl">directly</span> <span class="nv">resume</span><span class="ss">(</span><span class="nv">fsw</span>::<span class="nv">Coroutine</span> <span class="o">*</span><span class="nv">co</span><span class="ss">)</span> <span class="nv">instead</span> <span class="nv">of</span> <span class="nv">resume</span><span class="ss">(</span><span class="nv">long</span> <span class="nv">cid</span><span class="ss">)</span>,
+<span class="nv">which</span> <span class="nv">will</span> <span class="nv">reduce</span> <span class="nv">the</span> <span class="nv">lookup</span> <span class="nv">of</span> <span class="nv">the</span> <span class="nv">map</span>.
+</pre></div>
+
 
 <h2 id="defer">defer</h2>
 <p>delayed execution of tasks:</p>
-<pre><code class="cpp">static void defer(coroutine_func_t _fn, void* _args = nullptr)
-</code></pre>
+<div class="codehilite"><pre><span></span><span class="k">static</span> <span class="kt">void</span> <span class="n">defer</span><span class="p">(</span><span class="n">coroutine_func_t</span> <span class="n">_fn</span><span class="p">,</span> <span class="kt">void</span><span class="o">*</span> <span class="n">_args</span> <span class="o">=</span> <span class="k">nullptr</span><span class="p">)</span>
+</pre></div>
 
-<pre><code class="cpp">#include &quot;fsw/coroutine.h&quot;
 
-using fsw::Coroutine;
-using fsw::coroutine::run;
+<div class="codehilite"><pre><span></span><span class="cp">#include</span> <span class="cpf">&quot;fsw/coroutine.h&quot;</span><span class="cp"></span>
 
-int main(int argc, char const *argv[])
-{
-    run([](void *args)
-    {
-        long cid = Coroutine::create([](void *arg)
-        {
-            Coroutine::defer([](void *arg)
-            {
-                std::cout &lt;&lt; 1 &lt;&lt; std::endl;
-            });
-            Coroutine::defer([](void *arg)
-            {
-                std::cout &lt;&lt; 2 &lt;&lt; std::endl;
-            });
-            Coroutine::defer([](void *arg)
-            {
-                std::cout &lt;&lt; 3 &lt;&lt; std::endl;
-            });
-        });
-    });
+<span class="k">using</span> <span class="n">fsw</span><span class="o">::</span><span class="n">Coroutine</span><span class="p">;</span>
+<span class="k">using</span> <span class="n">fsw</span><span class="o">::</span><span class="n">coroutine</span><span class="o">::</span><span class="n">run</span><span class="p">;</span>
 
-    return 0;
-}
-</code></pre>
+<span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span> <span class="k">const</span> <span class="o">*</span><span class="n">argv</span><span class="p">[])</span>
+<span class="p">{</span>
+    <span class="n">run</span><span class="p">([](</span><span class="kt">void</span> <span class="o">*</span><span class="n">args</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="kt">long</span> <span class="n">cid</span> <span class="o">=</span> <span class="n">Coroutine</span><span class="o">::</span><span class="n">create</span><span class="p">([](</span><span class="kt">void</span> <span class="o">*</span><span class="n">arg</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="n">Coroutine</span><span class="o">::</span><span class="n">defer</span><span class="p">([](</span><span class="kt">void</span> <span class="o">*</span><span class="n">arg</span><span class="p">)</span>
+            <span class="p">{</span>
+                <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+            <span class="p">});</span>
+            <span class="n">Coroutine</span><span class="o">::</span><span class="n">defer</span><span class="p">([](</span><span class="kt">void</span> <span class="o">*</span><span class="n">arg</span><span class="p">)</span>
+            <span class="p">{</span>
+                <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="mi">2</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+            <span class="p">});</span>
+            <span class="n">Coroutine</span><span class="o">::</span><span class="n">defer</span><span class="p">([](</span><span class="kt">void</span> <span class="o">*</span><span class="n">arg</span><span class="p">)</span>
+            <span class="p">{</span>
+                <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="mi">3</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+            <span class="p">});</span>
+        <span class="p">});</span>
+    <span class="p">});</span>
+
+    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+
 
 <p>it will print:</p>
-<pre><code class="shell">3
-2
-1
-</code></pre>
+<div class="codehilite"><pre><span></span><span class="m">3</span>
+<span class="m">2</span>
+<span class="m">1</span>
+</pre></div>
+
 
 <h2 id="sleep">sleep</h2>
 <p>let the current coroutine sleep:</p>
-<pre><code class="cpp">static int fsw::Coroutine::sleep(double seconds)
-</code></pre>
-
-<pre><code class="cpp">#include &quot;fsw/coroutine.h&quot;
-#include &quot;fsw/timer.h&quot;
+<div class="codehilite"><pre><span></span><span class="k">static</span> <span class="kt">int</span> <span class="n">fsw</span><span class="o">::</span><span class="n">Coroutine</span><span class="o">::</span><span class="n">sleep</span><span class="p">(</span><span class="kt">double</span> <span class="n">seconds</span><span class="p">)</span>
+</pre></div>
 
 
-using fsw::Coroutine;
-using fsw::Timer;
-using fsw::coroutine::run;
+<div class="codehilite"><pre><span></span><span class="cp">#include</span> <span class="cpf">&quot;fsw/coroutine.h&quot;</span><span class="cp"></span>
+<span class="cp">#include</span> <span class="cpf">&quot;fsw/timer.h&quot;</span><span class="cp"></span>
 
-int main(int argc, char const *argv[])
-{
-    run([](void *args)
-    {
-        long cid = Coroutine::create([](void *arg)
-        {
-            std::cout &lt;&lt; 1 &lt;&lt; std::endl;
-            Coroutine::sleep(2 * Timer::MILLI_SECOND);
-            std::cout &lt;&lt; 2 &lt;&lt; std::endl;
-        });
 
-        Coroutine::create([](void *arg)
-        {
-            std::cout &lt;&lt; 3 &lt;&lt; std::endl;
-            Coroutine::sleep(1 * Timer::MILLI_SECOND);
-            std::cout &lt;&lt; 4 &lt;&lt; std::endl;
-        }, (void*)(uintptr_t)cid);
+<span class="k">using</span> <span class="n">fsw</span><span class="o">::</span><span class="n">Coroutine</span><span class="p">;</span>
+<span class="k">using</span> <span class="n">fsw</span><span class="o">::</span><span class="n">Timer</span><span class="p">;</span>
+<span class="k">using</span> <span class="n">fsw</span><span class="o">::</span><span class="n">coroutine</span><span class="o">::</span><span class="n">run</span><span class="p">;</span>
 
-    });
+<span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span> <span class="k">const</span> <span class="o">*</span><span class="n">argv</span><span class="p">[])</span>
+<span class="p">{</span>
+    <span class="n">run</span><span class="p">([](</span><span class="kt">void</span> <span class="o">*</span><span class="n">args</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="kt">long</span> <span class="n">cid</span> <span class="o">=</span> <span class="n">Coroutine</span><span class="o">::</span><span class="n">create</span><span class="p">([](</span><span class="kt">void</span> <span class="o">*</span><span class="n">arg</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+            <span class="n">Coroutine</span><span class="o">::</span><span class="n">sleep</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">Timer</span><span class="o">::</span><span class="n">MILLI_SECOND</span><span class="p">);</span>
+            <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="mi">2</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+        <span class="p">});</span>
 
-    return 0;
-}
-</code></pre>
+        <span class="n">Coroutine</span><span class="o">::</span><span class="n">create</span><span class="p">([](</span><span class="kt">void</span> <span class="o">*</span><span class="n">arg</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="mi">3</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+            <span class="n">Coroutine</span><span class="o">::</span><span class="n">sleep</span><span class="p">(</span><span class="mi">1</span> <span class="o">*</span> <span class="n">Timer</span><span class="o">::</span><span class="n">MILLI_SECOND</span><span class="p">);</span>
+            <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="mi">4</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+        <span class="p">},</span> <span class="p">(</span><span class="kt">void</span><span class="o">*</span><span class="p">)(</span><span class="kt">uintptr_t</span><span class="p">)</span><span class="n">cid</span><span class="p">);</span>
+
+    <span class="p">});</span>
+
+    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+
 
 <p>it will print:</p>
-<pre><code class="shell">1
-3
-4
-2
-</code></pre>
+<div class="codehilite"><pre><span></span><span class="m">1</span>
+<span class="m">3</span>
+<span class="m">4</span>
+<span class="m">2</span>
+</pre></div>
                 
                   
                 

@@ -240,9 +240,45 @@
       
     
     
+      <label class="md-nav__link md-nav__link--active" for="__toc">
+        HTTP Server
+      </label>
+    
     <a href="./" title="HTTP Server" class="md-nav__link md-nav__link--active">
       HTTP Server
     </a>
+    
+      
+<nav class="md-nav md-nav--secondary">
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">Table of contents</label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#custom-handler" class="md-nav__link">
+    custom handler
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#document-root" class="md-nav__link">
+    document root
+  </a>
+  
+</li>
+      
+      
+      
+      
+      
+    </ul>
+  
+</nav>
     
   </li>
 
@@ -276,6 +312,29 @@
     
   
   
+    <label class="md-nav__title" for="__toc">Table of contents</label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#custom-handler" class="md-nav__link">
+    custom handler
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#document-root" class="md-nav__link">
+    document root
+  </a>
+  
+</li>
+      
+      
+      
+      
+      
+    </ul>
+  
 </nav>
                   </div>
                 </div>
@@ -289,55 +348,81 @@
                 
                 <h1 id="http-server">HTTP Server</h1>
 <p>create an HTTP server:</p>
-<pre><code class="cpp">fsw::coroutine::http::Server::Server(char *host, int port)
-</code></pre>
+<div class="codehilite"><pre><span></span><span class="n">fsw</span><span class="o">::</span><span class="n">coroutine</span><span class="o">::</span><span class="n">http</span><span class="o">::</span><span class="n">Server</span><span class="o">::</span><span class="n">Server</span><span class="p">(</span><span class="kt">char</span> <span class="o">*</span><span class="n">host</span><span class="p">,</span> <span class="kt">int</span> <span class="n">port</span><span class="p">)</span>
+</pre></div>
+
 
 <p>start the HTTP Server:</p>
-<pre><code class="cpp">bool fsw::coroutine::http::Server::start()
-</code></pre>
+<div class="codehilite"><pre><span></span><span class="kt">bool</span> <span class="n">fsw</span><span class="o">::</span><span class="n">coroutine</span><span class="o">::</span><span class="n">http</span><span class="o">::</span><span class="n">Server</span><span class="o">::</span><span class="n">start</span><span class="p">()</span>
+</pre></div>
 
-<p>set the router:</p>
-<pre><code class="cpp">void fsw::coroutine::http::Server::set_http_handler(std::string pattern, on_accept_handler fn)
-</code></pre>
 
-<pre><code class="cpp">#include &quot;fsw/coroutine_http.h&quot;
-#include &quot;fsw/coroutine_http_server.h&quot;
-#include &quot;fsw/coroutine.h&quot;
-#include &quot;fsw/buffer.h&quot;
+<h2 id="custom-handler">custom handler</h2>
+<p>set the http handler:</p>
+<div class="codehilite"><pre><span></span><span class="kt">void</span> <span class="n">fsw</span><span class="o">::</span><span class="n">coroutine</span><span class="o">::</span><span class="n">http</span><span class="o">::</span><span class="n">Server</span><span class="o">::</span><span class="n">set_http_handler</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">string</span> <span class="n">pattern</span><span class="p">,</span> <span class="n">on_accept_handler</span> <span class="n">fn</span><span class="p">)</span>
+</pre></div>
 
-using fsw::Coroutine;
-using fsw::coroutine::http::Request;
-using fsw::coroutine::http::Response;
-using fsw::coroutine::http::Server;
-using fsw::Buffer;
-using fsw::coroutine::run;
 
-void handler(Request *request, Response *response)
-{
-    char response_body[] = &quot;hello world&quot;;
-    Buffer buffer(1024);
-    buffer.append(response_body, sizeof(response_body) - 1);
+<div class="codehilite"><pre><span></span><span class="cp">#include</span> <span class="cpf">&quot;fsw/coroutine_http.h&quot;</span><span class="cp"></span>
+<span class="cp">#include</span> <span class="cpf">&quot;fsw/coroutine_http_server.h&quot;</span><span class="cp"></span>
+<span class="cp">#include</span> <span class="cpf">&quot;fsw/coroutine.h&quot;</span><span class="cp"></span>
+<span class="cp">#include</span> <span class="cpf">&quot;fsw/buffer.h&quot;</span><span class="cp"></span>
 
-    response-&gt;set_header(&quot;Content-Type&quot;, &quot;text/html&quot;);
-    response-&gt;end(&amp;buffer);
+<span class="k">using</span> <span class="n">fsw</span><span class="o">::</span><span class="n">Coroutine</span><span class="p">;</span>
+<span class="k">using</span> <span class="n">fsw</span><span class="o">::</span><span class="n">coroutine</span><span class="o">::</span><span class="n">http</span><span class="o">::</span><span class="n">Request</span><span class="p">;</span>
+<span class="k">using</span> <span class="n">fsw</span><span class="o">::</span><span class="n">coroutine</span><span class="o">::</span><span class="n">http</span><span class="o">::</span><span class="n">Response</span><span class="p">;</span>
+<span class="k">using</span> <span class="n">fsw</span><span class="o">::</span><span class="n">coroutine</span><span class="o">::</span><span class="n">http</span><span class="o">::</span><span class="n">Server</span><span class="p">;</span>
+<span class="k">using</span> <span class="n">fsw</span><span class="o">::</span><span class="n">Buffer</span><span class="p">;</span>
+<span class="k">using</span> <span class="n">fsw</span><span class="o">::</span><span class="n">coroutine</span><span class="o">::</span><span class="n">run</span><span class="p">;</span>
 
-    return;
-}
+<span class="kt">void</span> <span class="nf">handler</span><span class="p">(</span><span class="n">Request</span> <span class="o">*</span><span class="n">request</span><span class="p">,</span> <span class="n">Response</span> <span class="o">*</span><span class="n">response</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="kt">char</span> <span class="n">response_body</span><span class="p">[]</span> <span class="o">=</span> <span class="s">&quot;hello world&quot;</span><span class="p">;</span>
+    <span class="n">Buffer</span> <span class="n">buffer</span><span class="p">(</span><span class="mi">1024</span><span class="p">);</span>
+    <span class="n">buffer</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="n">response_body</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">response_body</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">);</span>
 
-int main(int argc, char const *argv[])
-{
-    run([](void *args)
-    {
-        char ip[] = &quot;127.0.0.1&quot;;
+    <span class="n">response</span><span class="o">-&gt;</span><span class="n">set_header</span><span class="p">(</span><span class="s">&quot;Content-Type&quot;</span><span class="p">,</span> <span class="s">&quot;text/html&quot;</span><span class="p">);</span>
+    <span class="n">response</span><span class="o">-&gt;</span><span class="n">end</span><span class="p">(</span><span class="o">&amp;</span><span class="n">buffer</span><span class="p">);</span>
 
-        Server *serv = new Server(ip, 80);
-        serv-&gt;set_http_handler(&quot;/index&quot;, handler);
-        serv-&gt;start();
-    });
+    <span class="k">return</span><span class="p">;</span>
+<span class="p">}</span>
 
-    return 0;
-}
-</code></pre>
+<span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span> <span class="k">const</span> <span class="o">*</span><span class="n">argv</span><span class="p">[])</span>
+<span class="p">{</span>
+    <span class="n">run</span><span class="p">([](</span><span class="kt">void</span> <span class="o">*</span><span class="n">args</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="kt">char</span> <span class="n">ip</span><span class="p">[]</span> <span class="o">=</span> <span class="s">&quot;127.0.0.1&quot;</span><span class="p">;</span>
+
+        <span class="n">Server</span> <span class="o">*</span><span class="n">serv</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Server</span><span class="p">(</span><span class="n">ip</span><span class="p">,</span> <span class="mi">80</span><span class="p">);</span>
+        <span class="n">serv</span><span class="o">-&gt;</span><span class="n">set_http_handler</span><span class="p">(</span><span class="s">&quot;/index&quot;</span><span class="p">,</span> <span class="n">handler</span><span class="p">);</span>
+        <span class="n">serv</span><span class="o">-&gt;</span><span class="n">start</span><span class="p">();</span>
+    <span class="p">});</span>
+
+    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+
+
+<h2 id="document-root">document root</h2>
+<div class="codehilite"><pre><span></span><span class="cp">#include</span> <span class="cpf">&quot;fsw/coroutine_http_server.h&quot;</span><span class="cp"></span>
+
+<span class="k">using</span> <span class="n">fsw</span><span class="o">::</span><span class="n">coroutine</span><span class="o">::</span><span class="n">http</span><span class="o">::</span><span class="n">Server</span><span class="p">;</span>
+<span class="k">using</span> <span class="n">fsw</span><span class="o">::</span><span class="n">coroutine</span><span class="o">::</span><span class="n">run</span><span class="p">;</span>
+
+<span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span> <span class="k">const</span> <span class="o">*</span><span class="n">argv</span><span class="p">[])</span>
+<span class="p">{</span>
+    <span class="n">run</span><span class="p">([]()</span>
+    <span class="p">{</span>
+        <span class="kt">char</span> <span class="n">ip</span><span class="p">[]</span> <span class="o">=</span> <span class="s">&quot;127.0.0.1&quot;</span><span class="p">;</span>
+
+        <span class="n">Server</span> <span class="o">*</span><span class="n">serv</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Server</span><span class="p">(</span><span class="n">ip</span><span class="p">,</span> <span class="mi">80</span><span class="p">);</span>
+        <span class="n">serv</span><span class="o">-&gt;</span><span class="n">settings</span><span class="p">[</span><span class="s">&quot;document_root&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&quot;/var/www/html&quot;</span><span class="p">;</span>
+        <span class="n">serv</span><span class="o">-&gt;</span><span class="n">start</span><span class="p">();</span>
+    <span class="p">});</span>
+
+    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
                 
                   
                 

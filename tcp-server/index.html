@@ -289,61 +289,64 @@
                 
                 <h1 id="tcp-server">TCP Server</h1>
 <p>create an TCP server:</p>
-<pre><code class="cpp">Server::Server(char * host, int port)
-</code></pre>
+<div class="codehilite"><pre><span></span><span class="n">Server</span><span class="o">::</span><span class="n">Server</span><span class="p">(</span><span class="kt">char</span> <span class="o">*</span> <span class="n">host</span><span class="p">,</span> <span class="kt">int</span> <span class="n">port</span><span class="p">)</span>
+</pre></div>
+
 
 <p>start the TCP Server:</p>
-<pre><code class="cpp">bool Server::start()
-</code></pre>
+<div class="codehilite"><pre><span></span><span class="kt">bool</span> <span class="n">Server</span><span class="o">::</span><span class="n">start</span><span class="p">()</span>
+</pre></div>
+
 
 <p>set the handler to handle the connection</p>
-<pre><code class="cpp">void Server::set_handler(string pattern, on_accept_handler fn)
-</code></pre>
+<div class="codehilite"><pre><span></span><span class="kt">void</span> <span class="n">Server</span><span class="o">::</span><span class="n">set_handler</span><span class="p">(</span><span class="n">string</span> <span class="n">pattern</span><span class="p">,</span> <span class="n">on_accept_handler</span> <span class="n">fn</span><span class="p">)</span>
+</pre></div>
 
-<pre><code class="cpp">#include &quot;fsw/coroutine_server.h&quot;
-#include &quot;fsw/coroutine.h&quot;
 
-using fsw::Coroutine;
-using fsw::coroutine::Server;
-using fsw::coroutine::Socket;
-using fsw::coroutine::run;
+<div class="codehilite"><pre><span></span><span class="cp">#include</span> <span class="cpf">&quot;fsw/coroutine_server.h&quot;</span><span class="cp"></span>
+<span class="cp">#include</span> <span class="cpf">&quot;fsw/coroutine.h&quot;</span><span class="cp"></span>
 
-char response_str[] = &quot;HTTP/1.1 200 OK\r\nContent-Type: text/html\r\nConnection: close\r\nContent-Length: 11\r\n\r\nhello world\r\n&quot;;
+<span class="k">using</span> <span class="n">fsw</span><span class="o">::</span><span class="n">Coroutine</span><span class="p">;</span>
+<span class="k">using</span> <span class="n">fsw</span><span class="o">::</span><span class="n">coroutine</span><span class="o">::</span><span class="n">Server</span><span class="p">;</span>
+<span class="k">using</span> <span class="n">fsw</span><span class="o">::</span><span class="n">coroutine</span><span class="o">::</span><span class="n">Socket</span><span class="p">;</span>
+<span class="k">using</span> <span class="n">fsw</span><span class="o">::</span><span class="n">coroutine</span><span class="o">::</span><span class="n">run</span><span class="p">;</span>
 
-void handler(void *args)
-{
-    int ret;
-    char buf[1024] = {0};
-    Socket *conn = (Socket *)args;
+<span class="kt">char</span> <span class="n">response_str</span><span class="p">[]</span> <span class="o">=</span> <span class="s">&quot;HTTP/1.1 200 OK</span><span class="se">\r\n</span><span class="s">Content-Type: text/html</span><span class="se">\r\n</span><span class="s">Connection: close</span><span class="se">\r\n</span><span class="s">Content-Length: 11</span><span class="se">\r\n\r\n</span><span class="s">hello world</span><span class="se">\r\n</span><span class="s">&quot;</span><span class="p">;</span>
 
-    ret = conn-&gt;recv(buf, sizeof(buf) - 1);
-    if (ret &lt; 0)
-    {
-        fswWarn(&quot;Error has occurred: (errno %d) %s&quot;, errno, strerror(errno));
-    }
-    buf[ret] = 0;
-    ret = conn-&gt;send(response_str, sizeof(response_str) - 1);
-    if (ret &lt; 0)
-    {
-        fswWarn(&quot;Error has occurred: (errno %d) %s&quot;, errno, strerror(errno));
-    }
-    delete conn;
-}
+<span class="kt">void</span> <span class="nf">handler</span><span class="p">(</span><span class="kt">void</span> <span class="o">*</span><span class="n">args</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="kt">int</span> <span class="n">ret</span><span class="p">;</span>
+    <span class="kt">char</span> <span class="n">buf</span><span class="p">[</span><span class="mi">1024</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="mi">0</span><span class="p">};</span>
+    <span class="n">Socket</span> <span class="o">*</span><span class="n">conn</span> <span class="o">=</span> <span class="p">(</span><span class="n">Socket</span> <span class="o">*</span><span class="p">)</span><span class="n">args</span><span class="p">;</span>
 
-int main(int argc, char const *argv[])
-{
-    run([](void *arg)
-    {
-        char ip[] = &quot;127.0.0.1&quot;;
+    <span class="n">ret</span> <span class="o">=</span> <span class="n">conn</span><span class="o">-&gt;</span><span class="n">recv</span><span class="p">(</span><span class="n">buf</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">buf</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">);</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">ret</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">fswWarn</span><span class="p">(</span><span class="s">&quot;Error has occurred: (errno %d) %s&quot;</span><span class="p">,</span> <span class="n">errno</span><span class="p">,</span> <span class="n">strerror</span><span class="p">(</span><span class="n">errno</span><span class="p">));</span>
+    <span class="p">}</span>
+    <span class="n">buf</span><span class="p">[</span><span class="n">ret</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="n">ret</span> <span class="o">=</span> <span class="n">conn</span><span class="o">-&gt;</span><span class="n">send</span><span class="p">(</span><span class="n">response_str</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">response_str</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">);</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">ret</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">fswWarn</span><span class="p">(</span><span class="s">&quot;Error has occurred: (errno %d) %s&quot;</span><span class="p">,</span> <span class="n">errno</span><span class="p">,</span> <span class="n">strerror</span><span class="p">(</span><span class="n">errno</span><span class="p">));</span>
+    <span class="p">}</span>
+    <span class="k">delete</span> <span class="n">conn</span><span class="p">;</span>
+<span class="p">}</span>
 
-        Server *serv = new Server(ip, 80);
-        serv-&gt;set_handler(handler);
-        serv-&gt;start();
-    });
+<span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span> <span class="k">const</span> <span class="o">*</span><span class="n">argv</span><span class="p">[])</span>
+<span class="p">{</span>
+    <span class="n">run</span><span class="p">([](</span><span class="kt">void</span> <span class="o">*</span><span class="n">arg</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="kt">char</span> <span class="n">ip</span><span class="p">[]</span> <span class="o">=</span> <span class="s">&quot;127.0.0.1&quot;</span><span class="p">;</span>
 
-    return 0;
-}
-</code></pre>
+        <span class="n">Server</span> <span class="o">*</span><span class="n">serv</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Server</span><span class="p">(</span><span class="n">ip</span><span class="p">,</span> <span class="mi">80</span><span class="p">);</span>
+        <span class="n">serv</span><span class="o">-&gt;</span><span class="n">set_handler</span><span class="p">(</span><span class="n">handler</span><span class="p">);</span>
+        <span class="n">serv</span><span class="o">-&gt;</span><span class="n">start</span><span class="p">();</span>
+    <span class="p">});</span>
+
+    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
                 
                   
                 

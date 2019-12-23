@@ -363,75 +363,80 @@
                 <h1 id="channel">Channel</h1>
 <h2 id="create">Create</h2>
 <p>create a channel:</p>
-<pre><code class="cpp">fsw::coroutine::Channel::Channel(size_t _capacity = 1UL)
-</code></pre>
+<div class="codehilite"><pre><span></span><span class="n">fsw</span><span class="o">::</span><span class="n">coroutine</span><span class="o">::</span><span class="n">Channel</span><span class="o">::</span><span class="n">Channel</span><span class="p">(</span><span class="kt">size_t</span> <span class="n">_capacity</span> <span class="o">=</span> <span class="mi">1UL</span><span class="p">)</span>
+</pre></div>
 
-<pre><code class="cpp">#include &quot;fsw/coroutine_channel.h&quot;
 
-using fsw::coroutine::Channel;
-using fsw::coroutine::run;
+<div class="codehilite"><pre><span></span><span class="cp">#include</span> <span class="cpf">&quot;fsw/coroutine_channel.h&quot;</span><span class="cp"></span>
 
-int main(int argc, char const *argv[])
-{
-    run([](void *args)
-    {
-        Channel *chan1 = new Channel();
-        Channel *chan2 = new Channel(2);
-    });
+<span class="k">using</span> <span class="n">fsw</span><span class="o">::</span><span class="n">coroutine</span><span class="o">::</span><span class="n">Channel</span><span class="p">;</span>
+<span class="k">using</span> <span class="n">fsw</span><span class="o">::</span><span class="n">coroutine</span><span class="o">::</span><span class="n">run</span><span class="p">;</span>
 
-    return 0;
-}
-</code></pre>
+<span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span> <span class="k">const</span> <span class="o">*</span><span class="n">argv</span><span class="p">[])</span>
+<span class="p">{</span>
+    <span class="n">run</span><span class="p">([](</span><span class="kt">void</span> <span class="o">*</span><span class="n">args</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">Channel</span> <span class="o">*</span><span class="n">chan1</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Channel</span><span class="p">();</span>
+        <span class="n">Channel</span> <span class="o">*</span><span class="n">chan2</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Channel</span><span class="p">(</span><span class="mi">2</span><span class="p">);</span>
+    <span class="p">});</span>
+
+    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+
 
 <h2 id="push">push</h2>
 <p>push the data into the channel:</p>
-<pre><code class="cpp">bool fsw::coroutine::Channel::push(void *data, double timeout = (-1.0))
-</code></pre>
+<div class="codehilite"><pre><span></span><span class="kt">bool</span> <span class="n">fsw</span><span class="o">::</span><span class="n">coroutine</span><span class="o">::</span><span class="n">Channel</span><span class="o">::</span><span class="n">push</span><span class="p">(</span><span class="kt">void</span> <span class="o">*</span><span class="n">data</span><span class="p">,</span> <span class="kt">double</span> <span class="n">timeout</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="mf">1.0</span><span class="p">))</span>
+</pre></div>
 
-<pre><code class="cpp">#include &quot;fsw/coroutine.h&quot;
-#include &quot;fsw/coroutine_channel.h&quot;
 
-using fsw::coroutine::Channel;
-using fsw::Coroutine;
-using fsw::coroutine::run;
+<div class="codehilite"><pre><span></span><span class="cp">#include</span> <span class="cpf">&quot;fsw/coroutine.h&quot;</span><span class="cp"></span>
+<span class="cp">#include</span> <span class="cpf">&quot;fsw/coroutine_channel.h&quot;</span><span class="cp"></span>
 
-int main(int argc, char const *argv[])
-{
-    run([](void *args)
-    {
-        Channel *chan = new Channel();
+<span class="k">using</span> <span class="n">fsw</span><span class="o">::</span><span class="n">coroutine</span><span class="o">::</span><span class="n">Channel</span><span class="p">;</span>
+<span class="k">using</span> <span class="n">fsw</span><span class="o">::</span><span class="n">Coroutine</span><span class="p">;</span>
+<span class="k">using</span> <span class="n">fsw</span><span class="o">::</span><span class="n">coroutine</span><span class="o">::</span><span class="n">run</span><span class="p">;</span>
 
-        Coroutine::create([](void *arg)
-        {
-            void *data;
-            Channel *chan = (Channel *)arg;
-            data = chan-&gt;pop();
-            std::cout &lt;&lt; *(std::string *)data &lt;&lt; std::endl;
-        }, (void *)chan);
+<span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span> <span class="k">const</span> <span class="o">*</span><span class="n">argv</span><span class="p">[])</span>
+<span class="p">{</span>
+    <span class="n">run</span><span class="p">([](</span><span class="kt">void</span> <span class="o">*</span><span class="n">args</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">Channel</span> <span class="o">*</span><span class="n">chan</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Channel</span><span class="p">();</span>
 
-        Coroutine::create([](void *arg)
-        {
-            bool ret;
-            std::string data = &quot;hello world&quot;;
-            Channel *chan = (Channel *)arg;
-            ret = chan-&gt;push(&amp;data);
-            std::cout &lt;&lt; ret &lt;&lt; std::endl;
-        }, (void *)chan);
+        <span class="n">Coroutine</span><span class="o">::</span><span class="n">create</span><span class="p">([](</span><span class="kt">void</span> <span class="o">*</span><span class="n">arg</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="kt">void</span> <span class="o">*</span><span class="n">data</span><span class="p">;</span>
+            <span class="n">Channel</span> <span class="o">*</span><span class="n">chan</span> <span class="o">=</span> <span class="p">(</span><span class="n">Channel</span> <span class="o">*</span><span class="p">)</span><span class="n">arg</span><span class="p">;</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">chan</span><span class="o">-&gt;</span><span class="n">pop</span><span class="p">();</span>
+            <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="o">*</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">string</span> <span class="o">*</span><span class="p">)</span><span class="n">data</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+        <span class="p">},</span> <span class="p">(</span><span class="kt">void</span> <span class="o">*</span><span class="p">)</span><span class="n">chan</span><span class="p">);</span>
 
-        delete chan;
-    });
-}
-</code></pre>
+        <span class="n">Coroutine</span><span class="o">::</span><span class="n">create</span><span class="p">([](</span><span class="kt">void</span> <span class="o">*</span><span class="n">arg</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="kt">bool</span> <span class="n">ret</span><span class="p">;</span>
+            <span class="n">std</span><span class="o">::</span><span class="n">string</span> <span class="n">data</span> <span class="o">=</span> <span class="s">&quot;hello world&quot;</span><span class="p">;</span>
+            <span class="n">Channel</span> <span class="o">*</span><span class="n">chan</span> <span class="o">=</span> <span class="p">(</span><span class="n">Channel</span> <span class="o">*</span><span class="p">)</span><span class="n">arg</span><span class="p">;</span>
+            <span class="n">ret</span> <span class="o">=</span> <span class="n">chan</span><span class="o">-&gt;</span><span class="n">push</span><span class="p">(</span><span class="o">&amp;</span><span class="n">data</span><span class="p">);</span>
+            <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">ret</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+        <span class="p">},</span> <span class="p">(</span><span class="kt">void</span> <span class="o">*</span><span class="p">)</span><span class="n">chan</span><span class="p">);</span>
+
+        <span class="k">delete</span> <span class="n">chan</span><span class="p">;</span>
+    <span class="p">});</span>
+<span class="p">}</span>
+</pre></div>
+
 
 <p>it will print:</p>
-<pre><code class="shell">hello world
-1
-</code></pre>
+<div class="codehilite"><pre><span></span>hello world
+<span class="m">1</span>
+</pre></div>
+
 
 <h2 id="pop">pop</h2>
 <p>pop the data from the channel:</p>
-<pre><code class="cpp">void *fsw::coroutine::Channel::pop(double timeout = (-1.0))
-</code></pre>
+<div class="codehilite"><pre><span></span><span class="kt">void</span> <span class="o">*</span><span class="n">fsw</span><span class="o">::</span><span class="n">coroutine</span><span class="o">::</span><span class="n">Channel</span><span class="o">::</span><span class="n">pop</span><span class="p">(</span><span class="kt">double</span> <span class="n">timeout</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="mf">1.0</span><span class="p">))</span>
+</pre></div>
                 
                   
                 

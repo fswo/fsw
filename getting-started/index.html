@@ -403,69 +403,72 @@
                 <h1 id="getting-started">Getting-Started</h1>
 <h2 id="build">Build</h2>
 <h3 id="build-fsw">Build fsw</h3>
-<pre><code class="shell">cmake . &amp;&amp; make &amp;&amp; make install
-</code></pre>
+<div class="codehilite"><pre><span></span>cmake . <span class="o">&amp;&amp;</span> make <span class="o">&amp;&amp;</span> make install
+</pre></div>
+
 
 <h3 id="a-http-server-example">A HTTP Server example</h3>
-<pre><code class="cpp">#include &quot;fsw/coroutine_http.h&quot;
-#include &quot;fsw/coroutine_http_server.h&quot;
-#include &quot;fsw/coroutine.h&quot;
-#include &quot;fsw/buffer.h&quot;
+<div class="codehilite"><pre><span></span><span class="cp">#include</span> <span class="cpf">&quot;fsw/coroutine_http.h&quot;</span><span class="cp"></span>
+<span class="cp">#include</span> <span class="cpf">&quot;fsw/coroutine_http_server.h&quot;</span><span class="cp"></span>
+<span class="cp">#include</span> <span class="cpf">&quot;fsw/coroutine.h&quot;</span><span class="cp"></span>
+<span class="cp">#include</span> <span class="cpf">&quot;fsw/buffer.h&quot;</span><span class="cp"></span>
 
-using fsw::Coroutine;
-using fsw::coroutine::http::Request;
-using fsw::coroutine::http::Response;
-using fsw::coroutine::http::Server;
-using fsw::Buffer;
-using fsw::coroutine::run;
+<span class="k">using</span> <span class="n">fsw</span><span class="o">::</span><span class="n">Coroutine</span><span class="p">;</span>
+<span class="k">using</span> <span class="n">fsw</span><span class="o">::</span><span class="n">coroutine</span><span class="o">::</span><span class="n">http</span><span class="o">::</span><span class="n">Request</span><span class="p">;</span>
+<span class="k">using</span> <span class="n">fsw</span><span class="o">::</span><span class="n">coroutine</span><span class="o">::</span><span class="n">http</span><span class="o">::</span><span class="n">Response</span><span class="p">;</span>
+<span class="k">using</span> <span class="n">fsw</span><span class="o">::</span><span class="n">coroutine</span><span class="o">::</span><span class="n">http</span><span class="o">::</span><span class="n">Server</span><span class="p">;</span>
+<span class="k">using</span> <span class="n">fsw</span><span class="o">::</span><span class="n">Buffer</span><span class="p">;</span>
+<span class="k">using</span> <span class="n">fsw</span><span class="o">::</span><span class="n">coroutine</span><span class="o">::</span><span class="n">run</span><span class="p">;</span>
 
-void handler(Request *request, Response *response)
-{
-    char response_body[] = &quot;hello world&quot;;
-    Buffer buffer(1024);
-    buffer.append(response_body, sizeof(response_body) - 1);
+<span class="kt">void</span> <span class="nf">handler</span><span class="p">(</span><span class="n">Request</span> <span class="o">*</span><span class="n">request</span><span class="p">,</span> <span class="n">Response</span> <span class="o">*</span><span class="n">response</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="kt">char</span> <span class="n">response_body</span><span class="p">[]</span> <span class="o">=</span> <span class="s">&quot;hello world&quot;</span><span class="p">;</span>
+    <span class="n">Buffer</span> <span class="n">buffer</span><span class="p">(</span><span class="mi">1024</span><span class="p">);</span>
+    <span class="n">buffer</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="n">response_body</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">response_body</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">);</span>
 
-    response-&gt;set_header(&quot;Content-Type&quot;, &quot;text/html&quot;);
-    response-&gt;end(&amp;buffer);
+    <span class="n">response</span><span class="o">-&gt;</span><span class="n">set_header</span><span class="p">(</span><span class="s">&quot;Content-Type&quot;</span><span class="p">,</span> <span class="s">&quot;text/html&quot;</span><span class="p">);</span>
+    <span class="n">response</span><span class="o">-&gt;</span><span class="n">end</span><span class="p">(</span><span class="o">&amp;</span><span class="n">buffer</span><span class="p">);</span>
 
-    return;
-}
+    <span class="k">return</span><span class="p">;</span>
+<span class="p">}</span>
 
-int main(int argc, char const *argv[])
-{
-    run([](void *args)
-    {
-        char ip[] = &quot;127.0.0.1&quot;;
+<span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span> <span class="k">const</span> <span class="o">*</span><span class="n">argv</span><span class="p">[])</span>
+<span class="p">{</span>
+    <span class="n">run</span><span class="p">([](</span><span class="kt">void</span> <span class="o">*</span><span class="n">args</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="kt">char</span> <span class="n">ip</span><span class="p">[]</span> <span class="o">=</span> <span class="s">&quot;127.0.0.1&quot;</span><span class="p">;</span>
 
-        Server *serv = new Server(ip, 80);
-        serv-&gt;set_http_handler(&quot;/index&quot;, handler);
-        serv-&gt;start();
-    });
+        <span class="n">Server</span> <span class="o">*</span><span class="n">serv</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Server</span><span class="p">(</span><span class="n">ip</span><span class="p">,</span> <span class="mi">80</span><span class="p">);</span>
+        <span class="n">serv</span><span class="o">-&gt;</span><span class="n">set_http_handler</span><span class="p">(</span><span class="s">&quot;/index&quot;</span><span class="p">,</span> <span class="n">handler</span><span class="p">);</span>
+        <span class="n">serv</span><span class="o">-&gt;</span><span class="n">start</span><span class="p">();</span>
+    <span class="p">});</span>
 
-    return 0;
-}
-</code></pre>
+    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+
 
 <h3 id="build-the-example">Build the example</h3>
-<pre><code class="shell">~/codeDir/cppCode/fsw/example # g++ server.cc -lfsw
-</code></pre>
+<div class="codehilite"><pre><span></span>~/codeDir/cppCode/fsw/example <span class="c1"># g++ server.cc -lfsw</span>
+</pre></div>
+
 
 <h3 id="pressure-test">Pressure test</h3>
 <p>The machine configuration is one cpu core, 2G memory:</p>
-<pre><code class="shell">ab -c 1000 -n 1000000 -k 127.0.0.1/index
+<div class="codehilite"><pre><span></span>ab -c <span class="m">1000</span> -n <span class="m">1000000</span> -k <span class="m">127</span>.0.0.1/index
 
-Concurrency Level:      1000
-Time taken for tests:   35.721 seconds
-Complete requests:      1000000
-Failed requests:        0
-Keep-Alive requests:    1000000
-Total transferred:      101000000 bytes
-HTML transferred:       13000000 bytes
-Requests per second:    27994.62 [#/sec] (mean)
-Time per request:       35.721 [ms] (mean)
-Time per request:       0.036 [ms] (mean, across all concurrent requests)
-Transfer rate:          2761.19 [Kbytes/sec] received
-</code></pre>
+Concurrency Level:      <span class="m">1000</span>
+Time taken <span class="k">for</span> tests:   <span class="m">35</span>.721 seconds
+Complete requests:      <span class="m">1000000</span>
+Failed requests:        <span class="m">0</span>
+Keep-Alive requests:    <span class="m">1000000</span>
+Total transferred:      <span class="m">101000000</span> bytes
+HTML transferred:       <span class="m">13000000</span> bytes
+Requests per second:    <span class="m">27994</span>.62 <span class="o">[</span><span class="c1">#/sec] (mean)</span>
+Time per request:       <span class="m">35</span>.721 <span class="o">[</span>ms<span class="o">]</span> <span class="o">(</span>mean<span class="o">)</span>
+Time per request:       <span class="m">0</span>.036 <span class="o">[</span>ms<span class="o">]</span> <span class="o">(</span>mean, across all concurrent requests<span class="o">)</span>
+Transfer rate:          <span class="m">2761</span>.19 <span class="o">[</span>Kbytes/sec<span class="o">]</span> received
+</pre></div>
                 
                   
                 

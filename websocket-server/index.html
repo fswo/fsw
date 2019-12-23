@@ -378,69 +378,72 @@
 <p>Websocket Server is based on HTTP Server, so we can upgrade the protocol on the basis of HTTP Server.</p>
 <h2 id="set_websocket_handler">set_websocket_handler</h2>
 <p>set websocket handler:</p>
-<pre><code class="cpp">void fsw::coroutine::http::Server::set_websocket_handler(std::string pattern, on_accept_handler fn)
-</code></pre>
+<div class="codehilite"><pre><span></span><span class="kt">void</span> <span class="n">fsw</span><span class="o">::</span><span class="n">coroutine</span><span class="o">::</span><span class="n">http</span><span class="o">::</span><span class="n">Server</span><span class="o">::</span><span class="n">set_websocket_handler</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">string</span> <span class="n">pattern</span><span class="p">,</span> <span class="n">on_accept_handler</span> <span class="n">fn</span><span class="p">)</span>
+</pre></div>
+
 
 <h2 id="recv_frame">recv_frame</h2>
 <p>recevie the frame from websocket client:</p>
-<pre><code class="cpp">void fsw::coroutine::http::Response::recv_frame(fsw::websocket::Frame *frame)
-</code></pre>
+<div class="codehilite"><pre><span></span><span class="kt">void</span> <span class="n">fsw</span><span class="o">::</span><span class="n">coroutine</span><span class="o">::</span><span class="n">http</span><span class="o">::</span><span class="n">Response</span><span class="o">::</span><span class="n">recv_frame</span><span class="p">(</span><span class="n">fsw</span><span class="o">::</span><span class="n">websocket</span><span class="o">::</span><span class="n">Frame</span> <span class="o">*</span><span class="n">frame</span><span class="p">)</span>
+</pre></div>
+
 
 <h2 id="send_frame">send_frame</h2>
 <p>send the frame to websocket client:</p>
-<pre><code class="cpp">void fsw::coroutine::http::Response::send_frame(fsw::Buffer *data)
-</code></pre>
+<div class="codehilite"><pre><span></span><span class="kt">void</span> <span class="n">fsw</span><span class="o">::</span><span class="n">coroutine</span><span class="o">::</span><span class="n">http</span><span class="o">::</span><span class="n">Response</span><span class="o">::</span><span class="n">send_frame</span><span class="p">(</span><span class="n">fsw</span><span class="o">::</span><span class="n">Buffer</span> <span class="o">*</span><span class="n">data</span><span class="p">)</span>
+</pre></div>
+
 
 <h2 id="websocket-example">websocket example</h2>
-<pre><code class="cpp">#include &quot;fsw/coroutine_http.h&quot;
-#include &quot;fsw/coroutine_http_server.h&quot;
-#include &quot;fsw/coroutine.h&quot;
-#include &quot;fsw/buffer.h&quot;
-#include &quot;fsw/websocket_frame.h&quot;
+<div class="codehilite"><pre><span></span><span class="cp">#include</span> <span class="cpf">&quot;fsw/coroutine_http.h&quot;</span><span class="cp"></span>
+<span class="cp">#include</span> <span class="cpf">&quot;fsw/coroutine_http_server.h&quot;</span><span class="cp"></span>
+<span class="cp">#include</span> <span class="cpf">&quot;fsw/coroutine.h&quot;</span><span class="cp"></span>
+<span class="cp">#include</span> <span class="cpf">&quot;fsw/buffer.h&quot;</span><span class="cp"></span>
+<span class="cp">#include</span> <span class="cpf">&quot;fsw/websocket_frame.h&quot;</span><span class="cp"></span>
 
-using namespace fsw::coroutine::http;
+<span class="k">using</span> <span class="k">namespace</span> <span class="n">fsw</span><span class="o">::</span><span class="n">coroutine</span><span class="o">::</span><span class="n">http</span><span class="p">;</span>
 
-using fsw::Coroutine;
-using fsw::coroutine::http::Request;
-using fsw::coroutine::http::Response;
-using fsw::coroutine::http::Server;
-using fsw::Buffer;
-using fsw::websocket::Frame;
-using fsw::coroutine::run;
+<span class="k">using</span> <span class="n">fsw</span><span class="o">::</span><span class="n">Coroutine</span><span class="p">;</span>
+<span class="k">using</span> <span class="n">fsw</span><span class="o">::</span><span class="n">coroutine</span><span class="o">::</span><span class="n">http</span><span class="o">::</span><span class="n">Request</span><span class="p">;</span>
+<span class="k">using</span> <span class="n">fsw</span><span class="o">::</span><span class="n">coroutine</span><span class="o">::</span><span class="n">http</span><span class="o">::</span><span class="n">Response</span><span class="p">;</span>
+<span class="k">using</span> <span class="n">fsw</span><span class="o">::</span><span class="n">coroutine</span><span class="o">::</span><span class="n">http</span><span class="o">::</span><span class="n">Server</span><span class="p">;</span>
+<span class="k">using</span> <span class="n">fsw</span><span class="o">::</span><span class="n">Buffer</span><span class="p">;</span>
+<span class="k">using</span> <span class="n">fsw</span><span class="o">::</span><span class="n">websocket</span><span class="o">::</span><span class="n">Frame</span><span class="p">;</span>
+<span class="k">using</span> <span class="n">fsw</span><span class="o">::</span><span class="n">coroutine</span><span class="o">::</span><span class="n">run</span><span class="p">;</span>
 
-void websocket_handler(Request *request, Response *response)
-{
-    std::string data = &quot;hello websocket&quot;;
-    while (true)
-    {
-        Frame frame;
-        response-&gt;recv_frame(&amp;frame);
-        std::string recv_data(frame.payload, frame.payload_length);
-        std::cout &lt;&lt; recv_data &lt;&lt; std::endl;
+<span class="kt">void</span> <span class="nf">websocket_handler</span><span class="p">(</span><span class="n">Request</span> <span class="o">*</span><span class="n">request</span><span class="p">,</span> <span class="n">Response</span> <span class="o">*</span><span class="n">response</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">std</span><span class="o">::</span><span class="n">string</span> <span class="n">data</span> <span class="o">=</span> <span class="s">&quot;hello websocket&quot;</span><span class="p">;</span>
+    <span class="k">while</span> <span class="p">(</span><span class="nb">true</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">Frame</span> <span class="n">frame</span><span class="p">;</span>
+        <span class="n">response</span><span class="o">-&gt;</span><span class="n">recv_frame</span><span class="p">(</span><span class="o">&amp;</span><span class="n">frame</span><span class="p">);</span>
+        <span class="n">std</span><span class="o">::</span><span class="n">string</span> <span class="n">recv_data</span><span class="p">(</span><span class="n">frame</span><span class="p">.</span><span class="n">payload</span><span class="p">,</span> <span class="n">frame</span><span class="p">.</span><span class="n">payload_length</span><span class="p">);</span>
+        <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">recv_data</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
 
-        Buffer send_data(data.length());
-        send_data.append(data);
-        response-&gt;send_frame(&amp;send_data);
-        Coroutine::sleep(1);
-    }
+        <span class="n">Buffer</span> <span class="n">send_data</span><span class="p">(</span><span class="n">data</span><span class="p">.</span><span class="n">length</span><span class="p">());</span>
+        <span class="n">send_data</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="n">data</span><span class="p">);</span>
+        <span class="n">response</span><span class="o">-&gt;</span><span class="n">send_frame</span><span class="p">(</span><span class="o">&amp;</span><span class="n">send_data</span><span class="p">);</span>
+        <span class="n">Coroutine</span><span class="o">::</span><span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+    <span class="p">}</span>
 
-    return;
-}
+    <span class="k">return</span><span class="p">;</span>
+<span class="p">}</span>
 
-int main(int argc, char const *argv[])
-{
-    run([](void *arg)
-    {
-        char ip[] = &quot;127.0.0.1&quot;;
+<span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span> <span class="k">const</span> <span class="o">*</span><span class="n">argv</span><span class="p">[])</span>
+<span class="p">{</span>
+    <span class="n">run</span><span class="p">([](</span><span class="kt">void</span> <span class="o">*</span><span class="n">arg</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="kt">char</span> <span class="n">ip</span><span class="p">[]</span> <span class="o">=</span> <span class="s">&quot;127.0.0.1&quot;</span><span class="p">;</span>
 
-        Server *serv = new Server(ip, 80);
-        serv-&gt;set_websocket_handler(&quot;/websocket&quot;, websocket_handler);
-        serv-&gt;start();
-    });
+        <span class="n">Server</span> <span class="o">*</span><span class="n">serv</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Server</span><span class="p">(</span><span class="n">ip</span><span class="p">,</span> <span class="mi">80</span><span class="p">);</span>
+        <span class="n">serv</span><span class="o">-&gt;</span><span class="n">set_websocket_handler</span><span class="p">(</span><span class="s">&quot;/websocket&quot;</span><span class="p">,</span> <span class="n">websocket_handler</span><span class="p">);</span>
+        <span class="n">serv</span><span class="o">-&gt;</span><span class="n">start</span><span class="p">();</span>
+    <span class="p">});</span>
 
-    return 0;
-}
-</code></pre>
+    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
                 
                   
                 
