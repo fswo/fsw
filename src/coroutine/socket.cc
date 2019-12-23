@@ -87,6 +87,11 @@ int Socket::shutdown(int how)
     return fswSocket_shutdown(sockfd, how);
 }
 
+bool Socket::set_option(int level, int optname, const void *optval, socklen_t optlen)
+{
+    return fswSocket_set_option(sockfd, level, optname, optval, optlen) < 0 ? false : true;
+}
+
 Buffer* Socket::get_read_buf()
 {
     if (!read_buf)
