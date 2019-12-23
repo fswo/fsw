@@ -12,7 +12,9 @@ start the HTTP Server:
 bool fsw::coroutine::http::Server::start()
 ```
 
-set the router:
+## custom handler
+
+set the http handler:
 
 ```cpp
 void fsw::coroutine::http::Server::set_http_handler(std::string pattern, on_accept_handler fn)
@@ -51,6 +53,29 @@ int main(int argc, char const *argv[])
 
         Server *serv = new Server(ip, 80);
         serv->set_http_handler("/index", handler);
+        serv->start();
+    });
+
+    return 0;
+}
+```
+
+## document root
+
+```cpp
+#include "fsw/coroutine_http_server.h"
+
+using fsw::coroutine::http::Server;
+using fsw::coroutine::run;
+
+int main(int argc, char const *argv[])
+{
+    run([]()
+    {
+        char ip[] = "127.0.0.1";
+
+        Server *serv = new Server(ip, 80);
+        serv->settings["document_root"] = "/var/www/html";
         serv->start();
     });
 
