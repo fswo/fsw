@@ -338,9 +338,9 @@ Response* Response::build_http_body(Buffer *body)
     return this;
 }
 
-void Response::end(Buffer *body)
+void Response::end(Buffer *body, size_t size)
 {
-    size_t body_length = 0;
+    size_t body_length = size;
 
     clear_write_buf();
 
