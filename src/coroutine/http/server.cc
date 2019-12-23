@@ -65,7 +65,21 @@ void Server::on_accept(Socket* conn)
         */
         ctx->parse(recved);
         string path(ctx->request->path);
-        if ((handler = get_http_handler(path)) != nullptr)
+
+        string static_file = get_document_absolute_path(path);
+        if (!static_file.empty())
+        {
+            int read_fd;
+            struct stat stat_buf;
+            off_t offset = 0;
+
+            read_fd = open(static_file.c_str(), O_RDONLY);
+            fstat(read_fd, &stat_buf);
+
+            ctx->response->end(nullptr, stat_buf.st_size);
+            sendfile (conn->get_fd(), read_fd, &offset, stat_buf.st_size);
+            close (read_fd);
+        } else if ((handler = get_http_handler(path)) != nullptr)
         {
             if (!call_http_handler(handler, ctx))
             {

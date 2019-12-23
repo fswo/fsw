@@ -52,6 +52,7 @@ int main(int argc, char const *argv[])
         char ip[] = "127.0.0.1";
 
         Server *serv = new Server(ip, 80);
+        serv->settings["document_root"] = "/var/www/html";
         serv->set_http_handler("/index", http_handler);
         serv->set_websocket_handler("/websocket", websocket_handler);
         serv->start();

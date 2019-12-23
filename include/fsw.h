@@ -35,6 +35,7 @@
 #include <sys/types.h>
 #include <sys/utsname.h>
 #include <sys/stat.h>
+#include <sys/sendfile.h>
 
 #include <queue>
 #include <map>
