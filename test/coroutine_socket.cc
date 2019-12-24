@@ -46,3 +46,15 @@ TEST(coroutine_socket, set_option)
     ASSERT_TRUE(ret);
 }
 
+TEST(coroutine_socket, get_option)
+{
+    int ret;
+    int on = 1;
+    int get;
+    socklen_t len = sizeof(get);
+    Socket *sock = new Socket(AF_INET, SOCK_STREAM, 0);
+    ret = sock->set_option(SOL_SOCKET, SO_REUSEADDR, &on, sizeof(on));
+    sock->get_option(SOL_SOCKET, SO_REUSEADDR, &get, &len);
+    ASSERT_EQ(get, 1);
+}
+
