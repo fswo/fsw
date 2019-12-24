@@ -92,6 +92,11 @@ bool Socket::set_option(int level, int optname, const void *optval, socklen_t op
     return fswSocket_set_option(sockfd, level, optname, optval, optlen) < 0 ? false : true;
 }
 
+bool Socket::get_option(int level, int optname, void *optval, socklen_t *optlen)
+{
+    return fswSocket_get_option(sockfd, level, optname, optval, optlen) < 0 ? false : true;
+}
+
 Buffer* Socket::get_read_buf()
 {
     if (!read_buf)

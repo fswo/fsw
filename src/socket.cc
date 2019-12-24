@@ -98,6 +98,18 @@ int fswSocket_set_option(int fd, int level, int optname, const void *optval, soc
     return ret;
 }
 
+int fswSocket_get_option(int fd, int level, int optname, void *optval, socklen_t *optlen)
+{
+    int ret;
+
+    ret = getsockopt(fd, level, optname, optval, optlen);
+    if (ret < 0)
+    {
+        fswWarn("Error has occurred: (errno %d) %s", errno, strerror(errno));
+    }
+    return ret;
+}
+
 int fswSocket_listen(int sock, int backlog)
 {
     int ret;
