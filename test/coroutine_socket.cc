@@ -37,3 +37,12 @@ TEST(coroutine_socket, listen)
     ASSERT_EQ(ret, 0);
 }
 
+TEST(coroutine_socket, set_option)
+{
+    int ret;
+    int on = 1;
+    Socket *sock = new Socket(AF_INET, SOCK_STREAM, 0);
+    ret = sock->set_option(SOL_SOCKET, SO_REUSEADDR, &on, sizeof(on));
+    ASSERT_TRUE(ret);
+}
+
