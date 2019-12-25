@@ -107,7 +107,10 @@ void Server::on_accept(Socket* conn)
 
 Server::Server(char *host, int port)
 {
+    int on = 1;
     socket = new Socket(AF_INET, SOCK_STREAM, 0);
+
+    socket->set_option(SOL_SOCKET, SO_REUSEADDR, &on, sizeof(on));
     if (socket->bind(FSW_SOCK_TCP, host, port) < 0)
     {
         fswWarn("Error has occurred: (errno %d) %s", errno, strerror(errno));

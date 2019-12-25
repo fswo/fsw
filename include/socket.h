@@ -15,6 +15,8 @@ int fswSocket_listen(int sock, int backlog);
 int fswSocket_accept(int sock);
 int fswSocket_close(int fd);
 int fswSocket_shutdown(int sock, int how);
+int fswSocket_set_option(int fd, int level, int optname, const void *optval, socklen_t optlen);
+int fswSocket_get_option(int fd, int level, int optname, void *optval, socklen_t *optlen);
 
 ssize_t fswSocket_recv(int sock, void *buf, size_t len, int flag);
 ssize_t fswSocket_send(int sock, const void *buf, size_t len, int flag);
