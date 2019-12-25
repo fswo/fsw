@@ -30,6 +30,7 @@ public:
     int shutdown(int how);
     bool set_option(int level, int optname, const void *optval, socklen_t optlen);
     bool get_option(int level, int optname, void *optval, socklen_t *optlen);
+    std::map<std::string, std::string> get_name();
     Buffer* get_read_buf();
     Buffer* get_write_buf();
     bool wait_event(int event);

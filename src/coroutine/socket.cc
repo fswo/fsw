@@ -97,6 +97,23 @@ bool Socket::get_option(int level, int optname, void *optval, socklen_t *optlen)
     return fswSocket_get_option(sockfd, level, optname, optval, optlen) < 0 ? false : true;
 }
 
+std::map<std::string, std::string> Socket::get_name()
+{
+    int ret;
+    sockaddr_in addr;
+    socklen_t len = sizeof(addr);
+    std::map<std::string, std::string> info;
+
+    ret = fswSocket_getname(sockfd, (struct sockaddr *)&addr, &len);
+    if (ret == 0)
+    {
+        info["address"] = inet_ntoa(addr.sin_addr);
+        info["port"] = std::to_string(ntohs(addr.sin_port));
+    }
+    
+    return info;
+}
+
 Buffer* Socket::get_read_buf()
 {
     if (!read_buf)
