@@ -108,6 +108,18 @@ int fswSocket_get_option(int fd, int level, int optname, void *optval, socklen_t
     return ret;
 }
 
+int fswSocket_getname(int fd, sockaddr *addr, socklen_t *len)
+{
+    int ret;
+
+    ret = getsockname(fd, addr, len);
+    if (ret < 0)
+    {
+        fswWarn("Error has occurred: (errno %d) %s", errno, strerror(errno));
+    }
+    return ret;
+}
+
 int fswSocket_listen(int sock, int backlog)
 {
     int ret;
