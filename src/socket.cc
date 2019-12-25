@@ -3,7 +3,6 @@
 
 int fswSocket_create(int domain, int type, int protocol)
 {
-    int on = 1;
     int sock;
 
     sock = socket(domain, type, protocol);
@@ -11,7 +10,6 @@ int fswSocket_create(int domain, int type, int protocol)
     {
         fswWarn("Error has occurred: (errno %d) %s", errno, strerror(errno));
     }
-    setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, &on, sizeof(on));
 
     return sock;
 }
