@@ -149,7 +149,7 @@ public:
     Response* build_http_status_line();
     Response* build_http_header(int body_length);
     Response* build_http_body(Buffer *body);
-    void end(Buffer *body = nullptr);
+    void end(Buffer *body = nullptr, size_t size = 0);
     void clear_header();
     bool check_websocket_upgrade(std::string sec_websocket_key);
     bool upgrade();

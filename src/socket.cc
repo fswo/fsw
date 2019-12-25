@@ -3,7 +3,6 @@
 
 int fswSocket_create(int domain, int type, int protocol)
 {
-    int on = 1;
     int sock;
 
     sock = socket(domain, type, protocol);
@@ -11,7 +10,6 @@ int fswSocket_create(int domain, int type, int protocol)
     {
         fswWarn("Error has occurred: (errno %d) %s", errno, strerror(errno));
     }
-    setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, &on, sizeof(on));
 
     return sock;
 }
@@ -79,6 +77,42 @@ int fswSocket_shutdown(int sock, int how)
 
     ret = shutdown(sock, how);
 
+    if (ret < 0)
+    {
+        fswWarn("Error has occurred: (errno %d) %s", errno, strerror(errno));
+    }
+    return ret;
+}
+
+int fswSocket_set_option(int fd, int level, int optname, const void *optval, socklen_t optlen)
+{
+    int ret;
+
+    ret = setsockopt(fd, level, optname, optval, optlen);
+    if (ret < 0)
+    {
+        fswWarn("Error has occurred: (errno %d) %s", errno, strerror(errno));
+    }
+    return ret;
+}
+
+int fswSocket_get_option(int fd, int level, int optname, void *optval, socklen_t *optlen)
+{
+    int ret;
+
+    ret = getsockopt(fd, level, optname, optval, optlen);
+    if (ret < 0)
+    {
+        fswWarn("Error has occurred: (errno %d) %s", errno, strerror(errno));
+    }
+    return ret;
+}
+
+int fswSocket_getname(int fd, sockaddr *addr, socklen_t *len)
+{
+    int ret;
+
+    ret = getsockname(fd, addr, len);
     if (ret < 0)
     {
         fswWarn("Error has occurred: (errno %d) %s", errno, strerror(errno));
