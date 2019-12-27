@@ -65,6 +65,33 @@ ssize_t Socket::recv(void *buf, size_t len)
     return ret;
 }
 
+ssize_t Socket::recv_all(void *buf, size_t len)
+{
+    ssize_t ret;
+    ssize_t total = 0;
+
+    while (true)
+    {
+        do {
+            ret = fswSocket_recv(sockfd, (char *)buf + total, len - total, 0);
+        } while (ret < 0 && errno == EAGAIN && wait_event(fsw::event::fswEvent_type::FSW_EVENT_READ));
+        if (ret <= 0)
+        {
+            if (total == 0)
+            {
+                total = ret;
+            }
+            break;
+        }
+        total += ret;
+        if ((size_t)total == len)
+        {
+            break;
+        }
+    }
+    return total;
+}
+
 ssize_t Socket::send(const void *buf, size_t len)
 {
     int ret;
@@ -76,6 +103,34 @@ ssize_t Socket::send(const void *buf, size_t len)
     
     return ret;
 }
+
+ssize_t Socket::send_all(const void *buf, size_t len)
+{
+    ssize_t ret;
+    ssize_t total = 0;
+
+    while (true)
+    {
+        do {
+            ret = fswSocket_send(sockfd, (char *)buf + total, len - total, 0);
+        } while (ret < 0 && errno == EAGAIN && wait_event(fsw::event::fswEvent_type::FSW_EVENT_READ));
+        if (ret <= 0)
+        {
+            if (total == 0)
+            {
+                total = ret;
+            }
+            break;
+        }
+        total += ret;
+        if ((size_t)total == len)
+        {
+            break;
+        }
+    }
+    return total;
+}
+
 
 int Socket::close()
 {
@@ -105,6 +160,23 @@ std::map<std::string, std::string> Socket::get_name()
     std::map<std::string, std::string> info;
 
     ret = fswSocket_getname(sockfd, (struct sockaddr *)&addr, &len);
+    if (ret == 0)
+    {
+        info["address"] = inet_ntoa(addr.sin_addr);
+        info["port"] = std::to_string(ntohs(addr.sin_port));
+    }
+    
+    return info;
+}
+
+std::map<std::string, std::string> Socket::get_peername()
+{
+    int ret;
+    sockaddr_in addr;
+    socklen_t len = sizeof(addr);
+    std::map<std::string, std::string> info;
+
+    ret = fswSocket_getpeername(sockfd, (struct sockaddr *)&addr, &len);
     if (ret == 0)
     {
         info["address"] = inet_ntoa(addr.sin_addr);

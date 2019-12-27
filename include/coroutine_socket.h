@@ -25,12 +25,15 @@ public:
     int listen(int backlog);
     Socket* accept();
     ssize_t recv(void *buf, size_t len);
+    ssize_t recv_all(void *buf, size_t len);
     ssize_t send(const void *buf, size_t len);
+    ssize_t send_all(const void *buf, size_t len);
     int close();
     int shutdown(int how);
     bool set_option(int level, int optname, const void *optval, socklen_t optlen);
     bool get_option(int level, int optname, void *optval, socklen_t *optlen);
     std::map<std::string, std::string> get_name();
+    std::map<std::string, std::string> get_peername();
     Buffer* get_read_buf();
     Buffer* get_write_buf();
     bool wait_event(int event);

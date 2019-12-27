@@ -120,6 +120,18 @@ int fswSocket_getname(int fd, sockaddr *addr, socklen_t *len)
     return ret;
 }
 
+int fswSocket_getpeername(int fd, sockaddr *addr, socklen_t *len)
+{
+    int ret;
+
+    ret = getpeername(fd, addr, len);
+    if (ret < 0)
+    {
+        fswWarn("Error has occurred: (errno %d) %s", errno, strerror(errno));
+    }
+    return ret;
+}
+
 int fswSocket_listen(int sock, int backlog)
 {
     int ret;

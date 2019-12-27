@@ -18,6 +18,7 @@ int fswSocket_shutdown(int sock, int how);
 int fswSocket_set_option(int fd, int level, int optname, const void *optval, socklen_t optlen);
 int fswSocket_get_option(int fd, int level, int optname, void *optval, socklen_t *optlen);
 int fswSocket_getname(int fd, sockaddr *addr, socklen_t *len);
+int fswSocket_getpeername(int fd, sockaddr *addr, socklen_t *len);
 
 ssize_t fswSocket_recv(int sock, void *buf, size_t len, int flag);
 ssize_t fswSocket_send(int sock, const void *buf, size_t len, int flag);
