@@ -27,6 +27,7 @@ public:
     ssize_t recv(void *buf, size_t len);
     ssize_t recv_all(void *buf, size_t len);
     ssize_t send(const void *buf, size_t len);
+    ssize_t send_all(const void *buf, size_t len);
     int close();
     int shutdown(int how);
     bool set_option(int level, int optname, const void *optval, socklen_t optlen);

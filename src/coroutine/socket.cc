@@ -104,6 +104,34 @@ ssize_t Socket::send(const void *buf, size_t len)
     return ret;
 }
 
+ssize_t Socket::send_all(const void *buf, size_t len)
+{
+    ssize_t ret;
+    ssize_t total = 0;
+
+    while (true)
+    {
+        do {
+            ret = fswSocket_send(sockfd, (char *)buf + total, len - total, 0);
+        } while (ret < 0 && errno == EAGAIN && wait_event(fsw::event::fswEvent_type::FSW_EVENT_READ));
+        if (ret <= 0)
+        {
+            if (total == 0)
+            {
+                total = ret;
+            }
+            break;
+        }
+        total += ret;
+        if ((size_t)total == len)
+        {
+            break;
+        }
+    }
+    return total;
+}
+
+
 int Socket::close()
 {
     return fswSocket_close(sockfd);
