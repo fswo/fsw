@@ -25,6 +25,7 @@ public:
     int listen(int backlog);
     Socket* accept();
     ssize_t recv(void *buf, size_t len);
+    ssize_t recv_all(void *buf, size_t len);
     ssize_t send(const void *buf, size_t len);
     int close();
     int shutdown(int how);
