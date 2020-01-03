@@ -24,7 +24,7 @@ TEST(coroutine_socket, bind)
     char ip[] = "127.0.0.1";
     Socket *sock = new Socket(AF_INET, SOCK_STREAM, 0);
     ret = sock->bind(FSW_SOCK_TCP, ip, 6000);
-    ASSERT_EQ(ret, 0);
+    ASSERT_EQ(ret, true);
 }
 
 TEST(coroutine_socket, listen)
@@ -34,7 +34,7 @@ TEST(coroutine_socket, listen)
     Socket *sock = new Socket(AF_INET, SOCK_STREAM, 0);
     sock->bind(FSW_SOCK_TCP, ip, 6001);
     ret = sock->listen(512);
-    ASSERT_EQ(ret, 0);
+    ASSERT_EQ(ret, true);
 }
 
 TEST(coroutine_socket, set_option)
