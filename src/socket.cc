@@ -54,10 +54,7 @@ int fswSocket_accept(int sock)
 
 int fswSocket_close(int fd)
 {
-    int ret;
-
-    ret = close(fd);
-    return ret;
+    return close(fd);
 }
 
 int fswSocket_shutdown(int sock, int how)

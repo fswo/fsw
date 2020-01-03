@@ -144,9 +144,15 @@ ssize_t Socket::send_all(const void *buf, size_t len)
 }
 
 
-int Socket::close()
+bool Socket::close()
 {
-    return fswSocket_close(sockfd);
+    if (fswSocket_close(sockfd))
+    {
+        set_err();
+        return false;
+    }
+    
+    return true;
 }
 
 int Socket::shutdown(int how)
