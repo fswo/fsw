@@ -15,6 +15,8 @@ class Socket
 {
 private:
     int sockfd;
+    int err_code = 0;
+    const char *err_msg = "";
     Buffer *read_buf = nullptr;
     Buffer *write_buf = nullptr;
 public:
@@ -46,6 +48,12 @@ public:
     inline void check_client_close()
     {
         while (recv(read_buf->c_buffer(), READ_BUF_MAX_SIZE) > 0){}
+    }
+
+    inline void set_err()
+    {
+        err_code = errno;
+        err_msg = err_code ? strerror(err_code) : "";
     }
 };
 }
