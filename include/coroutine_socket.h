@@ -31,7 +31,7 @@ public:
     ssize_t send(const void *buf, size_t len);
     ssize_t send_all(const void *buf, size_t len);
     bool close();
-    int shutdown(int how);
+    bool shutdown(int how);
     bool set_option(int level, int optname, const void *optval, socklen_t optlen);
     bool get_option(int level, int optname, void *optval, socklen_t *optlen);
     std::map<std::string, std::string> get_name();

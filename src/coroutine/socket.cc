@@ -146,7 +146,7 @@ ssize_t Socket::send_all(const void *buf, size_t len)
 
 bool Socket::close()
 {
-    if (fswSocket_close(sockfd))
+    if (fswSocket_close(sockfd) < 0)
     {
         set_err();
         return false;
@@ -155,9 +155,15 @@ bool Socket::close()
     return true;
 }
 
-int Socket::shutdown(int how)
+bool Socket::shutdown(int how)
 {
-    return fswSocket_shutdown(sockfd, how);
+    if (fswSocket_shutdown(sockfd, how) < 0)
+    {
+        set_err();
+        return false;
+    }
+    
+    return true;
 }
 
 bool Socket::set_option(int level, int optname, const void *optval, socklen_t optlen)

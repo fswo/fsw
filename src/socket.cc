@@ -59,10 +59,7 @@ int fswSocket_close(int fd)
 
 int fswSocket_shutdown(int sock, int how)
 {
-    int ret;
-
-    ret = shutdown(sock, how);
-    return ret;
+    return shutdown(sock, how);
 }
 
 int fswSocket_set_option(int fd, int level, int optname, const void *optval, socklen_t optlen)
