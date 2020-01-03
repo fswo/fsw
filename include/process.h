@@ -9,13 +9,17 @@ class Process
 {
 private:
     std::function<void()> handler;
+    bool enable_coroutine;
+
 public:
     pid_t pid;
     pid_t child_pid;
 
-    Process(std::function<void()> fn);
     bool start();
     pid_t wait();
+
+    Process(std::function<void()> fn, bool enable_coroutine = false):
+        handler(fn), enable_coroutine(enable_coroutine) {}
 };
 }
 

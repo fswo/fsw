@@ -1,11 +1,8 @@
 #include "process.h"
+#include "coroutine.h"
 
 using fsw::Process;
-
-Process::Process(std::function<void()> fn)
-{
-    handler = fn;
-}
+using fsw::Coroutine;
 
 bool Process::start()
 {
@@ -20,7 +17,14 @@ bool Process::start()
     }
 
     // child process
-    handler();
+    if (enable_coroutine)
+    {
+        Coroutine::create(handler);
+    }
+    else
+    {
+        handler();
+    }
     exit(0);
 }
 
