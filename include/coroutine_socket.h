@@ -15,21 +15,23 @@ class Socket
 {
 private:
     int sockfd;
+    int err_code = 0;
+    const char *err_msg = "";
     Buffer *read_buf = nullptr;
     Buffer *write_buf = nullptr;
 public:
     Socket(int domain, int type, int protocol);
     Socket(int fd);
     ~Socket();
-    int bind(int type, char *host, int port);
-    int listen(int backlog);
+    bool bind(int type, char *host, int port);
+    bool listen(int backlog);
     Socket* accept();
     ssize_t recv(void *buf, size_t len);
     ssize_t recv_all(void *buf, size_t len);
     ssize_t send(const void *buf, size_t len);
     ssize_t send_all(const void *buf, size_t len);
-    int close();
-    int shutdown(int how);
+    bool close();
+    bool shutdown(int how);
     bool set_option(int level, int optname, const void *optval, socklen_t optlen);
     bool get_option(int level, int optname, void *optval, socklen_t *optlen);
     std::map<std::string, std::string> get_name();
@@ -46,6 +48,22 @@ public:
     inline void check_client_close()
     {
         while (recv(read_buf->c_buffer(), READ_BUF_MAX_SIZE) > 0){}
+    }
+
+    inline void set_err()
+    {
+        err_code = errno;
+        err_msg = err_code ? strerror(err_code) : "";
+    }
+
+    inline int get_err_code()
+    {
+        return err_code;
+    }
+
+    inline const char *get_err_msg()
+    {
+        return err_msg;
     }
 };
 }

@@ -31,14 +31,26 @@ Socket::~Socket()
     close();
 }
 
-int Socket::bind(int type, char *host, int port)
+bool Socket::bind(int type, char *host, int port)
 {
-    return fswSocket_bind(sockfd, type, host, port);
+    if (fswSocket_bind(sockfd, type, host, port) < 0)
+    {
+        set_err();
+        return false;
+    }
+    
+    return true;
 }
 
-int Socket::listen(int backlog)
+bool Socket::listen(int backlog)
 {
-    return fswSocket_listen(sockfd, backlog);
+    if (fswSocket_listen(sockfd, backlog) < 0)
+    {
+        set_err();
+        return false;
+    }
+    
+    return true;
 }
 
 Socket* Socket::accept()
@@ -132,14 +144,26 @@ ssize_t Socket::send_all(const void *buf, size_t len)
 }
 
 
-int Socket::close()
+bool Socket::close()
 {
-    return fswSocket_close(sockfd);
+    if (fswSocket_close(sockfd) < 0)
+    {
+        set_err();
+        return false;
+    }
+    
+    return true;
 }
 
-int Socket::shutdown(int how)
+bool Socket::shutdown(int how)
 {
-    return fswSocket_shutdown(sockfd, how);
+    if (fswSocket_shutdown(sockfd, how) < 0)
+    {
+        set_err();
+        return false;
+    }
+    
+    return true;
 }
 
 bool Socket::set_option(int level, int optname, const void *optval, socklen_t optlen)
