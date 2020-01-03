@@ -23,8 +23,8 @@ public:
     Socket(int domain, int type, int protocol);
     Socket(int fd);
     ~Socket();
-    int bind(int type, char *host, int port);
-    int listen(int backlog);
+    bool bind(int type, char *host, int port);
+    bool listen(int backlog);
     Socket* accept();
     ssize_t recv(void *buf, size_t len);
     ssize_t recv_all(void *buf, size_t len);
@@ -54,6 +54,16 @@ public:
     {
         err_code = errno;
         err_msg = err_code ? strerror(err_code) : "";
+    }
+
+    inline int get_err_code()
+    {
+        return err_code;
+    }
+
+    inline const char *get_err_msg()
+    {
+        return err_msg;
     }
 };
 }

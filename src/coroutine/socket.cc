@@ -31,14 +31,26 @@ Socket::~Socket()
     close();
 }
 
-int Socket::bind(int type, char *host, int port)
+bool Socket::bind(int type, char *host, int port)
 {
-    return fswSocket_bind(sockfd, type, host, port);
+    if (fswSocket_bind(sockfd, type, host, port) < 0)
+    {
+        set_err();
+        return false;
+    }
+    
+    return true;
 }
 
-int Socket::listen(int backlog)
+bool Socket::listen(int backlog)
 {
-    return fswSocket_listen(sockfd, backlog);
+    if (fswSocket_listen(sockfd, backlog) < 0)
+    {
+        set_err();
+        return false;
+    }
+    
+    return true;
 }
 
 Socket* Socket::accept()
