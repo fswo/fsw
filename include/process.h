@@ -7,8 +7,10 @@ namespace fsw
 {
 class Process
 {
+typedef void (*process_handler_t)(Process*);
+
 private:
-    std::function<void()> handler;
+    process_handler_t handler;
     bool enable_coroutine;
 
 public:
@@ -18,8 +20,13 @@ public:
     bool start();
     pid_t wait();
 
-    Process(std::function<void()> fn, bool enable_coroutine = false):
+    Process(process_handler_t fn, bool enable_coroutine = false):
         handler(fn), enable_coroutine(enable_coroutine) {}
+
+    void name(std::string name)
+    {
+        prctl(PR_SET_NAME, name.c_str());
+    }
 };
 }
 
