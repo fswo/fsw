@@ -19,11 +19,11 @@ bool Process::start()
     // child process
     if (enable_coroutine)
     {
-        Coroutine::create(handler);
+        Coroutine::create(std::bind(handler, this));
     }
     else
     {
-        handler();
+        handler(this);
     }
     exit(0);
 }
