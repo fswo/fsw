@@ -20,6 +20,11 @@ public:
 
     Process(std::function<void()> fn, bool enable_coroutine = false):
         handler(fn), enable_coroutine(enable_coroutine) {}
+
+    bool name(std::string name)
+    {
+        prctl(PR_SET_NAME, name.c_str());
+    }
 };
 }
 
