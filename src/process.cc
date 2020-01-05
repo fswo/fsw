@@ -4,6 +4,11 @@
 using fsw::Process;
 using fsw::Coroutine;
 
+Process::~Process()
+{
+    delete socket;
+}
+
 bool Process::start()
 {
     pid_t _pid;
@@ -34,4 +39,14 @@ pid_t Process::wait()
 
     _pid = ::wait(NULL);
     return _pid;
+}
+
+ssize_t Process::read(void *buf, size_t len)
+{
+    return socket->recv(buf, len);
+}
+
+ssize_t Process::write(const void *buf, size_t len)
+{
+    return socket->send(buf, len);
 }
