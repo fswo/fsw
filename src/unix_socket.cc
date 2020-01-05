@@ -13,6 +13,13 @@ UnixSocket::UnixSocket()
     master_fd = socket[1];
 }
 
+UnixSocket::~UnixSocket()
+{
+    delete read_buf;
+    delete write_buf;
+    close();
+}
+
 ssize_t UnixSocket::recv(void *buf, size_t len)
 {
     int ret;

@@ -14,6 +14,7 @@ class UnixSocket
 {
 public:
     UnixSocket();
+    ~UnixSocket();
     ssize_t recv(void *buf, size_t len);
     ssize_t send(const void *buf, size_t len);
     Buffer* get_read_buf();
