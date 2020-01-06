@@ -66,11 +66,11 @@ Buffer* UnixSocket::get_write_buf()
 
 bool UnixSocket::close()
 {
-    if (fswSocket_close(current_fd) < 0)
+    bool ret = fswSocket_close(current_fd);
+
+    if (!ret)
     {
         set_err();
-        return false;
     }
-    
-    return true;
+    return ret;
 }

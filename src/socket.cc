@@ -14,7 +14,7 @@ int fswSocket_create(int domain, int type, int protocol)
     return sock;
 }
 
-int fswSocket_bind(int sock, int type, char *host, int port)
+bool fswSocket_bind(int sock, int type, char *host, int port)
 {
     struct sockaddr_in servaddr;
 
@@ -23,22 +23,22 @@ int fswSocket_bind(int sock, int type, char *host, int port)
         bzero(&servaddr, sizeof(servaddr));
         if (inet_aton(host, &(servaddr.sin_addr)) < 0)
         {
-            return -1;
+            return false;
         }
         servaddr.sin_family = AF_INET;
         servaddr.sin_port = htons(port);
         if (bind(sock, (sockaddr *)&servaddr, sizeof(servaddr)) < 0)
         {
-            return -1;
+            return false;
         }
     }
     else
     {
         fswWarn("Error has occurred: %s", "the bind type is not supported");
-        return -1;
+        return false;
     }
 
-    return 0;
+    return true;
 }
 
 int fswSocket_accept(int sock)
@@ -52,54 +52,39 @@ int fswSocket_accept(int sock)
     return connfd;
 }
 
-int fswSocket_close(int fd)
+bool fswSocket_close(int fd)
 {
-    return close(fd);
+    return close(fd) < 0 ? false : true;
 }
 
-int fswSocket_shutdown(int sock, int how)
+bool fswSocket_shutdown(int sock, int how)
 {
-    return shutdown(sock, how);
+    return shutdown(sock, how) < 0 ? false : true;
 }
 
-int fswSocket_set_option(int fd, int level, int optname, const void *optval, socklen_t optlen)
+bool fswSocket_set_option(int fd, int level, int optname, const void *optval, socklen_t optlen)
 {
-    int ret;
-
-    ret = setsockopt(fd, level, optname, optval, optlen);
-    return ret;
+    return setsockopt(fd, level, optname, optval, optlen) < 0 ? false : true;
 }
 
-int fswSocket_get_option(int fd, int level, int optname, void *optval, socklen_t *optlen)
+bool fswSocket_get_option(int fd, int level, int optname, void *optval, socklen_t *optlen)
 {
-    int ret;
-
-    ret = getsockopt(fd, level, optname, optval, optlen);
-    return ret;
+    return getsockopt(fd, level, optname, optval, optlen) < 0 ? false : true;
 }
 
-int fswSocket_getname(int fd, sockaddr *addr, socklen_t *len)
+bool fswSocket_getname(int fd, sockaddr *addr, socklen_t *len)
 {
-    int ret;
-
-    ret = getsockname(fd, addr, len);
-    return ret;
+    return getsockname(fd, addr, len) < 0 ? false : true;
 }
 
-int fswSocket_getpeername(int fd, sockaddr *addr, socklen_t *len)
+bool fswSocket_getpeername(int fd, sockaddr *addr, socklen_t *len)
 {
-    int ret;
-
-    ret = getpeername(fd, addr, len);
-    return ret;
+    return getpeername(fd, addr, len) < 0 ? false : true;
 }
 
-int fswSocket_listen(int sock, int backlog)
+bool fswSocket_listen(int sock, int backlog)
 {
-    int ret;
-
-    ret = listen(sock, backlog);
-    return ret;
+    return listen(sock, backlog) < 0 ? false : true;
 }
 
 ssize_t fswSocket_recv(int sock, void *buf, size_t len, int flag)
