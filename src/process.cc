@@ -18,7 +18,7 @@ bool Process::start()
     child_pid = _pid;
     if (_pid > 0) // parent process
     {
-        return true; // return child pid
+        return true;
     }
 
     // child process
