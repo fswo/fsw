@@ -44,13 +44,13 @@ bool Socket::bind(int type, char *host, int port)
 
 bool Socket::listen(int backlog)
 {
-    if (fswSocket_listen(sockfd, backlog) < 0)
+    int success = fswSocket_listen(sockfd, backlog);
+    if (!success)
     {
         set_err();
-        return false;
     }
     
-    return true;
+    return success;
 }
 
 Socket* Socket::accept()
@@ -146,45 +146,55 @@ ssize_t Socket::send_all(const void *buf, size_t len)
 
 bool Socket::close()
 {
-    if (fswSocket_close(sockfd) < 0)
+    bool success = fswSocket_close(sockfd);
+
+    if (!success)
     {
         set_err();
-        return false;
     }
-    
-    return true;
+    return success;
 }
 
 bool Socket::shutdown(int how)
 {
-    if (fswSocket_shutdown(sockfd, how) < 0)
+    bool success = fswSocket_shutdown(sockfd, how);
+
+    if (!success)
     {
         set_err();
-        return false;
     }
-    
-    return true;
+    return success;
 }
 
 bool Socket::set_option(int level, int optname, const void *optval, socklen_t optlen)
 {
-    return fswSocket_set_option(sockfd, level, optname, optval, optlen) < 0 ? false : true;
+    bool success = fswSocket_set_option(sockfd, level, optname, optval, optlen);
+
+    if (!success)
+    {
+        set_err();
+    }
+    return success;
 }
 
 bool Socket::get_option(int level, int optname, void *optval, socklen_t *optlen)
 {
-    return fswSocket_get_option(sockfd, level, optname, optval, optlen) < 0 ? false : true;
+    bool success = fswSocket_get_option(sockfd, level, optname, optval, optlen);
+
+    if (!success)
+    {
+        set_err();
+    }
+    return success;
 }
 
 std::map<std::string, std::string> Socket::get_name()
 {
-    int ret;
     sockaddr_in addr;
     socklen_t len = sizeof(addr);
     std::map<std::string, std::string> info;
 
-    ret = fswSocket_getname(sockfd, (struct sockaddr *)&addr, &len);
-    if (ret == 0)
+    if (fswSocket_getname(sockfd, (struct sockaddr *)&addr, &len))
     {
         info["address"] = inet_ntoa(addr.sin_addr);
         info["port"] = std::to_string(ntohs(addr.sin_port));
@@ -195,13 +205,11 @@ std::map<std::string, std::string> Socket::get_name()
 
 std::map<std::string, std::string> Socket::get_peername()
 {
-    int ret;
     sockaddr_in addr;
     socklen_t len = sizeof(addr);
     std::map<std::string, std::string> info;
 
-    ret = fswSocket_getpeername(sockfd, (struct sockaddr *)&addr, &len);
-    if (ret == 0)
+    if (fswSocket_getpeername(sockfd, (struct sockaddr *)&addr, &len))
     {
         info["address"] = inet_ntoa(addr.sin_addr);
         info["port"] = std::to_string(ntohs(addr.sin_port));

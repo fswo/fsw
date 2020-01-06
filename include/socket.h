@@ -10,15 +10,15 @@ enum fswSocket_type
 };
 
 int fswSocket_create(int domain, int type, int protocol);
-int fswSocket_bind(int sock, int type, char *host, int port);
-int fswSocket_listen(int sock, int backlog);
+bool fswSocket_bind(int sock, int type, char *host, int port);
+bool fswSocket_listen(int sock, int backlog);
 int fswSocket_accept(int sock);
-int fswSocket_close(int fd);
-int fswSocket_shutdown(int sock, int how);
-int fswSocket_set_option(int fd, int level, int optname, const void *optval, socklen_t optlen);
-int fswSocket_get_option(int fd, int level, int optname, void *optval, socklen_t *optlen);
-int fswSocket_getname(int fd, sockaddr *addr, socklen_t *len);
-int fswSocket_getpeername(int fd, sockaddr *addr, socklen_t *len);
+bool fswSocket_close(int fd);
+bool fswSocket_shutdown(int sock, int how);
+bool fswSocket_set_option(int fd, int level, int optname, const void *optval, socklen_t optlen);
+bool fswSocket_get_option(int fd, int level, int optname, void *optval, socklen_t *optlen);
+bool fswSocket_getname(int fd, sockaddr *addr, socklen_t *len);
+bool fswSocket_getpeername(int fd, sockaddr *addr, socklen_t *len);
 
 ssize_t fswSocket_recv(int sock, void *buf, size_t len, int flag);
 ssize_t fswSocket_send(int sock, const void *buf, size_t len, int flag);

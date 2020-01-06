@@ -13,6 +13,14 @@ namespace fsw
 class UnixSocket
 {
 public:
+    enum type
+    {
+        WORKER = 1,
+        MASTER = 2,
+    };
+
+    int current_fd = -1; // use for current process
+
     UnixSocket();
     ~UnixSocket();
     ssize_t recv(void *buf, size_t len);
@@ -36,11 +44,16 @@ public:
     {
         return err_msg;
     }
+
+    inline int get_socket_fd(int type)
+    {
+        return type == WORKER ? worker_fd : master_fd;
+    }
+
 private:
     int socket[2];
     int worker_fd;
     int master_fd;
-    int current_fd = -1; // use for current process
     Buffer *read_buf = nullptr;
     Buffer *write_buf = nullptr;
     int err_code = 0;

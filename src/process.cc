@@ -3,6 +3,7 @@
 
 using fsw::Process;
 using fsw::Coroutine;
+using fsw::UnixSocket;
 
 Process::~Process()
 {
@@ -18,10 +19,12 @@ bool Process::start()
     child_pid = _pid;
     if (_pid > 0) // parent process
     {
-        return true; // return child pid
+        socket->current_fd = socket->get_socket_fd(UnixSocket::type::MASTER);
+        return true;
     }
 
     // child process
+    socket->current_fd = socket->get_socket_fd(UnixSocket::type::WORKER);
     if (enable_coroutine)
     {
         Coroutine::create(std::bind(handler, this));
