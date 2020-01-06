@@ -13,7 +13,7 @@ Server::Server(char *host, int port)
     socket = new Socket(AF_INET, SOCK_STREAM, 0);
 
     socket->set_option(SOL_SOCKET, SO_REUSEADDR, &on, sizeof(on));
-    if (!socket->bind(FSW_SOCK_TCP, host, port))
+    if (!socket->bind(fsw::Socket::FSW_SOCK_TCP, host, port))
     {
         fswWarn("Error has occurred: (errno %d) %s", socket->get_err_code(), socket->get_err_msg());
         return;

@@ -19,7 +19,7 @@ public:
         MASTER = 2,
     };
 
-    int current_fd = -1; // use for current process
+    fsw::Socket *current_sock; // use for current process
 
     UnixSocket();
     ~UnixSocket();
@@ -45,15 +45,17 @@ public:
         return err_msg;
     }
 
-    inline int get_socket_fd(int type)
+    inline fsw::Socket *get_socket(int type)
     {
-        return type == WORKER ? worker_fd : master_fd;
+        return type == WORKER ? worker_sock : master_sock;
     }
 
 private:
     int socket[2];
     int worker_fd;
     int master_fd;
+    fsw::Socket *worker_sock;
+    fsw::Socket *master_sock;
     Buffer *read_buf = nullptr;
     Buffer *write_buf = nullptr;
     int err_code = 0;

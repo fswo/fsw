@@ -23,7 +23,7 @@ TEST(coroutine_socket, bind)
     int ret;
     char ip[] = "127.0.0.1";
     Socket *sock = new Socket(AF_INET, SOCK_STREAM, 0);
-    ret = sock->bind(FSW_SOCK_TCP, ip, 6000);
+    ret = sock->bind(fsw::Socket::FSW_SOCK_TCP, ip, 6000);
     ASSERT_EQ(ret, true);
 }
 
@@ -32,7 +32,7 @@ TEST(coroutine_socket, listen)
     int ret;
     char ip[] = "127.0.0.1";
     Socket *sock = new Socket(AF_INET, SOCK_STREAM, 0);
-    sock->bind(FSW_SOCK_TCP, ip, 6001);
+    sock->bind(fsw::Socket::FSW_SOCK_TCP, ip, 6001);
     ret = sock->listen(512);
     ASSERT_EQ(ret, true);
 }
@@ -65,7 +65,7 @@ TEST(coroutine_socket, get_name)
     Socket *sock = new Socket(AF_INET, SOCK_STREAM, 0);
     std::map<std::string, std::string> info;
 
-    sock->bind(FSW_SOCK_TCP, ip, 6002);
+    sock->bind(fsw::Socket::FSW_SOCK_TCP, ip, 6002);
     sock->listen(512);
     info = sock->get_name();
     auto it = info.find("address");

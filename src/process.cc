@@ -19,12 +19,12 @@ bool Process::start()
     child_pid = _pid;
     if (_pid > 0) // parent process
     {
-        socket->current_fd = socket->get_socket_fd(UnixSocket::type::MASTER);
+        socket->current_sock = socket->get_socket(UnixSocket::type::MASTER);
         return true;
     }
 
     // child process
-    socket->current_fd = socket->get_socket_fd(UnixSocket::type::WORKER);
+    socket->current_sock = socket->get_socket(UnixSocket::type::WORKER);
     if (enable_coroutine)
     {
         Coroutine::create(std::bind(handler, this));
