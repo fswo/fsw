@@ -1,10 +1,12 @@
-#include "fsw/process.h"
-#include "fsw/fsw.h"
-#include "fsw/coroutine.h"
 #include "gtest/gtest.h"
+#include "fsw/fsw.h"
+#include "fsw/process.h"
+#include "fsw/buffer.h"
+#include "fsw/coroutine.h"
 
 using fsw::Process;
 using fsw::Coroutine;
+using fsw::Buffer;
 
 static void child_handler(Process *process)
 {
@@ -63,4 +65,28 @@ TEST(process, name)
     ret = process.start();
     process.name("master");
     process.wait();
+}
+
+static void read_child_handler(Process *process)
+{
+    int ret;
+    char *buff = process->socket->get_read_buf()->c_buffer();
+
+    ret = process->read(buff, 1024);
+    buff[ret] = 0;
+    ASSERT_STREQ(buff, "hello");
+}
+
+TEST(process, write_read)
+{
+    ssize_t ret;
+    pid_t pid;
+
+    Process process(read_child_handler);
+    process.start();
+    Buffer *buff = process.socket->get_write_buf();
+    buff->append("hello");
+    ret = process.write(buff->c_buffer(), buff->length());
+    ASSERT_EQ(ret, buff->length());
+    pid = process.wait();
 }
