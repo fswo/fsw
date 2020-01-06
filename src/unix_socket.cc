@@ -11,12 +11,16 @@ UnixSocket::UnixSocket()
     }
     worker_fd = socket[0];
     master_fd = socket[1];
+    worker_sock = new fsw::Socket(worker_fd);
+    master_sock = new fsw::Socket(master_fd);
 }
 
 UnixSocket::~UnixSocket()
 {
     delete read_buf;
     delete write_buf;
+    delete master_sock;
+    delete worker_sock;
     close();
 }
 
@@ -24,7 +28,7 @@ ssize_t UnixSocket::recv(void *buf, size_t len)
 {
     int ret;
 
-    ret = fswSocket_recv(current_fd, buf, len, 0);
+    ret = current_sock->recv(buf, len, 0);
     if (ret < 0)
     {
         set_err();
@@ -37,7 +41,7 @@ ssize_t UnixSocket::send(const void *buf, size_t len)
 {
     int ret;
 
-    ret = fswSocket_send(current_fd, buf, len, 0);
+    ret = current_sock->send(buf, len, 0);
     if (ret < 0)
     {
         set_err();
@@ -66,8 +70,9 @@ Buffer* UnixSocket::get_write_buf()
 
 bool UnixSocket::close()
 {
-    bool ret = fswSocket_close(current_fd);
+    bool ret;
 
+    ret = current_sock->close();
     if (!ret)
     {
         set_err();
