@@ -32,7 +32,6 @@ Socket::~Socket()
 {
     delete read_buf;
     delete write_buf;
-    close();
     delete sock;
 }
 
