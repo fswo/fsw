@@ -32,11 +32,11 @@ public:
 
     Event();
     ~Event();
-    int wait();
+    bool wait();
 
 private:
-    int init_Poll();
-    int free_Poll();
+    bool init_Poll();
+    bool free_Poll();
 };
 
 typedef struct

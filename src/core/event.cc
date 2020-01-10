@@ -25,7 +25,7 @@ Event::~Event()
     free_Poll();
 }
 
-int Event::wait()
+bool Event::wait()
 {
     while (running > 0)
     {
@@ -57,10 +57,10 @@ int Event::wait()
         timer_manager.run_timers();
     }
 
-    return 0;
+    return true;
 }
 
-int Event::init_Poll()
+bool Event::init_Poll()
 {
     poll = new Poll();
 
@@ -70,16 +70,16 @@ int Event::init_Poll()
         fswWarn("Error has occurred: (errno %d) %s", errno, strerror(errno));
         delete poll;
         poll = nullptr;
-        return -1;
+        return false;
     }
 
     poll->ncap = FSW_EPOLL_CAP;
     poll->events = new epoll_event[poll->ncap](); // zero initialized
     poll->event_num = 0;
-    return 0;
+    return true;
 }
 
-int Event::free_Poll()
+bool Event::free_Poll()
 {
     if (close(poll->epollfd) < 0)
     {
@@ -89,5 +89,5 @@ int Event::free_Poll()
     poll->events = nullptr;
     delete poll;
     poll = nullptr;
-    return 0;
+    return true;
 }
