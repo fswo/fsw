@@ -3,7 +3,7 @@
 
 #include "fsw.h"
 
-#define FSW_EPOLL_CAP 16;
+#define FSW_EPOLL_CAP 16
 
 namespace fsw {
 struct Poll
