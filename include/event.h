@@ -33,6 +33,9 @@ public:
     struct Poll *poll;
     TimerManager timer_manager;
 
+    std::function<bool()> handle_timer;
+    std::function<bool()> handle_io;
+
     Event();
     ~Event();
     bool wait();
@@ -40,8 +43,9 @@ public:
 private:
     int num;
 
-    bool handle_timer();
-    bool handle_io();
+    void register_handler();
+    bool default_handle_timer();
+    bool default_handle_io();
     bool init_Poll();
     bool free_Poll();
 };

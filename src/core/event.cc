@@ -11,6 +11,7 @@ fsw::Global_t fsw::FswG;
 Event::Event()
 {
     init_Poll();
+    register_handler();
     running = 1;
 }
 
@@ -41,13 +42,19 @@ bool Event::wait()
     return true;
 }
 
-bool Event::handle_timer()
+void Event::register_handler()
+{
+    handle_io = std::bind(&Event::default_handle_io, this);
+    handle_timer = std::bind(&Event::default_handle_timer, this);
+}
+
+bool Event::default_handle_timer()
 {
     timer_manager.run_timers();
     return true;
 }
 
-bool Event::handle_io()
+bool Event::default_handle_io()
 {
     for (int i = 0; i < num; i++)
     {
