@@ -1,5 +1,4 @@
-#ifndef COROUTINE_H
-#define COROUTINE_H
+#pragma once
 
 #include <unordered_map>
 #include "context.h"
@@ -73,5 +72,3 @@ namespace coroutine
     }
 }
 }
-
-#endif	/* COROUTINE_H */

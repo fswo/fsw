@@ -1,5 +1,4 @@
-#ifndef HELP_H_
-#define HELP_H_
+#pragma once
 
 #include "fsw.h"
 
@@ -20,5 +19,3 @@ inline void fromuint64(uint64_t v, int *fd, int *id)
 }
 }
 }
-
-#endif /* HELP_H_ */

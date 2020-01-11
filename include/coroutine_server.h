@@ -1,5 +1,4 @@
-#ifndef COROUTINE_SERVER_H
-#define COROUTINE_SERVER_H
+#pragma once
 
 #include "fsw.h"
 #include "coroutine_socket.h"
@@ -24,5 +23,3 @@ public:
 };
 }
 }
-
-#endif	/* COROUTINE_SERVER_H */

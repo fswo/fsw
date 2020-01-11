@@ -1,5 +1,4 @@
-#ifndef ERROR_H
-#define ERROR_H
+#pragma once
 
 #include "fsw.h"
 
@@ -13,5 +12,3 @@ enum fswErrorCode
 };
 
 const char* fsw_strerror(int code);
-
-#endif	/* ERROR_H */

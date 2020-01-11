@@ -1,5 +1,4 @@
-#ifndef TIMER_H
-#define TIMER_H
+#pragma once
 
 #include "fsw.h"
 
@@ -50,5 +49,3 @@ private:
 
 extern TimerManager timer_manager;
 }
-
-#endif	/* TIMER_H */

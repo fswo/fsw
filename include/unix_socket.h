@@ -1,5 +1,4 @@
-#ifndef UNIX_SOCKET_H
-#define UNIX_SOCKET_H
+#pragma once
 
 #define READ_BUF_MAX_SIZE 1024
 #define WRITE_BUF_MAX_SIZE 1024
@@ -62,5 +61,3 @@ private:
     const char *err_msg = "";
 };
 }
-
-#endif	/* UNIX_SOCKET_H */

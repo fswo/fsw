@@ -1,5 +1,4 @@
-#ifndef WEBSOCKET_FRAME_H
-#define WEBSOCKET_FRAME_H
+#pragma once
 
 #include "fsw.h"
 #include "buffer.h"
@@ -47,5 +46,3 @@ public:
 };
 }
 }
-
-#endif	/* WEBSOCKET_FRAME_H */

@@ -1,5 +1,4 @@
-#ifndef COROUTINE_SOCKET_H
-#define COROUTINE_SOCKET_H
+#pragma once
 
 #define READ_BUF_MAX_SIZE 1024
 #define WRITE_BUF_MAX_SIZE 1024
@@ -69,7 +68,3 @@ public:
 };
 }
 }
-
-
-
-#endif	/* COROUTINE_SOCKET_H */

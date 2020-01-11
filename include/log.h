@@ -1,5 +1,4 @@
-#ifndef LOG_H_
-#define LOG_H_
+#pragma once
 
 #include "fsw.h"
 #include "config.h"
@@ -56,5 +55,3 @@ enum fswLog_level
 };
 
 void fswLog_put(int level, char *cnt);
-
-#endif /* LOG_H_ */

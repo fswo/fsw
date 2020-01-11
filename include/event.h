@@ -1,5 +1,4 @@
-#ifndef EVENT_H_
-#define EVENT_H_
+#pragma once
 
 #include "fsw.h"
 
@@ -46,5 +45,3 @@ typedef struct
 
 extern Global_t FswG;
 }
-
-#endif /* EVENT_H_ */

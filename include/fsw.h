@@ -1,5 +1,4 @@
-#ifndef FSW_H_
-#define FSW_H_
+#pragma once
 
 // include standard library
 #include <assert.h>
@@ -53,5 +52,3 @@
 #ifdef HAVE_EPOLL
 #include <sys/epoll.h>
 #endif
-
-#endif /* FSW_H_ */

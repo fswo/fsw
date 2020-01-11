@@ -1,5 +1,4 @@
-#ifndef COROUTINE_CHANNEL_H
-#define COROUTINE_CHANNEL_H
+#pragma once
 
 #include "fsw.h"
 #include "coroutine.h"
@@ -28,5 +27,3 @@ protected:
 };
 }
 }
-
-#endif	/* COROUTINE_CHANNEL_H */

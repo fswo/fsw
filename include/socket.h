@@ -1,5 +1,4 @@
-#ifndef SOCKET_H
-#define SOCKET_H
+#pragma once
 
 #include "fsw.h"
 
@@ -35,5 +34,3 @@ public:
     int set_nonblock();
 };
 }
-
-#endif	/* SOCKET_H */
