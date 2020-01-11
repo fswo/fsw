@@ -52,12 +52,8 @@ int64_t TimerManager::get_next_timeout()
 void TimerManager::run_timers()
 {
     uint64_t now = Timer::get_current_ms();
-    while (true)
+    while (!timers.empty())
     {
-        if (timers.empty())
-        {
-            break;
-        }
         Timer *t = timers.top();
         if (now < t->exec_msec)
         {

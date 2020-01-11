@@ -6,7 +6,8 @@
 
 using fsw::Coroutine;
 using fsw::coroutine::Socket;
-using fsw::event::FswG;
+using fsw::Event;
+using fsw::FswG;
 
 Socket::Socket(int domain, int type, int protocol)
 {
@@ -64,7 +65,7 @@ Socket* Socket::accept()
     do
     {
         connfd = sock->accept();
-    } while (connfd < 0 && errno == EAGAIN && wait_event(fsw::event::fswEvent_type::FSW_EVENT_READ));
+    } while (connfd < 0 && errno == EAGAIN && wait_event(Event::type::FSW_EVENT_READ));
 
     return (new Socket(connfd));
 }
@@ -76,7 +77,7 @@ ssize_t Socket::recv(void *buf, size_t len)
     do
     {
         ret = sock->recv(buf, len, 0);
-    } while (ret < 0 && errno == EAGAIN && wait_event(fsw::event::fswEvent_type::FSW_EVENT_READ));
+    } while (ret < 0 && errno == EAGAIN && wait_event(Event::type::FSW_EVENT_READ));
     
     return ret;
 }
@@ -90,7 +91,7 @@ ssize_t Socket::recv_all(void *buf, size_t len)
     {
         do {
             ret = sock->recv((char *)buf + total, len - total, 0);
-        } while (ret < 0 && errno == EAGAIN && wait_event(fsw::event::fswEvent_type::FSW_EVENT_READ));
+        } while (ret < 0 && errno == EAGAIN && wait_event(Event::type::FSW_EVENT_READ));
         if (ret <= 0)
         {
             if (total == 0)
@@ -115,7 +116,7 @@ ssize_t Socket::send(const void *buf, size_t len)
     do
     {
         ret = sock->send(buf, len, 0);
-    } while (ret < 0 && errno == EAGAIN && wait_event(fsw::event::fswEvent_type::FSW_EVENT_WRITE));
+    } while (ret < 0 && errno == EAGAIN && wait_event(Event::type::FSW_EVENT_WRITE));
     
     return ret;
 }
@@ -129,7 +130,7 @@ ssize_t Socket::send_all(const void *buf, size_t len)
     {
         do {
             ret = sock->send((char *)buf + total, len - total, 0);
-        } while (ret < 0 && errno == EAGAIN && wait_event(fsw::event::fswEvent_type::FSW_EVENT_READ));
+        } while (ret < 0 && errno == EAGAIN && wait_event(Event::type::FSW_EVENT_READ));
         if (ret <= 0)
         {
             if (total == 0)
@@ -249,28 +250,28 @@ bool Socket::wait_event(int event)
     co = Coroutine::get_current();
     id = co->get_cid();
 
-    if (!FswG.poll)
+    if (!FswG.event->poll)
     {
         fswError("Need to call fsw_event_init first.");
     }
-    ev = FswG.poll->events;
+    ev = FswG.event->poll->events;
 
-    ev->events = event == fsw::event::fswEvent_type::FSW_EVENT_READ ? EPOLLIN : EPOLLOUT;
+    ev->events = event == Event::type::FSW_EVENT_READ ? EPOLLIN : EPOLLOUT;
     ev->data.u64 = fsw::help::touint64(sock->fd, id);
 
     fswTrace("add sockfd[%d] %s event", sock->fd, "EPOLL_CTL_ADD");
-    if (epoll_ctl(FswG.poll->epollfd, EPOLL_CTL_ADD, sock->fd, ev) < 0)
+    if (epoll_ctl(FswG.event->poll->epollfd, EPOLL_CTL_ADD, sock->fd, ev) < 0)
     {
         fswWarn("Error has occurred: (errno %d) %s", errno, strerror(errno));
         return false;
     }
-    (FswG.poll->event_num)++;
+    (FswG.event->poll->event_num)++;
 
     Coroutine::yield();;
 
     fswTrace("remove sockfd[%d] %s event", sock->fd, "EPOLL_CTL_DEL");
 
-    if (epoll_ctl(FswG.poll->epollfd, EPOLL_CTL_DEL, sock->fd, NULL) < 0)
+    if (epoll_ctl(FswG.event->poll->epollfd, EPOLL_CTL_DEL, sock->fd, NULL) < 0)
     {
         fswWarn("Error has occurred: (errno %d) %s", errno, strerror(errno));
         return false;
