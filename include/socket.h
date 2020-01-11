@@ -3,25 +3,37 @@
 
 #include "fsw.h"
 
-enum fswSocket_type
+namespace fsw
 {
-    FSW_SOCK_TCP          =  1,
-    FSW_SOCK_UDP          =  2,
+
+class Socket
+{
+    
+public:
+    enum type
+    {
+        FSW_SOCK_TCP          =  1,
+        FSW_SOCK_UDP          =  2,
+    };
+
+    int fd;
+
+    Socket(int domain, int type, int protocol);
+    Socket(int _fd);
+    ~Socket();
+    bool bind(int type, char *host, int port);
+    bool listen(int backlog);
+    int accept();
+    bool close();
+    bool shutdown(int how);
+    bool set_option(int level, int optname, const void *optval, socklen_t optlen);
+    bool get_option(int level, int optname, void *optval, socklen_t *optlen);
+    bool getname(sockaddr *addr, socklen_t *len);
+    bool getpeername(sockaddr *addr, socklen_t *len);
+    ssize_t recv(void *buf, size_t len, int flag);
+    ssize_t send(const void *buf, size_t len, int flag);
+    int set_nonblock();
 };
-
-int fswSocket_create(int domain, int type, int protocol);
-int fswSocket_bind(int sock, int type, char *host, int port);
-int fswSocket_listen(int sock, int backlog);
-int fswSocket_accept(int sock);
-int fswSocket_close(int fd);
-int fswSocket_shutdown(int sock, int how);
-int fswSocket_set_option(int fd, int level, int optname, const void *optval, socklen_t optlen);
-int fswSocket_get_option(int fd, int level, int optname, void *optval, socklen_t *optlen);
-int fswSocket_getname(int fd, sockaddr *addr, socklen_t *len);
-int fswSocket_getpeername(int fd, sockaddr *addr, socklen_t *len);
-
-ssize_t fswSocket_recv(int sock, void *buf, size_t len, int flag);
-ssize_t fswSocket_send(int sock, const void *buf, size_t len, int flag);
-int fswSocket_set_nonblock(int sock);
+}
 
 #endif	/* SOCKET_H */

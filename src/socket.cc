@@ -1,20 +1,28 @@
 #include "socket.h"
 #include "log.h"
 
-int fswSocket_create(int domain, int type, int protocol)
-{
-    int sock;
+using fsw::Socket;
 
-    sock = socket(domain, type, protocol);
-    if (sock < 0)
+Socket::Socket(int domain, int type, int protocol)
+{
+    fd = ::socket(domain, type, protocol);
+    if (socket < 0)
     {
         fswWarn("Error has occurred: (errno %d) %s", errno, strerror(errno));
     }
-
-    return sock;
 }
 
-int fswSocket_bind(int sock, int type, char *host, int port)
+Socket::Socket(int _fd)
+{
+    fd = _fd;
+}
+
+Socket::~Socket()
+{
+    close();
+}
+
+bool Socket::bind(int type, char *host, int port)
 {
     struct sockaddr_in servaddr;
 
@@ -23,110 +31,89 @@ int fswSocket_bind(int sock, int type, char *host, int port)
         bzero(&servaddr, sizeof(servaddr));
         if (inet_aton(host, &(servaddr.sin_addr)) < 0)
         {
-            return -1;
+            return false;
         }
         servaddr.sin_family = AF_INET;
         servaddr.sin_port = htons(port);
-        if (bind(sock, (sockaddr *)&servaddr, sizeof(servaddr)) < 0)
+        if (::bind(fd, (sockaddr *)&servaddr, sizeof(servaddr)) < 0)
         {
-            return -1;
+            return false;
         }
     }
     else
     {
         fswWarn("Error has occurred: %s", "the bind type is not supported");
-        return -1;
+        return false;
     }
 
-    return 0;
+    return true;
 }
 
-int fswSocket_accept(int sock)
+bool Socket::listen(int backlog)
+{
+    return ::listen(fd, backlog) < 0 ? false : true;
+}
+
+int Socket::accept()
 {
     int connfd;
     struct sockaddr_in sa;
     socklen_t len;
 
     len = sizeof(sa);
-    connfd = accept(sock, (struct sockaddr *)&sa, &len);
+    connfd = ::accept(fd, (struct sockaddr *)&sa, &len);
     return connfd;
 }
 
-int fswSocket_close(int fd)
+bool Socket::close()
 {
-    return close(fd);
+    return ::close(fd) < 0 ? false : true;
 }
 
-int fswSocket_shutdown(int sock, int how)
+bool Socket::shutdown(int how)
 {
-    return shutdown(sock, how);
+    return ::shutdown(fd, how) < 0 ? false : true;
 }
 
-int fswSocket_set_option(int fd, int level, int optname, const void *optval, socklen_t optlen)
+bool Socket::set_option(int level, int optname, const void *optval, socklen_t optlen)
 {
-    int ret;
-
-    ret = setsockopt(fd, level, optname, optval, optlen);
-    return ret;
+    return setsockopt(fd, level, optname, optval, optlen) < 0 ? false : true;
 }
 
-int fswSocket_get_option(int fd, int level, int optname, void *optval, socklen_t *optlen)
+bool Socket::get_option(int level, int optname, void *optval, socklen_t *optlen)
 {
-    int ret;
-
-    ret = getsockopt(fd, level, optname, optval, optlen);
-    return ret;
+    return getsockopt(fd, level, optname, optval, optlen) < 0 ? false : true;
 }
 
-int fswSocket_getname(int fd, sockaddr *addr, socklen_t *len)
+bool Socket::getname(sockaddr *addr, socklen_t *len)
 {
-    int ret;
-
-    ret = getsockname(fd, addr, len);
-    return ret;
+    return getsockname(fd, addr, len) < 0 ? false : true;
 }
 
-int fswSocket_getpeername(int fd, sockaddr *addr, socklen_t *len)
+bool Socket::getpeername(sockaddr *addr, socklen_t *len)
 {
-    int ret;
-
-    ret = getpeername(fd, addr, len);
-    return ret;
+    return ::getpeername(fd, addr, len) < 0 ? false : true;
 }
 
-int fswSocket_listen(int sock, int backlog)
+ssize_t Socket::recv(void *buf, size_t len, int flag)
 {
-    int ret;
-
-    ret = listen(sock, backlog);
-    return ret;
+    return ::recv(fd, buf, len, flag);
 }
 
-ssize_t fswSocket_recv(int sock, void *buf, size_t len, int flag)
+ssize_t Socket::send(const void *buf, size_t len, int flag)
 {
-    ssize_t ret;
-
-    ret = recv(sock, buf, len, flag);
-    return ret;
+    return ::send(fd, buf, len, flag);
 }
 
-ssize_t fswSocket_send(int sock, const void *buf, size_t len, int flag)
-{
-    ssize_t ret;
-
-    ret = send(sock, buf, len, flag);
-    return ret;
-}
-
-int fswSocket_set_nonblock(int sock)
+int Socket::set_nonblock()
 {
     int flags;
 
-    flags = fcntl(sock, F_GETFL, 0);
+    flags = fcntl(fd, F_GETFL, 0);
     if (flags < 0)
     {
         return -1;
     }
-    flags = fcntl(sock, F_SETFL, flags | O_NONBLOCK);
+    flags = fcntl(fd, F_SETFL, flags | O_NONBLOCK);
     return flags;
 }

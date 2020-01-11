@@ -36,6 +36,7 @@
 #include <sys/utsname.h>
 #include <sys/stat.h>
 #include <sys/sendfile.h>
+#include <sys/prctl.h>
 
 #include <queue>
 #include <map>

@@ -6,6 +6,7 @@
 
 #include "fsw.h"
 #include "buffer.h"
+#include "socket.h"
 
 using fsw::Buffer;
 
@@ -14,7 +15,7 @@ namespace fsw { namespace coroutine {
 class Socket
 {
 private:
-    int sockfd;
+    fsw::Socket *sock;
     int err_code = 0;
     const char *err_msg = "";
     Buffer *read_buf = nullptr;
@@ -42,7 +43,7 @@ public:
 
     inline int get_fd()
     {
-        return sockfd;
+        return sock->fd;
     }
 
     inline void check_client_close()

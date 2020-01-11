@@ -9,6 +9,9 @@
 
 #define DEFAULT_C_STACK_SIZE          (2 *1024 * 1024)
 
+using fsw::Event;
+using fsw::FswG;
+
 namespace fsw
 {
 class Coroutine
@@ -64,9 +67,9 @@ namespace coroutine
 {
     inline void run(std::function<void()> fn)
     {
-        fsw::event::fsw_event_init();
+        FswG.event = new Event();
         Coroutine::create(fn);
-        fsw::event::fsw_event_wait();
+        FswG.event->wait();
     }
 }
 }
