@@ -68,7 +68,7 @@ namespace coroutine
     {
         FswG.event = new Event();
         Coroutine::create(fn);
-        FswG.event->wait();
+        FE(wait());
         delete FswG.event;
     }
 }

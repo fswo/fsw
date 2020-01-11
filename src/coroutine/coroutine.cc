@@ -112,7 +112,7 @@ int Coroutine::sleep(double seconds)
 {
     fswTrace("coroutine[%ld] sleep", current->cid);
 
-    FswG.event->timer_manager.add_timer(seconds * Timer::SECOND, sleep_timeout, (void*)current);
+    FE(timer_manager).add_timer(seconds * Timer::SECOND, sleep_timeout, (void*)current);
     Coroutine::yield();
     return 0;
 }

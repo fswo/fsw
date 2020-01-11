@@ -30,7 +30,7 @@ void* Channel::pop(double timeout)
     {
         if (timeout > 0)
         {
-            FswG.event->timer_manager.add_timer(timeout * Timer::SECOND, sleep_timeout, (void*)co);
+            FE(timer_manager).add_timer(timeout * Timer::SECOND, sleep_timeout, (void*)co);
         }
         consumer_queue.push(co);
         Coroutine::yield();;
@@ -64,7 +64,7 @@ bool Channel::push(void *data, double timeout)
     {
         if (timeout > 0)
         {
-            FswG.event->timer_manager.add_timer(timeout * Timer::SECOND, sleep_timeout, (void*)co);
+            FE(timer_manager).add_timer(timeout * Timer::SECOND, sleep_timeout, (void*)co);
         }
         producer_queue.push(co);
         Coroutine::yield();;

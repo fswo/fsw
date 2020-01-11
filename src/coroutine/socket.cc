@@ -250,28 +250,28 @@ bool Socket::wait_event(int event)
     co = Coroutine::get_current();
     id = co->get_cid();
 
-    if (!FswG.event->poll)
+    if (!FE(poll))
     {
         fswError("Need to call fsw_event_init first.");
     }
-    ev = FswG.event->poll->events;
+    ev = FE(poll->events);
 
     ev->events = event == Event::type::FSW_EVENT_READ ? EPOLLIN : EPOLLOUT;
     ev->data.u64 = fsw::help::touint64(sock->fd, id);
 
     fswTrace("add sockfd[%d] %s event", sock->fd, "EPOLL_CTL_ADD");
-    if (epoll_ctl(FswG.event->poll->epollfd, EPOLL_CTL_ADD, sock->fd, ev) < 0)
+    if (epoll_ctl(FE(poll->epollfd), EPOLL_CTL_ADD, sock->fd, ev) < 0)
     {
         fswWarn("Error has occurred: (errno %d) %s", errno, strerror(errno));
         return false;
     }
-    (FswG.event->poll->event_num)++;
+    (FE(poll->event_num))++;
 
     Coroutine::yield();;
 
     fswTrace("remove sockfd[%d] %s event", sock->fd, "EPOLL_CTL_DEL");
 
-    if (epoll_ctl(FswG.event->poll->epollfd, EPOLL_CTL_DEL, sock->fd, NULL) < 0)
+    if (epoll_ctl(FE(poll->epollfd), EPOLL_CTL_DEL, sock->fd, NULL) < 0)
     {
         fswWarn("Error has occurred: (errno %d) %s", errno, strerror(errno));
         return false;

@@ -3,6 +3,8 @@
 #include "fsw.h"
 #include "timer.h"
 
+#define FE(v) (FswG.event->v)
+
 using fsw::TimerManager;
 
 #define FSW_EPOLL_CAP 16
