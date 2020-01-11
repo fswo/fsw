@@ -36,12 +36,12 @@ public:
     Event();
     ~Event();
     bool wait();
-    bool handle_timer();
-    bool handle_io();
 
 private:
     int num;
 
+    bool handle_timer();
+    bool handle_io();
     bool init_Poll();
     bool free_Poll();
 };
