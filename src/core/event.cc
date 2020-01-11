@@ -1,14 +1,9 @@
-#include "fsw.h"
 #include "coroutine.h"
 #include "log.h"
-#include "timer.h"
 #include "help.h"
 #include "event.h"
 
 using fsw::Coroutine;
-using fsw::Timer;
-using fsw::TimerManager;
-using fsw::timer_manager;
 using fsw::Event;
 
 fsw::Global_t fsw::FswG;

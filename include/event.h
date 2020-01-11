@@ -1,6 +1,9 @@
 #pragma once
 
 #include "fsw.h"
+#include "timer.h"
+
+using fsw::TimerManager;
 
 #define FSW_EPOLL_CAP 16
 
@@ -28,6 +31,7 @@ public:
 
     int running;
     struct Poll *poll;
+    TimerManager timer_manager;
 
     Event();
     ~Event();

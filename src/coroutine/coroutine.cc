@@ -3,7 +3,6 @@
 #include "timer.h"
 
 using fsw::Coroutine;
-using fsw::timer_manager;
 using fsw::Timer;
 
 Coroutine* Coroutine::current = nullptr;
@@ -113,7 +112,7 @@ int Coroutine::sleep(double seconds)
 {
     fswTrace("coroutine[%ld] sleep", current->cid);
 
-    timer_manager.add_timer(seconds * Timer::SECOND, sleep_timeout, (void*)current);
+    FswG.event->timer_manager.add_timer(seconds * Timer::SECOND, sleep_timeout, (void*)current);
     Coroutine::yield();
     return 0;
 }
