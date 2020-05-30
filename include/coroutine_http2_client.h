@@ -1,11 +1,16 @@
 #pragma once
 
 #include "coroutine_http2.h"
+#include "coroutine_socket.h"
+
+using fsw::coroutine::Socket;
 
 namespace fsw { namespace coroutine { namespace http2 {
 class Client
 {
 public:
+    Socket *sock = nullptr;
+
     settings local_settings = {};
     settings remote_settings = {};
 
@@ -25,8 +30,19 @@ public:
 
     Client();
     void init_settings_local_settings();
+    void init_settings_remote_settings();
+    bool connect(std::string host, int port);
     int32_t send_request(Request *req);
     ssize_t build_header(Request *req, char *buffer);
+private:
+    bool send(const char *buf, size_t len)
+    {
+        if (sock->send_all(buf, len) != (ssize_t )len)
+        {
+            return false;
+        }
+        return true;
+    }
 };
 }
 }
