@@ -17,10 +17,14 @@ using fsw::coroutine::Socket;
 
 #define FSW_HTTP2_FRAME_HEADER_SIZE             9
 
+#define FSW_HTTP2_PRI_STRING  "PRI * HTTP/2.0\r\n\r\nSM\r\n\r\n"
+
 namespace fsw { namespace coroutine { namespace http2 {
 
 class Request;
 class Response;
+
+void set_frame_header(char *buffer, uint8_t type, uint32_t length, uint8_t flags, uint32_t stream_id);
 
 enum stream_flag
 {
@@ -28,6 +32,30 @@ enum stream_flag
     FSW_HTTP2_STREAM_REQUEST_END       = 1 << 0,
     FSW_HTTP2_STREAM_PIPELINE_REQUEST  = 1 << 1,
     FSW_HTTP2_STREAM_PIPELINE_RESPONSE = 1 << 2,
+};
+
+enum frame_type
+{
+    FSW_HTTP2_TYPE_DATA = 0,
+    FSW_HTTP2_TYPE_HEADERS = 1,
+    FSW_HTTP2_TYPE_PRIORITY = 2,
+    FSW_HTTP2_TYPE_RST_STREAM = 3,
+    FSW_HTTP2_TYPE_SETTINGS = 4,
+    FSW_HTTP2_TYPE_PUSH_PROMISE = 5,
+    FSW_HTTP2_TYPE_PING = 6,
+    FSW_HTTP2_TYPE_GOAWAY = 7,
+    FSW_HTTP2_TYPE_WINDOW_UPDATE = 8,
+    FSW_HTTP2_TYPE_CONTINUATION = 9,
+};
+
+enum frame_flag
+{
+    FSW_HTTP2_FLAG_NONE = 0x00,
+    FSW_HTTP2_FLAG_ACK = 0x01,
+    FSW_HTTP2_FLAG_END_STREAM = 0x01,
+    FSW_HTTP2_FLAG_END_HEADERS = 0x04,
+    FSW_HTTP2_FLAG_PADDED = 0x08,
+    FSW_HTTP2_FLAG_PRIORITY = 0x20,
 };
 
 typedef struct _settings
