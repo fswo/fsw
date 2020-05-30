@@ -1,5 +1,4 @@
-#ifndef COROUTINE_HTTP_H
-#define COROUTINE_HTTP_H
+#pragma once
 
 #include "fsw.h"
 #include "coroutine_socket.h"
@@ -219,5 +218,3 @@ public:
 }
 }
 }
-
-#endif	/* COROUTINE_HTTP_H */

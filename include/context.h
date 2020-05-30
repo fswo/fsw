@@ -1,5 +1,4 @@
-#ifndef CONTEXT_H
-#define CONTEXT_H
+#pragma once
 
 #include "asm_context.h"
 
@@ -42,5 +41,3 @@ protected:
     bool end_ = false;
 };
 }
-
-#endif	/* CONTEXT_H */

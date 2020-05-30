@@ -1,5 +1,4 @@
-#ifndef BUFFER_H
-#define BUFFER_H
+#pragma once
 
 #include "fsw.h"
 
@@ -52,5 +51,3 @@ private:
     char *_buffer;
 };
 }
-
-#endif	/* BUFFER_H */

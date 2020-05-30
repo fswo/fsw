@@ -1,5 +1,4 @@
-#ifndef COROUTINE_H
-#define COROUTINE_H
+#pragma once
 
 #include <unordered_map>
 #include "context.h"
@@ -69,9 +68,8 @@ namespace coroutine
     {
         FswG.event = new Event();
         Coroutine::create(fn);
-        FswG.event->wait();
+        FE(wait());
+        delete FswG.event;
     }
 }
 }
-
-#endif	/* COROUTINE_H */

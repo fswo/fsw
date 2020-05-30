@@ -1,5 +1,4 @@
-#ifndef TIMER_H
-#define TIMER_H
+#pragma once
 
 #include "fsw.h"
 
@@ -47,8 +46,4 @@ public:
 private:
     std::priority_queue<Timer*, std::vector<Timer*>, CompareTimerPointer> timers;
 };
-
-extern TimerManager timer_manager;
 }
-
-#endif	/* TIMER_H */

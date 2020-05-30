@@ -3,8 +3,6 @@
 using fsw::Timer;
 using fsw::TimerManager;
 
-TimerManager fsw::timer_manager;
-
 const uint64_t Timer::MILLI_SECOND = 1;
 const uint64_t Timer::SECOND = 1000;
 

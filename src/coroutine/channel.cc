@@ -6,7 +6,6 @@ using fsw::Coroutine;
 using fsw::coroutine::Channel;
 using fsw::Timer;
 using fsw::TimerManager;
-using fsw::timer_manager;
 
 Channel::Channel(size_t _capacity):
     capacity(_capacity)
@@ -31,7 +30,7 @@ void* Channel::pop(double timeout)
     {
         if (timeout > 0)
         {
-            timer_manager.add_timer(timeout * Timer::SECOND, sleep_timeout, (void*)co);
+            FE(timer_manager).add_timer(timeout * Timer::SECOND, sleep_timeout, (void*)co);
         }
         consumer_queue.push(co);
         Coroutine::yield();;
@@ -65,7 +64,7 @@ bool Channel::push(void *data, double timeout)
     {
         if (timeout > 0)
         {
-            timer_manager.add_timer(timeout * Timer::SECOND, sleep_timeout, (void*)co);
+            FE(timer_manager).add_timer(timeout * Timer::SECOND, sleep_timeout, (void*)co);
         }
         producer_queue.push(co);
         Coroutine::yield();;

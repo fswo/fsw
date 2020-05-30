@@ -1,12 +1,12 @@
 #include "fsw/fsw.h"
 #include "fsw/coroutine.h"
 #include "fsw/timer.h"
+#include "fsw/event.h"
 #include "gtest/gtest.h"
 #include <iostream>
 
 using fsw::coroutine::run;
 using fsw::Timer;
-using fsw::timer_manager;
 
 static int ret[4];
 static int ii = 0;
@@ -20,10 +20,10 @@ TEST(timer, add_timer)
 {
     run([]()
     {
-        timer_manager.add_timer(1 * Timer::MILLI_SECOND, print_num, (void *)(uintptr_t)1);
-        timer_manager.add_timer(2 * Timer::MILLI_SECOND, print_num, (void *)(uintptr_t)2);
-        timer_manager.add_timer(3 * Timer::MILLI_SECOND, print_num, (void *)(uintptr_t)3);
-        timer_manager.add_timer(4 * Timer::MILLI_SECOND, print_num, (void *)(uintptr_t)4);
+        FswG.event->timer_manager.add_timer(1 * Timer::MILLI_SECOND, print_num, (void *)(uintptr_t)1);
+        FswG.event->timer_manager.add_timer(2 * Timer::MILLI_SECOND, print_num, (void *)(uintptr_t)2);
+        FswG.event->timer_manager.add_timer(3 * Timer::MILLI_SECOND, print_num, (void *)(uintptr_t)3);
+        FswG.event->timer_manager.add_timer(4 * Timer::MILLI_SECOND, print_num, (void *)(uintptr_t)4);
     });
 
     for (size_t i = 0; i < 4; i++)

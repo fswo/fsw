@@ -1,5 +1,4 @@
-#ifndef COROUTINE_HTTP_SERVER_H
-#define COROUTINE_HTTP_SERVER_H
+#pragma once
 
 #include "fsw.h"
 #include "coroutine.h"
@@ -67,5 +66,3 @@ private:
 }
 }
 }
-
-#endif	/* COROUTINE_HTTP_SERVER_H */

@@ -1,5 +1,4 @@
-#ifndef PROCESS_H_
-#define PROCESS_H_
+#pragma once
 
 #include "fsw.h"
 #include "unix_socket.h"
@@ -39,5 +38,3 @@ public:
     }
 };
 }
-
-#endif /* PROCESS_H_ */

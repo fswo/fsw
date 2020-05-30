@@ -1,14 +1,9 @@
-#include "fsw.h"
 #include "coroutine.h"
 #include "log.h"
-#include "timer.h"
 #include "help.h"
 #include "event.h"
 
 using fsw::Coroutine;
-using fsw::Timer;
-using fsw::TimerManager;
-using fsw::timer_manager;
 using fsw::Event;
 
 fsw::Global_t fsw::FswG;
@@ -16,6 +11,7 @@ fsw::Global_t fsw::FswG;
 Event::Event()
 {
     init_Poll();
+    register_handler();
     running = 1;
 }
 
@@ -29,34 +25,48 @@ bool Event::wait()
 {
     while (running > 0)
     {
-        int n;
         int64_t timeout;
-        epoll_event *events;
 
         timeout = timer_manager.get_next_timeout();
-        events = poll->events;
         if (timeout < 0 && poll->event_num == 0)
         {
             running = 0;
             break;
         }
-        n = epoll_wait(poll->epollfd, events, poll->ncap, timeout);
-        
-        for (int i = 0; i < n; i++)
-        {
-            int fd;
-            int cid;
-            struct epoll_event *p = &events[i];
-            uint64_t u64 = p->data.u64;
+        num = epoll_wait(poll->epollfd, poll->events, poll->ncap, timeout);
 
-            fsw::help::fromuint64(u64, &fd, &cid);
-            fswTrace("coroutine[%d] resume", cid);
-            Coroutine::resume(cid);
-        }
-
-        timer_manager.run_timers();
+        handle_io();
+        handle_timer();
     }
 
+    return true;
+}
+
+void Event::register_handler()
+{
+    handle_io = std::bind(&Event::default_handle_io, this);
+    handle_timer = std::bind(&Event::default_handle_timer, this);
+}
+
+bool Event::default_handle_timer()
+{
+    timer_manager.run_timers();
+    return true;
+}
+
+bool Event::default_handle_io()
+{
+    for (int i = 0; i < num; i++)
+    {
+        int fd;
+        int cid;
+        struct epoll_event *p = &(poll->events[i]);
+        uint64_t u64 = p->data.u64;
+
+        fsw::help::fromuint64(u64, &fd, &cid);
+        fswTrace("coroutine[%d] resume", cid);
+        Coroutine::resume(cid);
+    }
     return true;
 }
 

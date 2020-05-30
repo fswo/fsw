@@ -1,7 +1,11 @@
-#ifndef EVENT_H_
-#define EVENT_H_
+#pragma once
 
 #include "fsw.h"
+#include "timer.h"
+
+#define FE(v) (FswG.event->v)
+
+using fsw::TimerManager;
 
 #define FSW_EPOLL_CAP 16
 
@@ -29,12 +33,21 @@ public:
 
     int running;
     struct Poll *poll;
+    TimerManager timer_manager;
+
+    std::function<bool()> handle_timer;
+    std::function<bool()> handle_io;
 
     Event();
     ~Event();
     bool wait();
 
 private:
+    int num;
+
+    void register_handler();
+    bool default_handle_timer();
+    bool default_handle_io();
     bool init_Poll();
     bool free_Poll();
 };
@@ -46,5 +59,3 @@ typedef struct
 
 extern Global_t FswG;
 }
-
-#endif /* EVENT_H_ */
