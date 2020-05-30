@@ -53,6 +53,9 @@ int32_t Client::send_request(Request *req)
     char *buffer = FswG.buffer_stack->c_buffer();
     ssize_t bytes = build_header(req, buffer + FSW_HTTP2_FRAME_HEADER_SIZE);
 
+    Stream *stream = new Stream(stream_id, false);
+    streams.emplace(stream_id, stream);
+
     if (bytes <= 0)
     {
         return FSW_ERR;

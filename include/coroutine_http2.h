@@ -22,6 +22,14 @@ namespace fsw { namespace coroutine { namespace http2 {
 class Request;
 class Response;
 
+enum stream_flag
+{
+    FSW_HTTP2_STREAM_NORMAL            = 0,
+    FSW_HTTP2_STREAM_REQUEST_END       = 1 << 0,
+    FSW_HTTP2_STREAM_PIPELINE_REQUEST  = 1 << 1,
+    FSW_HTTP2_STREAM_PIPELINE_RESPONSE = 1 << 2,
+};
+
 typedef struct _settings
 {
     uint32_t header_table_size;
@@ -112,6 +120,26 @@ public:
      * header_name is converted to lowercase
      */
     std::map<std::string, std::string> header;
+};
+
+class Response
+{
+
+};
+
+class Stream
+{
+public:
+    uint32_t stream_id;
+    uint8_t flags;
+    Buffer *buffer;
+    Response response;
+
+    // flow control
+    uint32_t remote_window_size;
+    uint32_t local_window_size;
+
+    Stream(uint32_t stream_id, bool pipeline);
 };
 
 }
