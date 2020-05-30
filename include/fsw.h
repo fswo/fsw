@@ -52,3 +52,5 @@
 #ifdef HAVE_EPOLL
 #include <sys/epoll.h>
 #endif
+
+#define FSW_STRL(str)		(str), (sizeof(str)-1)

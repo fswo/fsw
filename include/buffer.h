@@ -2,6 +2,8 @@
 
 #include "fsw.h"
 
+#define FSW_STACK_BUFFER_SIZE       65536
+
 namespace fsw
 {
 /**

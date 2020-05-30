@@ -2,10 +2,12 @@
 
 #include "fsw.h"
 #include "timer.h"
+#include "buffer.h"
 
 #define FE(v) (FswG.event->v)
 
 using fsw::TimerManager;
+using fsw::Buffer;
 
 #define FSW_EPOLL_CAP 16
 
@@ -55,6 +57,7 @@ private:
 typedef struct
 {
     Event *event;
+    Buffer *buffer_stack;
 } Global_t;
 
 extern Global_t FswG;
