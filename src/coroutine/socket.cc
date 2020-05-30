@@ -148,7 +148,6 @@ ssize_t Socket::send_all(const void *buf, size_t len)
     return total;
 }
 
-
 bool Socket::close()
 {
     bool success = sock->close();
@@ -158,6 +157,38 @@ bool Socket::close()
         set_err();
     }
     return success;
+}
+
+bool Socket::connect(std::string host, int port, int flags)
+{
+    sockaddr_in inet_v4;
+    socklen_t addrlen = sizeof(inet_v4);
+
+    if (!inet_pton(AF_INET, host.c_str(), &inet_v4.sin_addr))
+    {
+        fswError("Error has occurred: (errno %d) %s", errno, strerror(errno));
+    }
+
+    inet_v4.sin_family = AF_INET;
+    inet_v4.sin_port = htons(port);
+
+    return connect((struct sockaddr *) &inet_v4, addrlen);
+}
+
+bool Socket::connect(const struct sockaddr *addr, socklen_t addrlen)
+{
+    int ret;
+
+    do {
+        ret = ::connect(sock->fd, addr, addrlen);
+    } while (ret < 0 && errno == EINPROGRESS && wait_event(Event::type::FSW_EVENT_WRITE));
+
+    if (ret < 0)
+    {
+        set_err();
+    }
+
+    return ret == 0;
 }
 
 bool Socket::shutdown(int how)
