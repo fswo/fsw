@@ -39,11 +39,11 @@ void Client::init_settings_local_settings()
 
 void Client::init_settings_remote_settings()
 {
-    local_settings.header_table_size = FSW_HTTP2_DEFAULT_HEADER_TABLE_SIZE;
-    local_settings.window_size = FSW_HTTP2_DEFAULT_WINDOW_SIZE;
-    local_settings.max_concurrent_streams = FSW_HTTP2_MAX_MAX_CONCURRENT_STREAMS;
-    local_settings.max_frame_size = FSW_HTTP2_MAX_MAX_FRAME_SIZE;
-    local_settings.max_header_list_size = FSW_HTTP2_DEFAULT_MAX_HEADER_LIST_SIZE;
+    remote_settings.header_table_size = FSW_HTTP2_DEFAULT_HEADER_TABLE_SIZE;
+    remote_settings.window_size = FSW_HTTP2_DEFAULT_WINDOW_SIZE;
+    remote_settings.max_concurrent_streams = FSW_HTTP2_MAX_MAX_CONCURRENT_STREAMS;
+    remote_settings.max_frame_size = FSW_HTTP2_MAX_MAX_FRAME_SIZE;
+    remote_settings.max_header_list_size = FSW_HTTP2_DEFAULT_MAX_HEADER_LIST_SIZE;
 }
 
 ssize_t Client::build_header(Request *req, char *buffer)
