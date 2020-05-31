@@ -20,6 +20,7 @@ int main(int argc, char const *argv[])
             fswError("%s", h2c.sock->get_err_msg());
         }
         h2c.send_request(&req);
+        h2c.recv_reponse();
         return 0;
     });
 }

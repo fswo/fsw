@@ -22,6 +22,11 @@ void set_frame_header(char *buffer, uint8_t type, uint32_t length, uint8_t flags
     *(uint32_t *) (buffer + 5) = htonl(stream_id);
 }
 
+ssize_t get_payload_length(char *buf)
+{
+    return (((uint8_t) buf[0]) << 16) + (((uint8_t) buf[1]) << 8) + (uint8_t) buf[2];
+}
+
 }
 }
 }

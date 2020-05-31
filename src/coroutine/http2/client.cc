@@ -2,10 +2,13 @@
 #include "event.h"
 #include "log.h"
 #include "socket.h"
+#include "buffer.h"
 
+using fsw::FswG;
+using fsw::Buffer;
 using fsw::coroutine::http2::Client;
 using fsw::coroutine::http2::Headers;
-using fsw::FswG;
+using fsw::coroutine::http2::Response;
 
 Client::Client()
 {
@@ -63,6 +66,77 @@ ssize_t Client::build_header(Request *req, char *buffer)
         return FSW_ERR;
     }
     return rv;
+}
+
+bool Client::parse_frame()
+{
+    char *buf = sock->get_read_buf()->c_buffer();
+    uint8_t type = buf[3];
+    uint8_t flags = buf[4];
+    uint32_t stream_id = ntohl((*(int *) (buf + 5))) & 0x7fffffff;
+    ssize_t payload_length = get_payload_length(buf);
+
+    buf += FSW_HTTP2_FRAME_HEADER_SIZE;
+
+    if (stream_id > last_stream_id)
+    {
+        last_stream_id = stream_id;
+    }
+
+    switch (type)
+    {
+    case FSW_HTTP2_TYPE_SETTINGS:
+        parse_setting_frame(buf, payload_length);
+        break;
+    
+    default:
+        break;
+    }
+}
+
+bool Client::parse_setting_frame(char *buf, ssize_t payload_length)
+{
+    uint16_t id = 0;
+    uint32_t value = 0;
+
+    while (payload_length > 0)
+    {
+        id = ntohs(*(uint16_t *) (buf));
+        value = ntohl(*(uint32_t *) (buf + sizeof(uint16_t)));
+        switch (id)
+        {
+        case FSW_HTTP2_SETTING_HEADER_TABLE_SIZE:
+            if (value != remote_settings.header_table_size)
+            {
+                remote_settings.header_table_size = value;
+                int ret = nghttp2_hd_deflate_change_table_size(deflater, value);
+                if (ret != 0)
+                {
+                    return false;
+                }
+            }
+            break;
+        case FSW_HTTP2_SETTINGS_MAX_CONCURRENT_STREAMS:
+            remote_settings.max_concurrent_streams = value;
+            break;
+        case FSW_HTTP2_SETTINGS_INIT_WINDOW_SIZE:
+            remote_settings.window_size = value;
+            break;
+        case FSW_HTTP2_SETTINGS_MAX_FRAME_SIZE:
+            remote_settings.max_frame_size = value;
+            break;
+        case FSW_HTTP2_SETTINGS_MAX_HEADER_LIST_SIZE:
+            if (value != remote_settings.max_header_list_size)
+            {
+                remote_settings.max_header_list_size = value;
+            }
+            break;
+        default:
+            break;
+        }
+        buf += sizeof(id) + sizeof(value);
+        payload_length -= sizeof(id) + sizeof(value);
+    }
 }
 
 bool Client::connect(std::string host, int port)
@@ -131,4 +205,13 @@ int32_t Client::send_request(Request *req)
     stream_id += 2;
 
     return stream->stream_id;
+}
+
+Response Client::recv_reponse()
+{
+    Buffer *read_buf = sock->get_read_buf();
+    char *buf = read_buf->c_buffer();
+
+    sock->recv(buf, read_buf->size());
+    parse_frame();
 }

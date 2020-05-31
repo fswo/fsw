@@ -25,6 +25,7 @@ class Request;
 class Response;
 
 void set_frame_header(char *buffer, uint8_t type, uint32_t length, uint8_t flags, uint32_t stream_id);
+ssize_t get_payload_length(char *buf);
 
 enum stream_flag
 {
@@ -56,6 +57,16 @@ enum frame_flag
     FSW_HTTP2_FLAG_END_HEADERS = 0x04,
     FSW_HTTP2_FLAG_PADDED = 0x08,
     FSW_HTTP2_FLAG_PRIORITY = 0x20,
+};
+
+enum setting_id
+{
+    FSW_HTTP2_SETTING_HEADER_TABLE_SIZE       = 0x1,
+    FSW_HTTP2_SETTINGS_ENABLE_PUSH            = 0x2,
+    FSW_HTTP2_SETTINGS_MAX_CONCURRENT_STREAMS = 0x3,
+    FSW_HTTP2_SETTINGS_INIT_WINDOW_SIZE       = 0x4,
+    FSW_HTTP2_SETTINGS_MAX_FRAME_SIZE         = 0x5,
+    FSW_HTTP2_SETTINGS_MAX_HEADER_LIST_SIZE   = 0x6,
 };
 
 typedef struct _settings
@@ -152,7 +163,9 @@ public:
 
 class Response
 {
-
+    uint32_t stream_id;
+    char *body = nullptr;
+    size_t body_length;
 };
 
 class Stream

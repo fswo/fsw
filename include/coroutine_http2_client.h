@@ -33,6 +33,7 @@ public:
     void init_settings_remote_settings();
     bool connect(std::string host, int port);
     int32_t send_request(Request *req);
+    Response recv_reponse();
     ssize_t build_header(Request *req, char *buffer);
 private:
     bool send(const char *buf, size_t len)
@@ -43,6 +44,9 @@ private:
         }
         return true;
     }
+
+    bool parse_frame();
+    bool parse_setting_frame(char *buf, ssize_t payload_length);
 };
 }
 }
