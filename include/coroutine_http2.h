@@ -189,9 +189,12 @@ public:
 
 class Response
 {
+public:
     uint32_t stream_id;
     char *body = nullptr;
     size_t body_length;
+    int status_code;
+    std::map<std::string, std::string> header;
 };
 
 class Stream

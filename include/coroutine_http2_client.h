@@ -4,6 +4,7 @@
 #include "coroutine_socket.h"
 
 using fsw::coroutine::Socket;
+using fsw::coroutine::http2::Stream;
 
 namespace fsw { namespace coroutine { namespace http2 {
 class Client
@@ -36,6 +37,9 @@ public:
     Response recv_reponse();
     ssize_t build_header(Request *req, char *buffer);
 private:
+    ssize_t recv_frame();
+    bool parse_header_stop(int inflate_flags, ssize_t inlen);
+    int parse_header(Frame *frame);
     bool send(const char *buf, size_t len)
     {
         if (sock->send_all(buf, len) != (ssize_t )len)
@@ -45,7 +49,20 @@ private:
         return true;
     }
 
-    bool parse_frame();
+    Stream* get_stream(uint32_t stream_id)
+    {
+        auto i = streams.find(stream_id);
+        if (i == streams.end())
+        {
+            return nullptr;
+        }
+        else
+        {
+            return i->second;
+        }
+    }
+
+    fswReturn_code parse_frame();
     bool parse_setting_frame(Frame *frame);
 };
 }
