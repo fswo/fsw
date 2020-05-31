@@ -79,6 +79,31 @@ typedef struct _settings
     uint32_t max_header_list_size;
 } settings;
 
+/**
+ * 9 byte frame header + payload
+ +-----------------------------------------------+
+ |                 Length (24)                   |
+ +---------------+---------------+---------------+
+ |   Type (8)    |   Flags (8)   |
+ +-+-------------+---------------+-------------------------------+
+ |R|                 Stream Identifier (31)                      |
+ +=+=============================================================+
+ |                   Frame Payload (0...)                      ...
+ +---------------------------------------------------------------+
+ */
+class Frame
+{
+public:
+    char *payload = nullptr;
+    ssize_t payload_length;
+    uint8_t type;
+    uint8_t flags;
+    uint32_t stream_id;
+
+    Frame(char *_payload, ssize_t _payload_length, uint8_t _type, uint8_t _flags, uint32_t _stream_id):
+        payload(_payload), payload_length(_payload_length), type(_type), flags(_flags), stream_id(_stream_id){};
+};
+
 class Headers
 {
 public:

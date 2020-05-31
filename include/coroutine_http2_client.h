@@ -46,7 +46,7 @@ private:
     }
 
     bool parse_frame();
-    bool parse_setting_frame(char *buf, ssize_t payload_length);
+    bool parse_setting_frame(Frame *frame);
 };
 }
 }

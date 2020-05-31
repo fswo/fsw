@@ -6,6 +6,7 @@
 
 using fsw::FswG;
 using fsw::Buffer;
+using fsw::coroutine::http2::Frame;
 using fsw::coroutine::http2::Client;
 using fsw::coroutine::http2::Headers;
 using fsw::coroutine::http2::Response;
@@ -76,9 +77,9 @@ bool Client::parse_frame()
     uint32_t stream_id = ntohl((*(int *) (buf + 5))) & 0x7fffffff;
     ssize_t payload_length = get_payload_length(buf);
 
-    char frame[FSW_HTTP2_FRAME_HEADER_SIZE + FSW_HTTP2_FRAME_PING_PAYLOAD_SIZE];
-
     buf += FSW_HTTP2_FRAME_HEADER_SIZE;
+
+    Frame frame(buf, payload_length, type, flags, stream_id);
 
     if (stream_id > last_stream_id)
     {
@@ -88,23 +89,24 @@ bool Client::parse_frame()
     switch (type)
     {
     case FSW_HTTP2_TYPE_SETTINGS:
-        parse_setting_frame(buf, payload_length);
-        set_frame_header(frame, FSW_HTTP2_TYPE_SETTINGS, 0, FSW_HTTP2_FLAG_ACK, stream_id);
-        if (!send(frame, FSW_HTTP2_FRAME_HEADER_SIZE))
-        {
-            return FSW_ERR;
-        }
+        parse_setting_frame(&frame);
         break;
     
     default:
         break;
     }
+
+    return true;
 }
 
-bool Client::parse_setting_frame(char *buf, ssize_t payload_length)
+bool Client::parse_setting_frame(Frame *frame)
 {
     uint16_t id = 0;
     uint32_t value = 0;
+    char *buf = frame->payload;
+    ssize_t payload_length = frame->payload_length;
+
+    char setting_ack_buf[FSW_HTTP2_FRAME_HEADER_SIZE + FSW_HTTP2_FRAME_PING_PAYLOAD_SIZE];
 
     while (payload_length > 0)
     {
@@ -141,6 +143,11 @@ bool Client::parse_setting_frame(char *buf, ssize_t payload_length)
         buf += sizeof(id) + sizeof(value);
         payload_length -= sizeof(id) + sizeof(value);
     }
+    set_frame_header(setting_ack_buf, FSW_HTTP2_TYPE_SETTINGS, 0, FSW_HTTP2_FLAG_ACK, frame->stream_id);
+    if (!send(setting_ack_buf, FSW_HTTP2_FRAME_HEADER_SIZE))
+    {
+        return false;
+    }
     return true;
 }
 
@@ -165,18 +172,6 @@ bool Client::connect(std::string host, int port)
     return true;
 }
 
-/**
- * 9 byte frame header + payload
- +-----------------------------------------------+
- |                 Length (24)                   |
- +---------------+---------------+---------------+
- |   Type (8)    |   Flags (8)   |
- +-+-------------+---------------+-------------------------------+
- |R|                 Stream Identifier (31)                      |
- +=+=============================================================+
- |                   Frame Payload (0...)                      ...
- +---------------------------------------------------------------+
- */
 int32_t Client::send_request(Request *req)
 {
     /**
