@@ -16,6 +16,7 @@ using fsw::coroutine::Socket;
 #define FSW_HTTP2_MAX_MAX_HEADER_LIST_SIZE      UINT32_MAX
 
 #define FSW_HTTP2_FRAME_HEADER_SIZE             9
+#define FSW_HTTP2_FRAME_PING_PAYLOAD_SIZE      8
 
 #define FSW_HTTP2_PRI_STRING  "PRI * HTTP/2.0\r\n\r\nSM\r\n\r\n"
 

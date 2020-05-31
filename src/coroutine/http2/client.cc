@@ -76,6 +76,8 @@ bool Client::parse_frame()
     uint32_t stream_id = ntohl((*(int *) (buf + 5))) & 0x7fffffff;
     ssize_t payload_length = get_payload_length(buf);
 
+    char frame[FSW_HTTP2_FRAME_HEADER_SIZE + FSW_HTTP2_FRAME_PING_PAYLOAD_SIZE];
+
     buf += FSW_HTTP2_FRAME_HEADER_SIZE;
 
     if (stream_id > last_stream_id)
@@ -87,6 +89,11 @@ bool Client::parse_frame()
     {
     case FSW_HTTP2_TYPE_SETTINGS:
         parse_setting_frame(buf, payload_length);
+        set_frame_header(frame, FSW_HTTP2_TYPE_SETTINGS, 0, FSW_HTTP2_FLAG_ACK, stream_id);
+        if (!send(frame, FSW_HTTP2_FRAME_HEADER_SIZE))
+        {
+            return FSW_ERR;
+        }
         break;
     
     default:
@@ -134,6 +141,7 @@ bool Client::parse_setting_frame(char *buf, ssize_t payload_length)
         buf += sizeof(id) + sizeof(value);
         payload_length -= sizeof(id) + sizeof(value);
     }
+    return true;
 }
 
 bool Client::connect(std::string host, int port)
