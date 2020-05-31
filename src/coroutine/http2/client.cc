@@ -126,10 +126,7 @@ bool Client::parse_setting_frame(char *buf, ssize_t payload_length)
             remote_settings.max_frame_size = value;
             break;
         case FSW_HTTP2_SETTINGS_MAX_HEADER_LIST_SIZE:
-            if (value != remote_settings.max_header_list_size)
-            {
-                remote_settings.max_header_list_size = value;
-            }
+            remote_settings.max_header_list_size = value;
             break;
         default:
             break;
