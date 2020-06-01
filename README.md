@@ -88,3 +88,36 @@ Time per request:       35.721 [ms] (mean)
 Time per request:       0.036 [ms] (mean, across all concurrent requests)
 Transfer rate:          2761.19 [Kbytes/sec] received
 ```
+
+#### A HTTP2 Client example
+
+```cpp
+#include "fsw/coroutine_http2_client.h"
+#include "fsw/coroutine.h"
+
+using fsw::coroutine::http2::Client;
+using fsw::coroutine::http2::Request;
+using fsw::coroutine::http2::Response;
+using fsw::coroutine::run;
+
+int main(int argc, char const *argv[])
+{
+    run([]()
+    {
+        bool ret;
+        Client h2c;
+        Request req;
+        Response rep;
+
+        ret = h2c.connect("127.0.0.1", 80);
+        if (!ret)
+        {
+            fswError("%s", h2c.sock->get_err_msg());
+        }
+        h2c.send_request(&req);
+        rep = h2c.recv_reponse();
+        std::cout << rep.body << std::endl;
+        return 0;
+    });
+}
+```
