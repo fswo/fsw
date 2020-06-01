@@ -103,20 +103,7 @@ fswReturn_code Client::parse_frame(Frame *frame)
     }
     else if (frame->type == FSW_HTTP2_TYPE_DATA)
     {
-        if (!(frame->flags & FSW_HTTP2_FLAG_END_STREAM))
-        {
-            frame->stream->flags |= FSW_HTTP2_STREAM_PIPELINE_RESPONSE;
-        }
-        if (frame->payload_length > 0)
-        {
-            if (!frame->stream->buffer)
-            {
-                frame->stream->buffer = new Buffer(READ_BUF_MAX_SIZE);
-            }
-            frame->stream->buffer->append(frame->payload, frame->payload_length);
-            local_settings.window_size -= frame->payload_length;
-            frame->stream->local_window_size -= frame->payload_length;
-        }
+        parse_payload(frame);
     }
 
     bool end = (frame->flags & FSW_HTTP2_FLAG_END_STREAM)   ||
@@ -188,6 +175,24 @@ int Client::parse_header(Frame *frame)
     }
 
     return FSW_OK;
+}
+
+void Client::parse_payload(Frame *frame)
+{
+    if (!(frame->flags & FSW_HTTP2_FLAG_END_STREAM))
+    {
+        frame->stream->flags |= FSW_HTTP2_STREAM_PIPELINE_RESPONSE;
+    }
+    if (frame->payload_length > 0)
+    {
+        if (!frame->stream->buffer)
+        {
+            frame->stream->buffer = new Buffer(READ_BUF_MAX_SIZE);
+        }
+        frame->stream->buffer->append(frame->payload, frame->payload_length);
+        local_settings.window_size -= frame->payload_length;
+        frame->stream->local_window_size -= frame->payload_length;
+    }
 }
 
 int Client::parse_setting_frame(Frame *frame)

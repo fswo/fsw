@@ -40,6 +40,7 @@ private:
     ssize_t recv_frame(Frame *frame);
     bool parse_header_stop(int inflate_flags, ssize_t inlen);
     int parse_header(Frame *frame);
+    void parse_payload(Frame *frame);
     bool send(const char *buf, size_t len)
     {
         if (sock->send_all(buf, len) != (ssize_t )len)
