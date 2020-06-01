@@ -3,7 +3,7 @@ project(libfsw)
 cmake_minimum_required(VERSION 2.8)
 
 enable_language(ASM)
-set(FSW_VERSION 0.0.1)
+set(FSW_VERSION 0.7.1)
 set(FSW_CLFLAGS ssl crypt crypto)
 set(CMAKE_CXX_STANDARD 11)
 set(ENABLE_DEBUG OFF)
@@ -12,19 +12,14 @@ set(ENABLE_TRACE OFF)
 # check library
 find_library(LIB_SSL ssl)
 if(NOT LIB_SSL)
-  message(FATAL_ERROR "libssl not found")
+    if (DEFINED openssl_dir)
+        include_directories(BEFORE ${openssl_dir}/include)
+        link_directories(${openssl_dir}/lib)
+    else()
+        message(FATAL_ERROR "libssl not found, you should set openssl_dir, eg:
+        cmake . -Dopenssl_dir=/usr/local/openssl")
+    endif()
 endif()
-
-find_library(LIB_CRYPT crypt)
-if(NOT LIB_CRYPT)
-  message(FATAL_ERROR "libcrypt not found")
-endif()
-
-find_library(LIB_CRYPTO crypto)
-if(NOT LIB_CRYPTO)
-  message(FATAL_ERROR "libcrypto not found")
-endif()
-# check library end
 
 include(CheckFunctionExists)
 check_function_exists(epoll_create HAVE_EPOLL)
@@ -53,22 +48,36 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 set(CMAKE_BUILD_TYPE Debug)
 set(CMAKE_CXX_FLAGS_DEBUG "$ENV{CXXFLAGS} -O0 -Wall -g -ggdb")
 
-file(GLOB_RECURSE SRC_LIST FOLLOW_SYMLINKS src/*.c src/*.cc thirdparty/boost/asm/combined.S thirdparty/http/http_parser.c)
-file(GLOB_RECURSE HEAD_FILES FOLLOW_SYMLINKS include/*.h thirdparty/http/*.h)
+file(GLOB_RECURSE HEAD_FILES FOLLOW_SYMLINKS
+    ./include/*.h
+    thirdparty/http/*.h
+    thirdparty/nghttp2/*.h
+)
+
+file(GLOB_RECURSE SRC_LIST FOLLOW_SYMLINKS 
+    src/*.c
+    src/*.cc
+    thirdparty/boost/asm/combined.S
+    thirdparty/http/http_parser.c
+    thirdparty/nghttp2/*.c
+)
 
 set(LIBRARY_OUTPUT_PATH ${CMAKE_CURRENT_SOURCE_DIR}/lib)
 set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin)
 
-include_directories(BEFORE ./include ./thirdparty/http)
+include_directories(BEFORE
+    ./include
+    ./thirdparty/http
+    ./thirdparty/nghttp2
+)
 
 #shared library
-add_library(shared SHARED ${SRC_LIST})
-set_target_properties(shared PROPERTIES OUTPUT_NAME "fsw" VERSION ${FSW_VERSION})
-target_link_libraries(shared ${FSW_CLFLAGS})
-
 link_directories(${LIBRARY_OUTPUT_PATH})
+add_library(libfsw SHARED ${SRC_LIST})
+set_target_properties(libfsw PROPERTIES OUTPUT_NAME "fsw" VERSION ${FSW_VERSION})
+target_link_libraries(libfsw ${FSW_CLFLAGS})
 
 #install
 install(CODE "MESSAGE(\"Are you run command using root user?\")")
-install(TARGETS shared LIBRARY DESTINATION lib ARCHIVE DESTINATION lib)
+install(TARGETS libfsw LIBRARY DESTINATION lib ARCHIVE DESTINATION lib)
 install(FILES ${HEAD_FILES} DESTINATION include/fsw)

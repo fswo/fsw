@@ -31,6 +31,8 @@ public:
     ssize_t send(const void *buf, size_t len);
     ssize_t send_all(const void *buf, size_t len);
     bool close();
+    bool connect(std::string host, int port, int flags = 0);
+    bool connect(const struct sockaddr *addr, socklen_t addrlen);
     bool shutdown(int how);
     bool set_option(int level, int optname, const void *optval, socklen_t optlen);
     bool get_option(int level, int optname, void *optval, socklen_t *optlen);

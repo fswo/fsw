@@ -67,6 +67,7 @@ namespace coroutine
     inline void run(std::function<void()> fn)
     {
         FswG.event = new Event();
+        FswG.buffer_stack = new Buffer(FSW_STACK_BUFFER_SIZE);
         Coroutine::create(fn);
         FE(wait());
         delete FswG.event;
