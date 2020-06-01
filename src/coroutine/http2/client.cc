@@ -69,27 +69,19 @@ ssize_t Client::build_header(Request *req, char *buffer)
     return rv;
 }
 
-fswReturn_code Client::parse_frame()
+fswReturn_code Client::parse_frame(Frame *frame)
 {
-    char *buf = sock->get_read_buf()->c_buffer();
-    uint8_t type = buf[3];
-    uint8_t flags = buf[4];
-    uint32_t stream_id = ntohl((*(int *) (buf + 5))) & 0x7fffffff;
-    ssize_t payload_length = get_payload_length(buf);
-
-    buf += FSW_HTTP2_FRAME_HEADER_SIZE;
-
-    Frame frame(buf, payload_length, type, flags, stream_id);
-
     if (stream_id > last_stream_id)
     {
         last_stream_id = stream_id;
     }
 
-    switch (type)
+    int value = 0;
+
+    switch (frame->type)
     {
     case FSW_HTTP2_TYPE_SETTINGS:
-        parse_setting_frame(&frame);
+        value = parse_setting_frame(frame);
         return FSW_CONTINUE;
     case FSW_HTTP2_TYPE_WINDOW_UPDATE:
         return FSW_CONTINUE;
@@ -105,9 +97,44 @@ fswReturn_code Client::parse_frame()
         break;
     }
 
-    if (type == FSW_HTTP2_TYPE_HEADERS)
+    if (frame->type == FSW_HTTP2_TYPE_HEADERS)
     {
-        parse_header(&frame);
+        parse_header(frame);
+    }
+    else if (frame->type == FSW_HTTP2_TYPE_DATA)
+    {
+        if (!(frame->flags & FSW_HTTP2_FLAG_END_STREAM))
+        {
+            frame->stream->flags |= FSW_HTTP2_STREAM_PIPELINE_RESPONSE;
+        }
+        if (frame->payload_length > 0)
+        {
+            if (!frame->stream->buffer)
+            {
+                frame->stream->buffer = new Buffer(READ_BUF_MAX_SIZE);
+            }
+            frame->stream->buffer->append(frame->payload, frame->payload_length);
+            local_settings.window_size -= frame->payload_length;
+            frame->stream->local_window_size -= frame->payload_length;
+        }
+    }
+
+    bool end = (frame->flags & FSW_HTTP2_FLAG_END_STREAM)   ||
+            frame->type == FSW_HTTP2_TYPE_RST_STREAM        ||
+            frame->type == FSW_HTTP2_TYPE_GOAWAY;
+    if (end)
+    {
+        if (frame->type == FSW_HTTP2_TYPE_RST_STREAM)
+        {
+            frame->stream->response.status_code = -3; /* HTTP_CLIENT_ESTATUS_SERVER_RESET */
+            frame->stream->response.err_code = value;
+        }
+        if (frame->stream->buffer && frame->stream->buffer->length() > 0)
+        {
+            frame->stream->response.body = std::string(frame->stream->buffer->c_buffer(), frame->stream->buffer->length());
+            frame->stream->buffer->clear();
+        }
+        return FSW_READY;
     }
 
     return FSW_CONTINUE;
@@ -127,10 +154,9 @@ bool Client::parse_header_stop(int inflate_flags, ssize_t inlen)
 
 int Client::parse_header(Frame *frame)
 {
-    Stream *stream = get_stream(frame->stream_id);
     char *in = frame->payload;
     ssize_t inlen = frame->payload_length;
-    Response response = stream->response;
+    Response response = frame->stream->response;
 
     ssize_t rv;
     int inflate_flags = 0;
@@ -164,7 +190,7 @@ int Client::parse_header(Frame *frame)
     return FSW_OK;
 }
 
-bool Client::parse_setting_frame(Frame *frame)
+int Client::parse_setting_frame(Frame *frame)
 {
     uint16_t id = 0;
     uint32_t value = 0;
@@ -186,7 +212,7 @@ bool Client::parse_setting_frame(Frame *frame)
                 int ret = nghttp2_hd_deflate_change_table_size(deflater, value);
                 if (ret != 0)
                 {
-                    return false;
+                    return FSW_ERR;
                 }
             }
             break;
@@ -211,9 +237,9 @@ bool Client::parse_setting_frame(Frame *frame)
     set_frame_header(setting_ack_buf, FSW_HTTP2_TYPE_SETTINGS, 0, FSW_HTTP2_FLAG_ACK, frame->stream_id);
     if (!send(setting_ack_buf, FSW_HTTP2_FRAME_HEADER_SIZE))
     {
-        return false;
+        return FSW_ERR;
     }
-    return true;
+    return value;
 }
 
 bool Client::connect(std::string host, int port)
@@ -272,7 +298,7 @@ int32_t Client::send_request(Request *req)
     return stream->stream_id;
 }
 
-ssize_t Client::recv_frame()
+ssize_t Client::recv_frame(Frame *frame)
 {
     Buffer *read_buf = sock->get_read_buf();
     char *buf = read_buf->c_buffer();
@@ -280,17 +306,37 @@ ssize_t Client::recv_frame()
     sock->recv(buf, FSW_HTTP2_FRAME_HEADER_SIZE);
     ssize_t payload_length = get_payload_length(buf);
     sock->recv(buf + FSW_HTTP2_FRAME_HEADER_SIZE, payload_length);
+
+    uint8_t type = buf[3];
+    uint8_t flags = buf[4];
+    uint32_t stream_id = ntohl((*(int *) (buf + 5))) & 0x7fffffff;
+
+    buf += FSW_HTTP2_FRAME_HEADER_SIZE;
+
+    frame->flags = flags;
+    frame->payload = buf;
+    frame->payload_length = payload_length;
+    frame->stream_id = stream_id;
+    frame->type = type;
+    frame->stream = get_stream(stream_id);
 }
 
 Response Client::recv_reponse()
 {
+    Frame frame;
+
     while (true)
     {
-        recv_frame();
-        enum fswReturn_code ret = parse_frame();
+        recv_frame(&frame);
+        enum fswReturn_code ret = parse_frame(&frame);
         if (ret == FSW_CONTINUE)
         {
             continue;
         }
+        else if (ret == FSW_READY)
+        {
+            break;
+        }
     }
+    return frame.stream->response;
 }

@@ -24,6 +24,7 @@ namespace fsw { namespace coroutine { namespace http2 {
 
 class Request;
 class Response;
+class Stream;
 
 void set_frame_header(char *buffer, uint8_t type, uint32_t length, uint8_t flags, uint32_t stream_id);
 ssize_t get_payload_length(char *buf);
@@ -99,7 +100,9 @@ public:
     uint8_t type;
     uint8_t flags;
     uint32_t stream_id;
+    Stream *stream;
 
+    Frame(){};
     Frame(char *_payload, ssize_t _payload_length, uint8_t _type, uint8_t _flags, uint32_t _stream_id):
         payload(_payload), payload_length(_payload_length), type(_type), flags(_flags), stream_id(_stream_id){};
 };
@@ -191,9 +194,10 @@ class Response
 {
 public:
     uint32_t stream_id;
-    char *body = nullptr;
+    std::string body;
     size_t body_length;
     int status_code;
+    int err_code;
     std::map<std::string, std::string> header;
 };
 
@@ -202,7 +206,7 @@ class Stream
 public:
     uint32_t stream_id;
     uint8_t flags;
-    Buffer *buffer;
+    Buffer *buffer = nullptr;
     Response response;
 
     // flow control

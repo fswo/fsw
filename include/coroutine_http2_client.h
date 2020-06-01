@@ -37,7 +37,7 @@ public:
     Response recv_reponse();
     ssize_t build_header(Request *req, char *buffer);
 private:
-    ssize_t recv_frame();
+    ssize_t recv_frame(Frame *frame);
     bool parse_header_stop(int inflate_flags, ssize_t inlen);
     int parse_header(Frame *frame);
     bool send(const char *buf, size_t len)
@@ -62,8 +62,32 @@ private:
         }
     }
 
-    fswReturn_code parse_frame();
-    bool parse_setting_frame(Frame *frame);
+    void destroy_stream(Stream *stream)
+    {
+        if (stream->buffer)
+        {
+            delete stream->buffer;
+            stream->buffer = nullptr;
+        }
+        delete stream;
+    }
+
+    bool delete_stream(uint32_t stream_id)
+    {
+        auto i = streams.find(stream_id);
+        if (i == streams.end())
+        {
+            return false;
+        }
+
+        destroy_stream(i->second);
+        streams.erase(i);
+
+        return true;
+    }
+
+    fswReturn_code parse_frame(Frame *frame);
+    int parse_setting_frame(Frame *frame);
 };
 }
 }
