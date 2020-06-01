@@ -39,6 +39,8 @@ public:
 private:
     ssize_t recv_frame(Frame *frame);
     bool parse_header_stop(int inflate_flags, ssize_t inlen);
+    void build_setting_frame(Frame *frame);
+    void build_frame_header(Frame *frame);
     int parse_frame_header(Frame *frame);
     void parse_payload(Frame *frame);
     bool send(const char *buf, size_t len)
