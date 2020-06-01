@@ -50,7 +50,7 @@ void Client::init_settings_remote_settings()
     remote_settings.max_header_list_size = FSW_HTTP2_DEFAULT_MAX_HEADER_LIST_SIZE;
 }
 
-ssize_t Client::build_header(Request *req, char *buffer)
+ssize_t Client::build_http_header(Request *req, char *buffer)
 {
     Headers headers(8 + req->header.size());
     headers.add(FSW_STRL(":method"), FSW_STRL("GET"));
@@ -99,7 +99,7 @@ fswReturn_code Client::parse_frame(Frame *frame)
 
     if (frame->type == FSW_HTTP2_TYPE_HEADERS)
     {
-        parse_header(frame);
+        parse_frame_header(frame);
     }
     else if (frame->type == FSW_HTTP2_TYPE_DATA)
     {
@@ -139,7 +139,7 @@ bool Client::parse_header_stop(int inflate_flags, ssize_t inlen)
     return stop;
 }
 
-int Client::parse_header(Frame *frame)
+int Client::parse_frame_header(Frame *frame)
 {
     char *in = frame->payload;
     ssize_t inlen = frame->payload_length;
@@ -274,7 +274,8 @@ int32_t Client::send_request(Request *req)
      * send headers
      */
     char *buffer = FswG.buffer_stack->c_buffer();
-    ssize_t bytes = build_header(req, buffer + FSW_HTTP2_FRAME_HEADER_SIZE);
+    Frame frame;
+    ssize_t bytes = build_http_header(req, buffer + FSW_HTTP2_FRAME_HEADER_SIZE);
 
     if (bytes <= 0)
     {
