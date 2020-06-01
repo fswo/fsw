@@ -3,7 +3,7 @@ project(libfsw)
 cmake_minimum_required(VERSION 2.8)
 
 enable_language(ASM)
-set(FSW_VERSION 0.7.1)
+set(FSW_VERSION 0.8.0)
 set(FSW_CLFLAGS ssl crypt crypto)
 set(CMAKE_CXX_STANDARD 11)
 set(ENABLE_DEBUG OFF)
