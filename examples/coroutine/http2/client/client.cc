@@ -3,8 +3,8 @@
 
 using fsw::coroutine::http2::Client;
 using fsw::coroutine::http2::Request;
+using fsw::coroutine::http2::Response;
 using fsw::coroutine::run;
-
 
 int main(int argc, char const *argv[])
 {
@@ -20,7 +20,11 @@ int main(int argc, char const *argv[])
             fswError("%s", h2c.sock->get_err_msg());
         }
         h2c.send_request(&req);
-        h2c.recv_reponse();
+        Response rep = h2c.recv_reponse();
+        std::cout << rep.body << std::endl;
+        h2c.send_request(&req);
+        rep = h2c.recv_reponse();
+        std::cout << rep.body << std::endl;
         return 0;
     });
 }
