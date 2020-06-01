@@ -22,9 +22,6 @@ int main(int argc, char const *argv[])
         h2c.send_request(&req);
         Response rep = h2c.recv_reponse();
         std::cout << rep.body << std::endl;
-        h2c.send_request(&req);
-        rep = h2c.recv_reponse();
-        std::cout << rep.body << std::endl;
         return 0;
     });
 }

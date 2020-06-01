@@ -50,7 +50,7 @@ void Client::init_settings_remote_settings()
     remote_settings.max_header_list_size = FSW_HTTP2_DEFAULT_MAX_HEADER_LIST_SIZE;
 }
 
-ssize_t Client::build_header(Request *req, char *buffer)
+ssize_t Client::build_http_header(Request *req, char *buffer)
 {
     Headers headers(8 + req->header.size());
     headers.add(FSW_STRL(":method"), FSW_STRL("GET"));
@@ -99,7 +99,7 @@ fswReturn_code Client::parse_frame(Frame *frame)
 
     if (frame->type == FSW_HTTP2_TYPE_HEADERS)
     {
-        parse_header(frame);
+        parse_frame_header(frame);
     }
     else if (frame->type == FSW_HTTP2_TYPE_DATA)
     {
@@ -139,7 +139,63 @@ bool Client::parse_header_stop(int inflate_flags, ssize_t inlen)
     return stop;
 }
 
-int Client::parse_header(Frame *frame)
+void Client::build_setting_frame(Frame *frame)
+{
+    uint16_t id = 0;
+    uint32_t value = 0;
+    Buffer *write_buf = sock->get_write_buf();
+    char *buf = write_buf->c_buffer();
+
+    frame->flags = 0;
+    frame->type = FSW_HTTP2_TYPE_SETTINGS;
+    frame->stream_id = 0;
+    frame->payload = buf + FSW_HTTP2_FRAME_HEADER_SIZE;
+    frame->payload_length = 3 * 6;
+    build_frame_header(frame);
+
+    char *p = frame->payload;
+
+    /**
+     * header table size
+     */
+    id = htons(FSW_HTTP2_SETTING_HEADER_TABLE_SIZE);
+    memcpy(p, &id, sizeof(id));
+    p += 2;
+    value = htonl(local_settings.header_table_size);
+    memcpy(p, &value, sizeof(value));
+    p += 4;
+    /**
+     * max concurrent streams
+     */
+    id = htons(FSW_HTTP2_SETTINGS_MAX_CONCURRENT_STREAMS);
+    memcpy(p, &id, sizeof(id));
+    p += 2;
+    value = htonl(local_settings.max_concurrent_streams);
+    memcpy(p, &value, sizeof(value));
+    p += 4;
+    /**
+     * init window size
+     */
+    id = htons(FSW_HTTP2_SETTINGS_INIT_WINDOW_SIZE);
+    memcpy(p, &id, sizeof(id));
+    p += 2;
+    value = htonl(local_settings.window_size);
+    memcpy(p, &value, sizeof(value));
+    p += 4;
+}
+
+void Client::build_frame_header(Frame *frame)
+{
+    char *buf = frame->payload - FSW_HTTP2_FRAME_HEADER_SIZE;
+    buf[0] = frame->payload_length >> 16;
+    buf[1] = frame->payload_length >> 8;
+    buf[2] = frame->payload_length;
+    buf[3] = frame->type;
+    buf[4] = frame->flags;
+    *(uint32_t *) (buf + 5) = htonl(frame->stream_id);
+}
+
+int Client::parse_frame_header(Frame *frame)
 {
     char *in = frame->payload;
     ssize_t inlen = frame->payload_length;
@@ -265,7 +321,9 @@ bool Client::connect(std::string host, int port)
     {
         return false;
     }
-    return true;
+    Frame frame;
+    build_setting_frame(&frame);
+    return send(frame.payload - FSW_HTTP2_FRAME_HEADER_SIZE, FSW_HTTP2_FRAME_HEADER_SIZE + frame.payload_length);
 }
 
 int32_t Client::send_request(Request *req)
@@ -274,7 +332,8 @@ int32_t Client::send_request(Request *req)
      * send headers
      */
     char *buffer = FswG.buffer_stack->c_buffer();
-    ssize_t bytes = build_header(req, buffer + FSW_HTTP2_FRAME_HEADER_SIZE);
+    Frame frame;
+    ssize_t bytes = build_http_header(req, buffer + FSW_HTTP2_FRAME_HEADER_SIZE);
 
     if (bytes <= 0)
     {
@@ -324,6 +383,7 @@ ssize_t Client::recv_frame(Frame *frame)
     frame->stream_id = stream_id;
     frame->type = type;
     frame->stream = get_stream(stream_id);
+    return FSW_HTTP2_FRAME_HEADER_SIZE + payload_length;
 }
 
 Response Client::recv_reponse()

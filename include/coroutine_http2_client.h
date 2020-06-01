@@ -35,11 +35,13 @@ public:
     bool connect(std::string host, int port);
     int32_t send_request(Request *req);
     Response recv_reponse();
-    ssize_t build_header(Request *req, char *buffer);
+    ssize_t build_http_header(Request *req, char *buffer);
 private:
     ssize_t recv_frame(Frame *frame);
     bool parse_header_stop(int inflate_flags, ssize_t inlen);
-    int parse_header(Frame *frame);
+    void build_setting_frame(Frame *frame);
+    void build_frame_header(Frame *frame);
+    int parse_frame_header(Frame *frame);
     void parse_payload(Frame *frame);
     bool send(const char *buf, size_t len)
     {
