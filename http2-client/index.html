@@ -445,6 +445,8 @@
         <span class="p">{</span>
             <span class="n">fswError</span><span class="p">(</span><span class="s">&quot;%s&quot;</span><span class="p">,</span> <span class="n">h2c</span><span class="p">.</span><span class="n">sock</span><span class="o">-&gt;</span><span class="n">get_err_msg</span><span class="p">());</span>
         <span class="p">}</span>
+        <span class="n">req</span><span class="p">.</span><span class="n">body</span> <span class="o">=</span> <span class="p">(</span><span class="kt">char</span> <span class="o">*</span><span class="p">)</span> <span class="s">&quot;http2 client&quot;</span><span class="p">;</span>
+        <span class="n">req</span><span class="p">.</span><span class="n">body_length</span> <span class="o">=</span> <span class="n">strlen</span><span class="p">(</span><span class="n">req</span><span class="p">.</span><span class="n">body</span><span class="p">);</span>
         <span class="n">h2c</span><span class="p">.</span><span class="n">send_request</span><span class="p">(</span><span class="o">&amp;</span><span class="n">req</span><span class="p">);</span>
         <span class="n">rep</span> <span class="o">=</span> <span class="n">h2c</span><span class="p">.</span><span class="n">recv_reponse</span><span class="p">();</span>
         <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">rep</span><span class="p">.</span><span class="n">body</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
