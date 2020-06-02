@@ -13,6 +13,7 @@ int main(int argc, char const *argv[])
         bool ret;
         Client h2c;
         Request req;
+        Response rep;
 
         ret = h2c.connect("127.0.0.1", 80);
         if (!ret)
@@ -20,7 +21,7 @@ int main(int argc, char const *argv[])
             fswError("%s", h2c.sock->get_err_msg());
         }
         h2c.send_request(&req);
-        Response rep = h2c.recv_reponse();
+        rep = h2c.recv_reponse();
         std::cout << rep.body << std::endl;
         return 0;
     });
