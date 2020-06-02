@@ -354,7 +354,10 @@ bool Client::send_http_header_frame(Frame *frame, Request *req)
     frame->stream = stream;
 
     frame->flags = FSW_HTTP2_FLAG_END_HEADERS;
-    if (!(stream->flags & FSW_HTTP2_STREAM_PIPELINE_REQUEST))
+    /**
+     * if don't need to send the body, can end the stream
+     */
+    if (!req->body_length)
     {
         frame->flags |= FSW_HTTP2_FLAG_END_STREAM;
     }
@@ -369,11 +372,33 @@ bool Client::send_http_header_frame(Frame *frame, Request *req)
     return send(frame->payload - FSW_HTTP2_FRAME_HEADER_SIZE, FSW_HTTP2_FRAME_HEADER_SIZE + frame->payload_length);
 }
 
+bool Client::send_http_body_frame(Frame *frame, Request *req)
+{
+    Stream *stream = frame->stream;
+    frame->payload = FswG.buffer_stack->c_buffer() + FSW_HTTP2_FRAME_HEADER_SIZE;
+    memcpy(frame->payload, req->body, req->body_length);
+
+    frame->type = FSW_HTTP2_TYPE_DATA;
+    frame->payload_length = req->body_length;
+    frame->stream_id = frame->stream_id;
+    frame->stream = stream;
+
+    frame->flags = FSW_HTTP2_FLAG_END_STREAM;
+
+    build_frame_header(frame);
+
+    /**
+     * send http body frame
+     */
+    return send(frame->payload - FSW_HTTP2_FRAME_HEADER_SIZE, FSW_HTTP2_FRAME_HEADER_SIZE + frame->payload_length);
+}
+
 int32_t Client::send_request(Request *req)
 {
     Frame frame;
 
     send_http_header_frame(&frame, req);
+    send_http_body_frame(&frame, req);
 
     stream_id += 2;
 

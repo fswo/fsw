@@ -20,6 +20,8 @@ int main(int argc, char const *argv[])
         {
             fswError("%s", h2c.sock->get_err_msg());
         }
+        req.body = (char *) "http2 client";
+        req.body_length = strlen(req.body);
         h2c.send_request(&req);
         rep = h2c.recv_reponse();
         std::cout << rep.body << std::endl;
