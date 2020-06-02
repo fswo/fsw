@@ -31,14 +31,15 @@ using fsw::coroutine::http::Request;
 using fsw::coroutine::http::Response;
 using fsw::coroutine::http::Server;
 using fsw::Buffer;
+using fsw::coroutine::run;
 
-void handler(Request *request, Response *response)
+void http_handler(Request *request, Response *response)
 {
     char response_body[] = "hello world";
     Buffer buffer(1024);
     buffer.append(response_body, sizeof(response_body) - 1);
 
-    response->set_header("Content-Type", "text/html");
+    response->header["Content-Type"] = "text/html";
     response->end(&buffer);
 
     return;
@@ -46,18 +47,14 @@ void handler(Request *request, Response *response)
 
 int main(int argc, char const *argv[])
 {
-    fsw_event_init();
-
-    Coroutine::create([](void *arg)
+    run([]()
     {
         char ip[] = "127.0.0.1";
 
         Server *serv = new Server(ip, 80);
-        serv->set_handler("/index", handler);
+        serv->set_http_handler("/index", http_handler);
         serv->start();
     });
-
-    fsw_event_wait();
 
     return 0;
 }
