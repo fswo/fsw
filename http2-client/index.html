@@ -439,17 +439,29 @@
         <span class="n">Client</span> <span class="n">h2c</span><span class="p">;</span>
         <span class="n">Request</span> <span class="n">req</span><span class="p">;</span>
         <span class="n">Response</span> <span class="n">rep</span><span class="p">;</span>
+        <span class="kt">int32_t</span> <span class="n">stream_id</span><span class="p">;</span>
 
         <span class="n">ret</span> <span class="o">=</span> <span class="n">h2c</span><span class="p">.</span><span class="n">connect</span><span class="p">(</span><span class="s">&quot;127.0.0.1&quot;</span><span class="p">,</span> <span class="mi">80</span><span class="p">);</span>
         <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">ret</span><span class="p">)</span>
         <span class="p">{</span>
             <span class="n">fswError</span><span class="p">(</span><span class="s">&quot;%s&quot;</span><span class="p">,</span> <span class="n">h2c</span><span class="p">.</span><span class="n">sock</span><span class="o">-&gt;</span><span class="n">get_err_msg</span><span class="p">());</span>
         <span class="p">}</span>
+
+        <span class="n">req</span><span class="p">.</span><span class="n">method</span> <span class="o">=</span> <span class="s">&quot;GET&quot;</span><span class="p">;</span>
+        <span class="n">req</span><span class="p">.</span><span class="n">path</span> <span class="o">=</span> <span class="s">&quot;/&quot;</span><span class="p">;</span>
+
+        <span class="n">req</span><span class="p">.</span><span class="n">header</span><span class="p">[</span><span class="s">&quot;host&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&quot;127.0.0.1&quot;</span><span class="p">;</span>
+        <span class="n">req</span><span class="p">.</span><span class="n">header</span><span class="p">[</span><span class="s">&quot;user-agent&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&quot;Chrome/49.0.2587.3&quot;</span><span class="p">;</span>
+        <span class="n">req</span><span class="p">.</span><span class="n">header</span><span class="p">[</span><span class="s">&quot;content-type&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&quot;text/html&quot;</span><span class="p">;</span>
+
         <span class="n">req</span><span class="p">.</span><span class="n">body</span> <span class="o">=</span> <span class="p">(</span><span class="kt">char</span> <span class="o">*</span><span class="p">)</span> <span class="s">&quot;http2 client&quot;</span><span class="p">;</span>
         <span class="n">req</span><span class="p">.</span><span class="n">body_length</span> <span class="o">=</span> <span class="n">strlen</span><span class="p">(</span><span class="n">req</span><span class="p">.</span><span class="n">body</span><span class="p">);</span>
-        <span class="n">h2c</span><span class="p">.</span><span class="n">send_request</span><span class="p">(</span><span class="o">&amp;</span><span class="n">req</span><span class="p">);</span>
+
+        <span class="n">stream_id</span> <span class="o">=</span> <span class="n">h2c</span><span class="p">.</span><span class="n">send_request</span><span class="p">(</span><span class="o">&amp;</span><span class="n">req</span><span class="p">);</span>
+        <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">stream_id</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
         <span class="n">rep</span> <span class="o">=</span> <span class="n">h2c</span><span class="p">.</span><span class="n">recv_reponse</span><span class="p">();</span>
         <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">rep</span><span class="p">.</span><span class="n">body</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+
         <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
     <span class="p">});</span>
 <span class="p">}</span>
