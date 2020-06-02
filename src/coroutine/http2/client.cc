@@ -50,8 +50,10 @@ void Client::init_settings_remote_settings()
     remote_settings.max_header_list_size = FSW_HTTP2_DEFAULT_MAX_HEADER_LIST_SIZE;
 }
 
-ssize_t Client::build_http_header(Request *req, char *buffer)
+ssize_t Client::build_http_header(Frame *frame, Request *req)
 {
+    char *buffer = frame->payload;
+
     Headers headers(8 + req->header.size());
     headers.add(FSW_STRL(":method"), FSW_STRL("GET"));
     headers.add(FSW_STRL(":path"), FSW_STRL("/"));
@@ -341,7 +343,7 @@ bool Client::send_http_header_frame(Frame *frame, Request *req)
 {
     Stream *stream = new Stream(stream_id, false);
     frame->payload = FswG.buffer_stack->c_buffer() + FSW_HTTP2_FRAME_HEADER_SIZE;
-    ssize_t payload_length = build_http_header(req, frame->payload);
+    ssize_t payload_length = build_http_header(frame, req);
 
     if (payload_length <= 0)
     {

@@ -35,7 +35,7 @@ public:
     bool connect(std::string host, int port);
     int32_t send_request(Request *req);
     Response recv_reponse();
-    ssize_t build_http_header(Request *req, char *buffer);
+    ssize_t build_http_header(Frame *frame, Request *req);
 private:
     ssize_t recv_frame(Frame *frame);
     bool send_http_header_frame(Frame *frame, Request *req);
