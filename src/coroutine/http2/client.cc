@@ -50,14 +50,20 @@ void Client::init_settings_remote_settings()
     remote_settings.max_header_list_size = FSW_HTTP2_DEFAULT_MAX_HEADER_LIST_SIZE;
 }
 
-ssize_t Client::build_http_header(Request *req, char *buffer)
+ssize_t Client::build_http_header(Frame *frame, Request *req)
 {
-    Headers headers(8 + req->header.size());
-    headers.add(FSW_STRL(":method"), FSW_STRL("GET"));
-    headers.add(FSW_STRL(":path"), FSW_STRL("/"));
-    headers.add(FSW_STRL(":scheme"), FSW_STRL("http"));
+    char *buffer = frame->payload;
 
-    headers.reserve_one();
+    Headers headers(8 + req->header.size());
+    headers.add(FSW_STRL(":method"), req->method.c_str(), req->method.length());
+    headers.add(FSW_STRL(":path"), req->path.c_str(), req->path.length());
+    headers.add(FSW_STRL(":scheme"), FSW_STRL("http"));
+    headers.add(FSW_STRL(":authority"), FSW_STRL("127.0.0.1"));
+
+    for (auto iter = req->header.begin( ); iter != req->header.end( ); iter++)
+    {
+        headers.add(FSW_STRL(iter->first.c_str()), FSW_STRL(iter->second.c_str()));
+    }
 
     size_t buflen = nghttp2_hd_deflate_bound(deflater, headers.get(), headers.len());
     ssize_t rv = nghttp2_hd_deflate_hd(deflater, (uint8_t *) buffer, buflen, headers.get(), headers.len());
@@ -334,14 +340,14 @@ bool Client::connect(std::string host, int port)
      */
     Frame frame;
     build_setting_frame(&frame);
-    return send(frame.payload - FSW_HTTP2_FRAME_HEADER_SIZE, FSW_HTTP2_FRAME_HEADER_SIZE + frame.payload_length);
+    return send_frame(&frame);
 }
 
 bool Client::send_http_header_frame(Frame *frame, Request *req)
 {
     Stream *stream = new Stream(stream_id, false);
     frame->payload = FswG.buffer_stack->c_buffer() + FSW_HTTP2_FRAME_HEADER_SIZE;
-    ssize_t payload_length = build_http_header(req, frame->payload);
+    ssize_t payload_length = build_http_header(frame, req);
 
     if (payload_length <= 0)
     {
@@ -354,7 +360,10 @@ bool Client::send_http_header_frame(Frame *frame, Request *req)
     frame->stream = stream;
 
     frame->flags = FSW_HTTP2_FLAG_END_HEADERS;
-    if (!(stream->flags & FSW_HTTP2_STREAM_PIPELINE_REQUEST))
+    /**
+     * if don't need to send the body, can end the stream
+     */
+    if (!req->body_length)
     {
         frame->flags |= FSW_HTTP2_FLAG_END_STREAM;
     }
@@ -366,7 +375,28 @@ bool Client::send_http_header_frame(Frame *frame, Request *req)
     /**
      * send http headers
      */
-    return send(frame->payload - FSW_HTTP2_FRAME_HEADER_SIZE, FSW_HTTP2_FRAME_HEADER_SIZE + frame->payload_length);
+    return send_frame(frame);
+}
+
+bool Client::send_http_body_frame(Frame *frame, Request *req)
+{
+    Stream *stream = frame->stream;
+    frame->payload = FswG.buffer_stack->c_buffer() + FSW_HTTP2_FRAME_HEADER_SIZE;
+    memcpy(frame->payload, req->body, req->body_length);
+
+    frame->type = FSW_HTTP2_TYPE_DATA;
+    frame->payload_length = req->body_length;
+    frame->stream_id = frame->stream_id;
+    frame->stream = stream;
+
+    frame->flags = FSW_HTTP2_FLAG_END_STREAM;
+
+    build_frame_header(frame);
+
+    /**
+     * send http body frame
+     */
+    return send_frame(frame);
 }
 
 int32_t Client::send_request(Request *req)
@@ -374,6 +404,7 @@ int32_t Client::send_request(Request *req)
     Frame frame;
 
     send_http_header_frame(&frame, req);
+    send_http_body_frame(&frame, req);
 
     stream_id += 2;
 

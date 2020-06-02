@@ -35,15 +35,17 @@ public:
     bool connect(std::string host, int port);
     int32_t send_request(Request *req);
     Response recv_reponse();
-    ssize_t build_http_header(Request *req, char *buffer);
+    ssize_t build_http_header(Frame *frame, Request *req);
 private:
     ssize_t recv_frame(Frame *frame);
     bool send_http_header_frame(Frame *frame, Request *req);
+    bool send_http_body_frame(Frame *frame, Request *req);
     bool parse_header_stop(int inflate_flags, ssize_t inlen);
     void build_setting_frame(Frame *frame);
     void build_frame_header(Frame *frame);
     int parse_frame_header(Frame *frame);
     void parse_payload(Frame *frame);
+
     bool send(const char *buf, size_t len)
     {
         if (sock->send_all(buf, len) != (ssize_t )len)
@@ -51,6 +53,11 @@ private:
             return false;
         }
         return true;
+    }
+
+    bool send_frame(Frame *frame)
+    {
+        return send(frame->payload - FSW_HTTP2_FRAME_HEADER_SIZE, FSW_HTTP2_FRAME_HEADER_SIZE + frame->payload_length);
     }
 
     Stream* get_stream(uint32_t stream_id)
