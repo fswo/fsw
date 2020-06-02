@@ -317,10 +317,17 @@ bool Client::connect(std::string host, int port)
         return false;
     }
 
+    /**
+     * send http2 pri
+     */
     if (!send(FSW_STRL(FSW_HTTP2_PRI_STRING)))
     {
         return false;
     }
+
+    /**
+     * send http2 setting frame
+     */
     Frame frame;
     build_setting_frame(&frame);
     return send(frame.payload - FSW_HTTP2_FRAME_HEADER_SIZE, FSW_HTTP2_FRAME_HEADER_SIZE + frame.payload_length);
