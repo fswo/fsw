@@ -55,11 +55,15 @@ ssize_t Client::build_http_header(Frame *frame, Request *req)
     char *buffer = frame->payload;
 
     Headers headers(8 + req->header.size());
-    headers.add(FSW_STRL(":method"), FSW_STRL("GET"));
-    headers.add(FSW_STRL(":path"), FSW_STRL("/"));
+    headers.add(FSW_STRL(":method"), req->method.c_str(), req->method.length());
+    headers.add(FSW_STRL(":path"), req->path.c_str(), req->path.length());
     headers.add(FSW_STRL(":scheme"), FSW_STRL("http"));
+    headers.add(FSW_STRL(":authority"), FSW_STRL("127.0.0.1"));
 
-    headers.reserve_one();
+    for (auto iter = req->header.begin( ); iter != req->header.end( ); iter++)
+    {
+        headers.add(FSW_STRL(iter->first.c_str()), FSW_STRL(iter->second.c_str()));
+    }
 
     size_t buflen = nghttp2_hd_deflate_bound(deflater, headers.get(), headers.len());
     ssize_t rv = nghttp2_hd_deflate_hd(deflater, (uint8_t *) buffer, buflen, headers.get(), headers.len());

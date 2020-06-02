@@ -178,7 +178,7 @@ class Request
 {
 public:
     std::string method;
-    char *path = nullptr;
+    std::string path;
     uint32_t path_len;
     char *body = nullptr;
     size_t body_length;
