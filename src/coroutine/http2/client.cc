@@ -334,7 +334,7 @@ bool Client::connect(std::string host, int port)
      */
     Frame frame;
     build_setting_frame(&frame);
-    return send(frame.payload - FSW_HTTP2_FRAME_HEADER_SIZE, FSW_HTTP2_FRAME_HEADER_SIZE + frame.payload_length);
+    return send_frame(&frame);
 }
 
 bool Client::send_http_header_frame(Frame *frame, Request *req)
@@ -369,7 +369,7 @@ bool Client::send_http_header_frame(Frame *frame, Request *req)
     /**
      * send http headers
      */
-    return send(frame->payload - FSW_HTTP2_FRAME_HEADER_SIZE, FSW_HTTP2_FRAME_HEADER_SIZE + frame->payload_length);
+    return send_frame(frame);
 }
 
 bool Client::send_http_body_frame(Frame *frame, Request *req)
@@ -390,7 +390,7 @@ bool Client::send_http_body_frame(Frame *frame, Request *req)
     /**
      * send http body frame
      */
-    return send(frame->payload - FSW_HTTP2_FRAME_HEADER_SIZE, FSW_HTTP2_FRAME_HEADER_SIZE + frame->payload_length);
+    return send_frame(frame);
 }
 
 int32_t Client::send_request(Request *req)

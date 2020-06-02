@@ -45,6 +45,7 @@ private:
     void build_frame_header(Frame *frame);
     int parse_frame_header(Frame *frame);
     void parse_payload(Frame *frame);
+
     bool send(const char *buf, size_t len)
     {
         if (sock->send_all(buf, len) != (ssize_t )len)
@@ -52,6 +53,11 @@ private:
             return false;
         }
         return true;
+    }
+
+    bool send_frame(Frame *frame)
+    {
+        return send(frame->payload - FSW_HTTP2_FRAME_HEADER_SIZE, FSW_HTTP2_FRAME_HEADER_SIZE + frame->payload_length);
     }
 
     Stream* get_stream(uint32_t stream_id)
