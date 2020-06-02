@@ -38,6 +38,7 @@ public:
     ssize_t build_http_header(Request *req, char *buffer);
 private:
     ssize_t recv_frame(Frame *frame);
+    bool send_http_header_frame(Frame *frame, Request *req);
     bool parse_header_stop(int inflate_flags, ssize_t inlen);
     void build_setting_frame(Frame *frame);
     void build_frame_header(Frame *frame);

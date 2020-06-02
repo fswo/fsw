@@ -184,9 +184,13 @@ void Client::build_setting_frame(Frame *frame)
     p += 4;
 }
 
+/**
+ * serialize the Frame structure as byte stream
+ */
 void Client::build_frame_header(Frame *frame)
 {
     char *buf = frame->payload - FSW_HTTP2_FRAME_HEADER_SIZE;
+
     buf[0] = frame->payload_length >> 16;
     buf[1] = frame->payload_length >> 8;
     buf[2] = frame->payload_length;
@@ -333,40 +337,47 @@ bool Client::connect(std::string host, int port)
     return send(frame.payload - FSW_HTTP2_FRAME_HEADER_SIZE, FSW_HTTP2_FRAME_HEADER_SIZE + frame.payload_length);
 }
 
-int32_t Client::send_request(Request *req)
+bool Client::send_http_header_frame(Frame *frame, Request *req)
 {
-    /**
-     * send headers
-     */
-    char *buffer = FswG.buffer_stack->c_buffer();
-    Frame frame;
-    ssize_t bytes = build_http_header(req, buffer + FSW_HTTP2_FRAME_HEADER_SIZE);
+    Stream *stream = new Stream(stream_id, false);
+    frame->payload = FswG.buffer_stack->c_buffer() + FSW_HTTP2_FRAME_HEADER_SIZE;
+    ssize_t payload_length = build_http_header(req, frame->payload);
 
-    if (bytes <= 0)
+    if (payload_length <= 0)
     {
-        return FSW_ERR;
+        return false;
     }
 
-    Stream *stream = new Stream(stream_id, false);
+    frame->type = FSW_HTTP2_TYPE_HEADERS;
+    frame->payload_length = payload_length;
+    frame->stream_id = stream_id;
+    frame->stream = stream;
+
+    frame->flags = FSW_HTTP2_FLAG_END_HEADERS;
+    if (!(stream->flags & FSW_HTTP2_STREAM_PIPELINE_REQUEST))
+    {
+        frame->flags |= FSW_HTTP2_FLAG_END_STREAM;
+    }
+
+    build_frame_header(frame);
+
     streams.emplace(stream_id, stream);
 
-    if (stream->flags & FSW_HTTP2_STREAM_PIPELINE_REQUEST)
-    {
-        set_frame_header(buffer, FSW_HTTP2_TYPE_HEADERS, bytes, FSW_HTTP2_FLAG_END_HEADERS, stream->stream_id);
-    }
-    else
-    {
-        set_frame_header(buffer, FSW_HTTP2_TYPE_HEADERS, bytes, FSW_HTTP2_FLAG_END_STREAM | FSW_HTTP2_FLAG_END_HEADERS, stream->stream_id);
-    }
+    /**
+     * send http headers
+     */
+    return send(frame->payload - FSW_HTTP2_FRAME_HEADER_SIZE, FSW_HTTP2_FRAME_HEADER_SIZE + frame->payload_length);
+}
 
-    if (!send(buffer, FSW_HTTP2_FRAME_HEADER_SIZE + bytes))
-    {
-        return FSW_OK;
-    }
+int32_t Client::send_request(Request *req)
+{
+    Frame frame;
+
+    send_http_header_frame(&frame, req);
 
     stream_id += 2;
 
-    return stream->stream_id;
+    return frame.stream->stream_id;
 }
 
 ssize_t Client::recv_frame(Frame *frame)
