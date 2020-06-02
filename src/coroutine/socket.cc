@@ -307,6 +307,7 @@ bool Socket::wait_event(int event)
         fswWarn("Error has occurred: (errno %d) %s", errno, strerror(errno));
         return false;
     }
+    (FE(poll->event_num))--;
 
     return true;
 }
