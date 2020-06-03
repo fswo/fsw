@@ -50,6 +50,12 @@ void Client::init_settings_remote_settings()
     remote_settings.max_header_list_size = FSW_HTTP2_DEFAULT_MAX_HEADER_LIST_SIZE;
 }
 
+/**
+ * 1. HTTP/1's status line information (method, path, status, etc...), 
+ * which is split into key-value pairs in HTTP/2 and put into headers (the ones that start with colons), 
+ * also enjoys dictionary and Huffman compression.
+ * 2. All header names in HTTP/2 must be lowercase.
+ */
 ssize_t Client::build_http_header(Frame *frame, Request *req)
 {
     char *buffer = frame->payload;
