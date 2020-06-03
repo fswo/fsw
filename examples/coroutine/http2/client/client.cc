@@ -24,6 +24,7 @@ int main(int argc, char const *argv[])
 
         req.method = "GET";
         req.path = "/";
+        req.pipeline = true;
 
         req.header["host"] = "127.0.0.1";
         req.header["user-agent"] = "Chrome/49.0.2587.3";
@@ -34,6 +35,13 @@ int main(int argc, char const *argv[])
 
         stream_id = h2c.send_request(&req);
         std::cout << stream_id << std::endl;
+
+        stream_id = h2c.write_data(stream_id, req.body, req.body_length, false);
+        std::cout << stream_id << std::endl;
+
+        stream_id = h2c.write_data(stream_id, req.body, req.body_length, true);
+        std::cout << stream_id << std::endl;
+
         rep = h2c.recv_reponse();
         std::cout << rep.body << std::endl;
 

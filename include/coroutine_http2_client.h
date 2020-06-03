@@ -34,6 +34,7 @@ public:
     void init_settings_remote_settings();
     bool connect(std::string host, int port);
     int32_t send_request(Request *req);
+    int32_t write_data(int32_t stream_id, char *data, size_t data_len, bool end_stream = false);
     Response recv_reponse();
     ssize_t build_http_header(Frame *frame, Request *req);
 private:
