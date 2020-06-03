@@ -60,7 +60,7 @@ ssize_t Client::build_http_header(Frame *frame, Request *req)
 {
     char *buffer = frame->payload;
 
-    Headers headers(8 + req->header.size());
+    Headers headers(FSW_HTTP2_MAX_STATUS_LINE_NUM + req->header.size());
     headers.add(FSW_STRL(":method"), req->method.c_str(), req->method.length());
     headers.add(FSW_STRL(":path"), req->path.c_str(), req->path.length());
     headers.add(FSW_STRL(":scheme"), FSW_STRL("http"));
